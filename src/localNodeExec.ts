@@ -38,7 +38,7 @@ export class LaunchedContract {
     functionName: string,
     senderAddress: string,
     ...args: string[]
-  ): Promise<void> {
+  ): Promise<{ debugOutput: string }> {
     return this.localNodeExecutor.execute(
       this.contractName,
       functionName,
@@ -47,8 +47,20 @@ export class LaunchedContract {
     );
   }
 
-  eval(evalStatement: string): Promise<string> {
-    return this.localNodeExecutor.eval(this.contractName, evalStatement);
+  eval(evalStatement: string): Promise<string>;
+  eval(
+    evalStatement: string,
+    includeDebugOutput: true
+  ): Promise<{ result: string; debugOutput: string }>;
+  eval(
+    evalStatement: string,
+    includeDebugOutput: boolean = false
+  ): Promise<string | { result: string; debugOutput: string }> {
+    return this.localNodeExecutor.eval(
+      this.contractName,
+      evalStatement,
+      includeDebugOutput
+    );
   }
 }
 
@@ -71,8 +83,18 @@ export interface LocalNodeExecutor {
     functionName: string,
     senderAddress: string,
     ...args: string[]
-  ): Promise<void>;
+  ): Promise<{ debugOutput: string }>;
   eval(contractName: string, evalStatement: string): Promise<string>;
+  eval(
+    contractName: string,
+    evalStatement: string,
+    includeDebugOutput: true
+  ): Promise<{ result: string; debugOutput: string }>;
+  eval(
+    contractName: string,
+    evalStatement: string,
+    includeDebugOutput?: boolean
+  ): Promise<string | { result: string; debugOutput: string }>;
   setBlockHeight(height: BigInt): Promise<void>;
   getBlockHeight(): Promise<BigInt>;
   close(): Promise<void>;
@@ -265,7 +287,7 @@ export class CargoLocalNodeExecutor implements LocalNodeExecutor {
     functionName: string,
     senderAddress: string,
     ...args: string[]
-  ): Promise<void> {
+  ): Promise<{ debugOutput: string }> {
     const result = await this.cargoRunLocal([
       'execute',
       this.dbFilePath,
@@ -294,9 +316,22 @@ export class CargoLocalNodeExecutor implements LocalNodeExecutor {
         result.stderr
       );
     }
+    return {
+      debugOutput: result.stderr
+    };
   }
 
-  async eval(contractName: string, evalStatement: string): Promise<string> {
+  eval(contractName: string, evalStatement: string): Promise<string>;
+  eval(
+    contractName: string,
+    evalStatement: string,
+    includeDebugOutput: true
+  ): Promise<{ result: string; debugOutput: string }>;
+  async eval(
+    contractName: string,
+    evalStatement: string,
+    includeDebugOutput?: boolean
+  ): Promise<string | { result: string; debugOutput: string }> {
     const result = await this.cargoRunLocal(
       ['eval', contractName, this.dbFilePath],
       {
@@ -327,7 +362,14 @@ export class CargoLocalNodeExecutor implements LocalNodeExecutor {
     }
     // Get the output string with the prefix message and last EOL trimmed.
     const outputResult = result.stdout.substr(successPrefix[0].length);
-    return outputResult;
+    if (includeDebugOutput) {
+      return {
+        result: outputResult,
+        debugOutput: result.stderr
+      };
+    } else {
+      return outputResult;
+    }
   }
 
   async setBlockHeight(height: BigInt): Promise<void> {

@@ -1,7 +1,6 @@
 import path from 'path';
 import { assert } from 'chai';
 import {
-  LocalExecutionError,
   CargoLocalNodeExecutor,
   LaunchedContract,
   LocalNodeExecutor

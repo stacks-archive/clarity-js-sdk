@@ -1,7 +1,6 @@
 import path from 'path';
 import { assert } from 'chai';
 import {
-  LocalExecutionError,
   CargoLocalNodeExecutor,
   LaunchedContract,
   LocalNodeExecutor
@@ -55,6 +54,23 @@ describe('block height testing', () => {
       'height-at-deployment'
     );
     assert.equal(heightAtDeployment, '117');
+  });
+
+  it('print current block height [eval]', async () => {
+    const result = await blockHeightTestContract.eval(
+      '(print-current-block-height)',
+      true
+    );
+    assert.equal(result.result, '117');
+    assert.equal(result.debugOutput, 'Int(117)');
+  });
+
+  it('print current block height [execute]', async () => {
+    const result = await blockHeightTestContract.execute(
+      'print-current-block-height-public',
+      DEMO_ADDRESS
+    );
+    assert.equal(result.debugOutput, 'Int(117)');
   });
 
   it('increment block height', async () => {
