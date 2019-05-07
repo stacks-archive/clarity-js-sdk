@@ -95,8 +95,10 @@ export interface LocalNodeExecutor {
     evalStatement: string,
     includeDebugOutput?: boolean
   ): Promise<string | { result: string; debugOutput: string }>;
-  setBlockHeight(height: BigInt): Promise<void>;
-  getBlockHeight(): Promise<BigInt>;
+  setBlockHeight(height: bigint): Promise<void>;
+  getBlockHeight(): Promise<bigint>;
+  incrementBlockHeight(blockCount?: number): Promise<bigint>;
+  incrementBlockHeight(blockCount?: bigint): Promise<bigint>;
   close(): Promise<void>;
 }
 
@@ -372,7 +374,7 @@ export class CargoLocalNodeExecutor implements LocalNodeExecutor {
     }
   }
 
-  async setBlockHeight(height: BigInt): Promise<void> {
+  async setBlockHeight(height: bigint): Promise<void> {
     const result = await this.cargoRunLocal([
       'set_block_height',
       height.toString(),
@@ -399,7 +401,7 @@ export class CargoLocalNodeExecutor implements LocalNodeExecutor {
     }
   }
 
-  async getBlockHeight(): Promise<BigInt> {
+  async getBlockHeight(): Promise<bigint> {
     const result = await this.cargoRunLocal([
       'get_block_height',
       this.dbFilePath
@@ -431,6 +433,25 @@ export class CargoLocalNodeExecutor implements LocalNodeExecutor {
     const outputResult = result.stdout.substr(successPrefix[0].length);
     const heightInt = BigInt(outputResult);
     return heightInt;
+  }
+
+  incrementBlockHeight(blockCount: number): Promise<bigint>;
+  incrementBlockHeight(blockCount: bigint): Promise<bigint>;
+  async incrementBlockHeight(blockCount?: number | bigint): Promise<bigint> {
+    const currentHeight = await this.getBlockHeight();
+    let count: bigint;
+    if (blockCount) {
+      if (typeof blockCount === 'number') {
+        count = BigInt(blockCount);
+      } else {
+        count = blockCount;
+      }
+    } else {
+      count = BigInt(1);
+    }
+    const newHeight = currentHeight + count;
+    await this.setBlockHeight(newHeight);
+    return newHeight;
   }
 
   async close(): Promise<void> {
