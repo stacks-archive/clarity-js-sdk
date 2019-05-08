@@ -25,7 +25,6 @@
   (+ time-at-launch 
     (* (- block-height height-at-launch) block-time)))
 
-
 (begin
     (set-entry! height-info 
         (tuple (key 123))

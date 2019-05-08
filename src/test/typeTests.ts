@@ -1,32 +1,61 @@
-import path from 'path';
-import { assert } from 'chai';
+import { assert } from '../assertUtil';
 import { CargoLocalNodeExecutor, LocalNodeExecutor } from '../localNodeExec';
 import {
   FunctionArgTypes,
   FunctionReturnType,
-  ContractTypes
+  ContractInterface
 } from '../ContractTypes';
 
-describe('sample contracts', () => {
-  let contractsDir: string;
+describe('contract interface type checking', () => {
   let localNode: LocalNodeExecutor;
-  let contractTypes: ContractTypes;
+  let namesContractInterface: ContractInterface;
+  let typeTestContractInterface: ContractInterface;
 
   before(async () => {
-    contractsDir = path.join(__dirname, 'contracts');
     localNode = await CargoLocalNodeExecutor.createEphemeral();
 
-    const tokensContractFile = path.join(contractsDir, 'tokens.scm');
-    await localNode.launchContract('tokens', tokensContractFile);
+    await localNode.launchContract('tokens', 'tokens.scm');
 
-    const namesContractFile = path.join(contractsDir, 'names.scm');
-    const checkResult = await localNode.checkContract(namesContractFile);
-    contractTypes = checkResult.contractTypes;
-    assert.isTrue(checkResult.isValid, checkResult.message);
+    const namesCheckResult = await localNode.checkContract('names.scm');
+    assert.isTrue(namesCheckResult.isValid, namesCheckResult.message);
+    namesContractInterface = namesCheckResult.contractInterface;
+
+    const typeTestCheckResult = await localNode.checkContract(
+      'type-interface-test'
+    );
+    assert.isTrue(typeTestCheckResult.isValid, typeTestCheckResult.message);
+    typeTestContractInterface = typeTestCheckResult.contractInterface;
+  });
+
+  it('eval raw null check', async () => {
+    let result = await localNode.evalRaw('(isnull? 1234)');
+    assert.equal(result.result, 'false', result.debugOutput);
+    result = await localNode.evalRaw("(isnull? 'null)");
+    assert.equal(result.result, 'true', result.debugOutput);
+  });
+
+  it('null const variable', async () => {
+    const exNullConst =
+      typeTestContractInterface.variable_types['example-null-const'];
+    assert.equal(exNullConst.atomic_type, 'VoidType');
+  });
+
+  it('null check function', async () => {
+    const getNullVarFn =
+      typeTestContractInterface.private_function_types['get-null-var'].Fixed;
+    assert.equal(getNullVarFn[FunctionReturnType].atomic_type, 'VoidType');
+  });
+
+  it('null arg input function', async () => {
+    const echoNullVarFn =
+      typeTestContractInterface.private_function_types['echo-null-var'].Fixed;
+    assert.equal(echoNullVarFn[FunctionArgTypes][0].atomic_type, 'VoidType');
+    assert.equal(echoNullVarFn[FunctionReturnType].atomic_type, 'VoidType');
   });
 
   it('check private function types', async () => {
-    const priceFuncSig = contractTypes.private_function_types['price-function'];
+    const priceFuncSig =
+      namesContractInterface.private_function_types['price-function'];
     assert.isOk(priceFuncSig.Fixed);
     const priceFuncArgs = priceFuncSig.Fixed[FunctionArgTypes];
     assert.equal(priceFuncArgs[0].atomic_type, 'IntType');
@@ -35,7 +64,8 @@ describe('sample contracts', () => {
   });
 
   it('check public function types', async () => {
-    const preorderFuncSig = contractTypes.public_function_types['preorder'];
+    const preorderFuncSig =
+      namesContractInterface.public_function_types['preorder'];
     assert.isOk(preorderFuncSig.Fixed);
     assert.deepEqual(preorderFuncSig.Fixed[FunctionArgTypes][0].atomic_type, {
       BufferType: 20
@@ -49,7 +79,8 @@ describe('sample contracts', () => {
       'BoolType'
     );
 
-    const registerFuncSig = contractTypes.public_function_types['register'];
+    const registerFuncSig =
+      namesContractInterface.public_function_types['register'];
     assert.isOk(registerFuncSig.Fixed);
     assert.equal(
       registerFuncSig.Fixed[FunctionArgTypes][0].atomic_type,
@@ -70,12 +101,13 @@ describe('sample contracts', () => {
   });
 
   it('check variable types', async () => {
-    const burnAddressVarType = contractTypes.variable_types['burn-address'];
+    const burnAddressVarType =
+      namesContractInterface.variable_types['burn-address'];
     assert.equal(burnAddressVarType.atomic_type, 'PrincipalType');
   });
 
   it('check map types', async () => {
-    const nameMap = contractTypes.map_types['name-map'];
+    const nameMap = namesContractInterface.map_types['name-map'];
     assert.deepEqual(nameMap[0].atomic_type, {
       TupleType: {
         type_map: {
@@ -97,7 +129,7 @@ describe('sample contracts', () => {
       }
     });
 
-    const preorderMap = contractTypes.map_types['preorder-map'];
+    const preorderMap = namesContractInterface.map_types['preorder-map'];
     assert.deepEqual(preorderMap[0].atomic_type, {
       TupleType: {
         type_map: {

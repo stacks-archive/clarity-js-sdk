@@ -32,11 +32,11 @@ export interface FunctionTypeSignatureArray {
 }
 
 export interface FunctionTypeSignature {
-  Fixed?: FunctionTypeSignatureArray;
-  Variadic?: FunctionTypeSignatureArray;
+  Fixed: FunctionTypeSignatureArray;
+  // Variadic?: FunctionTypeSignatureArray;
 }
 
-export interface ContractTypes {
+export interface ContractInterface {
   private_function_types: {
     [name: string]: FunctionTypeSignature;
   };

@@ -5,7 +5,7 @@
   "main": "lib/index.js",
   "scripts": {
     "compile": "tsc -p tsconfig.dist.json",
-    "test": "nyc mocha --require ts-node/register/transpile-only --require source-map-support/register --recursive ./src/test/**/*.ts",
+    "test": "nyc mocha --timeout 10000 --require ts-node/register/transpile-only --require source-map-support/register --recursive ./src/test/**/*.ts",
     "codecovUpload": "codecov",
     "lint": "eslint --ext .ts ./src",
     "lint-fix": "eslint --ext .ts ./src --fix",
@@ -17,7 +17,9 @@
   "author": "",
   "license": "GPL-3.0",
   "dependencies": {
+    "@types/chai-string": "^1.4.1",
     "big-integer": "^1.6.43",
+    "chai-string": "^1.5.0",
     "fs-extra": "^7.0.1"
   },
   "devDependencies": {

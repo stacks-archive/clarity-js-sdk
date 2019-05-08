@@ -1,5 +1,4 @@
-import path from 'path';
-import { assert } from 'chai';
+import { assert } from '../assertUtil';
 import {
   CargoLocalNodeExecutor,
   LaunchedContract,
@@ -7,7 +6,6 @@ import {
 } from '../localNodeExec';
 
 describe('block height testing', () => {
-  let contractsDir: string;
   let localNode: LocalNodeExecutor;
 
   let blockHeightTestContract: LaunchedContract;
@@ -15,7 +13,6 @@ describe('block height testing', () => {
   const DEMO_ADDRESS = 'SZ2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKQ9H6DPR';
 
   before(async () => {
-    contractsDir = path.join(__dirname, 'contracts');
     localNode = await CargoLocalNodeExecutor.createEphemeral();
   });
 
@@ -24,24 +21,14 @@ describe('block height testing', () => {
   });
 
   it('check block height contract', async () => {
-    const blockHeightTestsContractFile = path.join(
-      contractsDir,
-      'block-height-test.scm'
-    );
-    const checkResult = await localNode.checkContract(
-      blockHeightTestsContractFile
-    );
+    const checkResult = await localNode.checkContract('block-height-test.scm');
     assert.isTrue(checkResult.isValid, checkResult.message);
   });
 
   it('launch block height contract', async () => {
-    const blockHeightTestsContractFile = path.join(
-      contractsDir,
-      'block-height-test.scm'
-    );
     blockHeightTestContract = await localNode.launchContract(
       'block-height-tests',
-      blockHeightTestsContractFile
+      'block-height-test.scm'
     );
   });
 

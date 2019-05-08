@@ -1,5 +1,4 @@
-import path from 'path';
-import { assert } from 'chai';
+import { assert } from '../assertUtil';
 import {
   CargoLocalNodeExecutor,
   LaunchedContract,
@@ -7,7 +6,6 @@ import {
 } from '../localNodeExec';
 
 describe('sample contracts', () => {
-  let contractsDir: string;
   let localNode: LocalNodeExecutor;
 
   let tokensContract: LaunchedContract;
@@ -16,13 +14,11 @@ describe('sample contracts', () => {
   const DEMO_ADDRESS = 'SZ2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKQ9H6DPR';
 
   before(async () => {
-    contractsDir = path.join(__dirname, 'contracts');
     localNode = await CargoLocalNodeExecutor.createEphemeral();
   });
 
   it('check names contract fails', async () => {
-    const namesContractFile = path.join(contractsDir, 'names.scm');
-    const checkResult = await localNode.checkContract(namesContractFile);
+    const checkResult = await localNode.checkContract('names.scm');
     assert.isFalse(checkResult.isValid, checkResult.message);
     assert.equal(checkResult.code, 1);
     assert.equal(
@@ -32,22 +28,16 @@ describe('sample contracts', () => {
   });
 
   it('launch tokens contract', async () => {
-    const tokensContractFile = path.join(contractsDir, 'tokens.scm');
-    tokensContract = await localNode.launchContract(
-      'tokens',
-      tokensContractFile
-    );
+    tokensContract = await localNode.launchContract('tokens', 'tokens.scm');
   });
 
   it('check names contract succeeds', async () => {
-    const namesContractFile = path.join(contractsDir, 'names.scm');
-    const checkResult = await localNode.checkContract(namesContractFile);
+    const checkResult = await localNode.checkContract('names.scm');
     assert.isTrue(checkResult.isValid, checkResult.message);
   });
 
   it('launch names contract', async () => {
-    const namesContractFile = path.join(contractsDir, 'names.scm');
-    namesContract = await localNode.launchContract('names', namesContractFile);
+    namesContract = await localNode.launchContract('names', 'names.scm');
   });
 
   it('execute token mint', async () => {

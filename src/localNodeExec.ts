@@ -3,7 +3,55 @@ import fs from 'fs';
 import os from 'os';
 import { executeCommand } from './processUtil';
 import './globalUtil';
-import { ContractTypes } from './ContractTypes';
+import { ContractInterface } from './ContractTypes';
+
+const CONTRACT_FILE_EXT = '.scm';
+
+function fileExists(filePath: string): boolean {
+  try {
+    const stat = fs.statSync(filePath);
+    if (stat.isFile()) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (error) {
+    return false;
+  }
+}
+
+export function getContractFilePath(contractFile: string): string {
+  function* getLocations(file: string): IterableIterator<string> {
+    yield path.resolve(file);
+    yield path.resolve('contracts', file);
+    yield path.resolve(__dirname, 'contracts', file);
+    yield path.resolve(__dirname, file);
+    if (!file.endsWith(CONTRACT_FILE_EXT)) {
+      for (const f of getLocations(file + CONTRACT_FILE_EXT)) {
+        yield f;
+      }
+    }
+  }
+
+  // Normalize OS path separators.
+  if (path.sep == path.posix.sep && contractFile.includes(path.win32.sep)) {
+    contractFile = contractFile.replace(/\\/g, path.sep);
+  } else if (
+    path.sep == path.win32.sep &&
+    contractFile.includes(path.posix.sep)
+  ) {
+    contractFile = contractFile.replace(/\//g, path.sep);
+  }
+
+  for (const filePath of getLocations(contractFile)) {
+    if (fileExists(filePath)) {
+      return filePath;
+    }
+  }
+
+  throw new Error(`Could not find contract file: ${contractFile}`);
+}
+
 
 export class LocalExecutionError extends Error {
   readonly code: number;
@@ -68,7 +116,7 @@ export interface CheckContractResult {
   isValid: boolean;
   message: string;
   code: number;
-  contractTypes?: ContractTypes;
+  contractInterface?: ContractInterface;
 }
 
 export interface LocalNodeExecutor {
@@ -95,6 +143,9 @@ export interface LocalNodeExecutor {
     evalStatement: string,
     includeDebugOutput?: boolean
   ): Promise<string | { result: string; debugOutput: string }>;
+  evalRaw(
+    evalStatement: string
+  ): Promise<{ result: string; debugOutput: string }>;
   setBlockHeight(height: bigint): Promise<void>;
   getBlockHeight(): Promise<bigint>;
   incrementBlockHeight(blockCount?: number): Promise<bigint>;
@@ -116,7 +167,7 @@ export class CargoLocalNodeExecutor implements LocalNodeExecutor {
   private closeActions: (() => Promise<any>)[] = [];
 
   static getCoreSrcDir() {
-    const dir = path.resolve(__dirname, '../../blockstack-core');
+    const dir = path.resolve(path.dirname(__dirname), 'blockstack-core');
     return dir;
   }
 
@@ -230,9 +281,10 @@ export class CargoLocalNodeExecutor implements LocalNodeExecutor {
   }
 
   async checkContract(contractFilePath: string): Promise<CheckContractResult> {
+    const filePath = getContractFilePath(contractFilePath);
     const result = await this.cargoRunLocal([
       'check',
-      contractFilePath,
+      filePath,
       this.dbFilePath,
       '--output_analysis'
     ]);
@@ -243,12 +295,12 @@ export class CargoLocalNodeExecutor implements LocalNodeExecutor {
         code: result.exitCode
       };
     } else {
-      const contractTypes = JSON.parse(result.stdout) as ContractTypes;
+      const contractInterface = JSON.parse(result.stdout) as ContractInterface;
       return {
         isValid: true,
         message: result.stdout,
         code: result.exitCode,
-        contractTypes: contractTypes
+        contractInterface: contractInterface
       };
     }
   }
@@ -257,10 +309,11 @@ export class CargoLocalNodeExecutor implements LocalNodeExecutor {
     contractName: string,
     contractFilePath: string
   ): Promise<LaunchedContract> {
+    const filePath = getContractFilePath(contractFilePath);
     const result = await this.cargoRunLocal([
       'launch',
       contractName,
-      contractFilePath,
+      filePath,
       this.dbFilePath
     ]);
     if (result.exitCode !== 0) {
@@ -319,6 +372,42 @@ export class CargoLocalNodeExecutor implements LocalNodeExecutor {
       );
     }
     return {
+      debugOutput: result.stderr
+    };
+  }
+
+  async evalRaw(
+    evalStatement: string
+  ): Promise<{ result: string; debugOutput: string }> {
+    const result = await this.cargoRunLocal(['eval_raw', this.dbFilePath], {
+      stdin: evalStatement
+    });
+    if (result.exitCode !== 0) {
+      throw new LocalExecutionError(
+        `Eval raw expression failed with bad exit code ${result.exitCode}: ${
+          result.stderr
+        }`,
+        result.exitCode,
+        result.stdout,
+        result.stderr
+      );
+    }
+    // Check and trim success prefix line.
+    const successPrefix = result.stdout.match(
+      /(Program executed successfully! Output: (\r\n|\r|\n))/
+    );
+    if (!successPrefix || successPrefix.length < 1) {
+      throw new LocalExecutionError(
+        `Eval raw expression failed with bad output: ${result.stdout}`,
+        result.exitCode,
+        result.stdout,
+        result.stderr
+      );
+    }
+    // Get the output string with the prefix message and last EOL trimmed.
+    const outputResult = result.stdout.substr(successPrefix[0].length);
+    return {
+      result: outputResult,
       debugOutput: result.stderr
     };
   }
