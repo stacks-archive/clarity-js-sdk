@@ -17,7 +17,7 @@ describe('block height testing', () => {
   });
 
   it('set local node block height', async () => {
-    await localNode.setBlockHeight(BigInt('117'));
+    await localNode.mineBlocks(7);
   });
 
   it('check block height contract', async () => {
@@ -36,11 +36,11 @@ describe('block height testing', () => {
     const deployHeight = await blockHeightTestContract.eval(
       '(get-height-info 123)'
     );
-    assert.equal(deployHeight, '117');
+    assert.equal(deployHeight, '26');
     const heightAtDeployment = await blockHeightTestContract.eval(
       'height-at-launch'
     );
-    assert.equal(heightAtDeployment, '117');
+    assert.equal(heightAtDeployment, '26');
   });
 
   it('print current block height [eval]', async () => {
@@ -48,8 +48,8 @@ describe('block height testing', () => {
       '(print-current-block-height)',
       true
     );
-    assert.equal(result.result, '117');
-    assert.equal(result.debugOutput, 'Int(117)');
+    assert.equal(result.result, '26');
+    assert.equal(result.debugOutput, 'Int(26)');
   });
 
   it('print current block height [execute]', async () => {
@@ -57,22 +57,22 @@ describe('block height testing', () => {
       'print-current-block-height-public',
       DEMO_ADDRESS
     );
-    assert.equal(result.debugOutput, 'Int(117)');
+    assert.equal(result.debugOutput, 'Int(26)');
   });
 
   it('increment block height', async () => {
     const currentHeightOutput = await blockHeightTestContract.eval(
       '(get-current-block-height)'
     );
-    assert.equal(currentHeightOutput, '117');
-    const newHeight = BigInt(currentHeightOutput) + BigInt(100);
-    await localNode.setBlockHeight(newHeight);
+    assert.equal(currentHeightOutput, '26');
+    const newHeight = BigInt(currentHeightOutput) + BigInt(8);
+    await localNode.mineBlocks(newHeight);
     const getHeightCheck = await localNode.getBlockHeight();
-    assert.equal(getHeightCheck, BigInt('217'));
+    assert.equal(getHeightCheck.toString(), '60');
     const newHeightOutput = await blockHeightTestContract.eval(
       '(get-current-block-height)'
     );
-    assert.equal(newHeightOutput, '217');
+    assert.equal(newHeightOutput, '60');
   });
 
   it('estimate current timestamp', async () => {
@@ -82,7 +82,8 @@ describe('block height testing', () => {
     const timestampAtLaunch = BigInt(
       await blockHeightTestContract.eval('time-at-launch')
     );
-    const currentBlockHeight = await localNode.incrementBlockHeight(33);
+    await localNode.mineBlocks(33);
+    const currentBlockHeight = await localNode.getBlockHeight();
 
     const expectedTimestamp =
       (currentBlockHeight - heightAtLaunch) * BigInt(60 * 10) +
@@ -91,7 +92,7 @@ describe('block height testing', () => {
     const result = await blockHeightTestContract.eval(
       '(estimate-current-timestamp)'
     );
-    assert.equal(BigInt(result), expectedTimestamp);
+    assert.equal(result, expectedTimestamp.toString());
   });
 
   after(async () => {

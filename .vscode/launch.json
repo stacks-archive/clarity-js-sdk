@@ -17,7 +17,8 @@
         "ts-node/register/transpile-only"
       ],
       "cwd": "${workspaceFolder}",
-      "outputCapture": "std"
+      "outputCapture": "std",
+      "console": "integratedTerminal"
     },
     {
       "type": "node",

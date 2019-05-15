@@ -146,10 +146,9 @@ export interface LocalNodeExecutor {
   evalRaw(
     evalStatement: string
   ): Promise<{ result: string; debugOutput: string }>;
-  setBlockHeight(height: bigint): Promise<void>;
   getBlockHeight(): Promise<bigint>;
-  incrementBlockHeight(blockCount?: number): Promise<bigint>;
-  incrementBlockHeight(blockCount?: bigint): Promise<bigint>;
+  mineBlock(time?: number | bigint): Promise<void>;
+  mineBlocks(count: number | bigint): Promise<void>;
   close(): Promise<void>;
 }
 
@@ -463,16 +462,16 @@ export class CargoLocalNodeExecutor implements LocalNodeExecutor {
     }
   }
 
-  async setBlockHeight(height: bigint): Promise<void> {
-    const result = await this.cargoRunLocal([
-      'set_block_height',
-      height.toString(),
-      this.dbFilePath
-    ]);
+  async mineBlock(time?: number | bigint): Promise<void> {
+    const args = ['mine_block', `--data=${this.dbFilePath}`];
+    if (time) {
+      args.push(`--time=${time.toString()}`);
+    }
+    const result = await this.cargoRunLocal(args);
 
     if (result.exitCode !== 0) {
       throw new LocalExecutionError(
-        `Set block height failed with bad exit code ${result.exitCode}: ${
+        `Mine block failed with bad exit code ${result.exitCode}: ${
           result.stderr
         }`,
         result.exitCode,
@@ -480,9 +479,36 @@ export class CargoLocalNodeExecutor implements LocalNodeExecutor {
         result.stderr
       );
     }
-    if (result.stdout !== 'Simulated block height updated!') {
+    if (result.stdout !== 'Simulated block mine!') {
       throw new LocalExecutionError(
-        `Set block height failed with bad output: ${result.stdout}`,
+        `Mine block failed with bad output: ${result.stdout}`,
+        result.exitCode,
+        result.stdout,
+        result.stderr
+      );
+    }
+  }
+
+  async mineBlocks(count: number | bigint): Promise<void> {
+    const result = await this.cargoRunLocal([
+      'mine_blocks',
+      `--data=${this.dbFilePath}`,
+      `--count=${count.toString()}`
+    ]);
+
+    if (result.exitCode !== 0) {
+      throw new LocalExecutionError(
+        `Mine blocks failed with bad exit code ${result.exitCode}: ${
+          result.stderr
+        }`,
+        result.exitCode,
+        result.stdout,
+        result.stderr
+      );
+    }
+    if (result.stdout !== 'Simulated block mine!') {
+      throw new LocalExecutionError(
+        `Mine blocks failed with bad output: ${result.stdout}`,
         result.exitCode,
         result.stdout,
         result.stderr
@@ -522,25 +548,6 @@ export class CargoLocalNodeExecutor implements LocalNodeExecutor {
     const outputResult = result.stdout.substr(successPrefix[0].length);
     const heightInt = BigInt(outputResult);
     return heightInt;
-  }
-
-  incrementBlockHeight(blockCount: number): Promise<bigint>;
-  incrementBlockHeight(blockCount: bigint): Promise<bigint>;
-  async incrementBlockHeight(blockCount?: number | bigint): Promise<bigint> {
-    const currentHeight = await this.getBlockHeight();
-    let count: bigint;
-    if (blockCount) {
-      if (typeof blockCount === 'number') {
-        count = BigInt(blockCount);
-      } else {
-        count = blockCount;
-      }
-    } else {
-      count = BigInt(1);
-    }
-    const newHeight = currentHeight + count;
-    await this.setBlockHeight(newHeight);
-    return newHeight;
   }
 
   async close(): Promise<void> {
