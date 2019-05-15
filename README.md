@@ -1,6 +1,6 @@
 # smart-contract-sdk
 
-A development environment for Blockstack smart contracts. 
+A development environment, testing framework, and deployment tool for Blockstack smart contracts. 
 
 
 ### [WIP] Features:

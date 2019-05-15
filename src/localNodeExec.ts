@@ -52,7 +52,6 @@ export function getContractFilePath(contractFile: string): string {
   throw new Error(`Could not find contract file: ${contractFile}`);
 }
 
-
 export class LocalExecutionError extends Error {
   readonly code: number;
   readonly commandOutput: string;
