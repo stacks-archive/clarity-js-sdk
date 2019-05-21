@@ -257,7 +257,10 @@ export class CargoLocalNodeExecutor implements LocalNodeExecutor {
   }
 
   async initialize(): Promise<void> {
-    const result = await this.cargoRunLocal(['initialize', this.dbFilePath]);
+    const result = await this.cargoRunLocal([
+      'initialize',
+      `--data=${this.dbFilePath}`
+    ]);
     if (result.exitCode !== 0) {
       throw new LocalExecutionError(
         `Initialize failed with bad exit code ${result.exitCode}: ${
@@ -282,9 +285,9 @@ export class CargoLocalNodeExecutor implements LocalNodeExecutor {
     const filePath = getContractFilePath(contractFilePath);
     const result = await this.cargoRunLocal([
       'check',
-      filePath,
-      this.dbFilePath,
-      '--output_analysis'
+      `--file=${filePath}`,
+      `--data=${this.dbFilePath}`,
+      '--analysis'
     ]);
     if (result.exitCode !== 0) {
       return {
@@ -310,9 +313,9 @@ export class CargoLocalNodeExecutor implements LocalNodeExecutor {
     const filePath = getContractFilePath(contractFilePath);
     const result = await this.cargoRunLocal([
       'launch',
-      contractName,
-      filePath,
-      this.dbFilePath
+      `--contract=${contractName}`,
+      `--file=${filePath}`,
+      `--data=${this.dbFilePath}`
     ]);
     if (result.exitCode !== 0) {
       throw new LocalExecutionError(
@@ -343,11 +346,11 @@ export class CargoLocalNodeExecutor implements LocalNodeExecutor {
   ): Promise<{ debugOutput: string }> {
     const result = await this.cargoRunLocal([
       'execute',
-      this.dbFilePath,
-      contractName,
-      functionName,
-      senderAddress,
-      ...args
+      `--data=${this.dbFilePath}`,
+      `--contract=${contractName}`,
+      `--function=${functionName}`,
+      `--sender=${senderAddress}`,
+      ...args.map(a => `--args=${a}`)
     ]);
     if (result.exitCode !== 0) {
       throw new LocalExecutionError(
@@ -377,9 +380,12 @@ export class CargoLocalNodeExecutor implements LocalNodeExecutor {
   async evalRaw(
     evalStatement: string
   ): Promise<{ result: string; debugOutput: string }> {
-    const result = await this.cargoRunLocal(['eval_raw', this.dbFilePath], {
-      stdin: evalStatement
-    });
+    const result = await this.cargoRunLocal(
+      ['eval', `--data=${this.dbFilePath}`],
+      {
+        stdin: evalStatement
+      }
+    );
     if (result.exitCode !== 0) {
       throw new LocalExecutionError(
         `Eval raw expression failed with bad exit code ${result.exitCode}: ${
@@ -422,7 +428,7 @@ export class CargoLocalNodeExecutor implements LocalNodeExecutor {
     includeDebugOutput?: boolean
   ): Promise<string | { result: string; debugOutput: string }> {
     const result = await this.cargoRunLocal(
-      ['eval', contractName, this.dbFilePath],
+      ['eval', `--contract=${contractName}`, `--data=${this.dbFilePath}`],
       {
         stdin: evalStatement
       }
@@ -518,7 +524,7 @@ export class CargoLocalNodeExecutor implements LocalNodeExecutor {
   async getBlockHeight(): Promise<bigint> {
     const result = await this.cargoRunLocal([
       'get_block_height',
-      this.dbFilePath
+      `--data=${this.dbFilePath}`
     ]);
 
     if (result.exitCode !== 0) {
