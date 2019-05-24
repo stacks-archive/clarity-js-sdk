@@ -71,7 +71,10 @@
 
 ;; Transfers tokens to a specified principal.
 (define (transfer! (sender principal) (recipient principal) (amount int))
-  (if (and (debit-balance! sender amount) (credit-balance! recipient amount)) 
+  (if (and  
+        (not (eq? sender recipient)) 
+        (debit-balance! sender amount) 
+        (credit-balance! recipient amount)) 
     'true
     'false))
 

@@ -118,7 +118,10 @@
 
 ;; Transfers the ownership of a given token ID to another address.
 (define-public (transfer-from (owner principal) (recipient principal) (token-id int))
-  (if (can-transfer tx-sender token-id)
+  (if (and 
+        (can-transfer tx-sender token-id) 
+        (eq? (owner-of token-id) owner)
+        (not (eq? recipient owner)))
     (and
       (release-token! owner token-id)
       (register-token! recipient token-id))
@@ -135,6 +138,6 @@
 ;; Initialize the contract
 (begin
   (mint! 'SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7 10001)
-  (mint! 'S02J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKPVKG2CE 10002)
-  (mint! 'SZ2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKQ9H6DPR 10003)
+  (mint! 'SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7 10002)
+  (mint! 'S02J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKPVKG2CE 10003)
   'null)
