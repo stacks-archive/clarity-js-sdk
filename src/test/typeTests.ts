@@ -27,13 +27,6 @@ describe('contract interface type checking', () => {
     typeTestContractInterface = typeTestCheckResult.contractInterface;
   });
 
-  it('eval raw null check', async () => {
-    let result = await localNode.evalRaw('(isnull? 1234)');
-    assert.equal(result.result, 'false', result.debugOutput);
-    result = await localNode.evalRaw("(isnull? 'null)");
-    assert.equal(result.result, 'true', result.debugOutput);
-  });
-
   it('null const variable', async () => {
     const exNullConst =
       typeTestContractInterface.variable_types['example-null-const'];

@@ -147,7 +147,6 @@ export interface LocalNodeExecutor {
   ): Promise<{ result: string; debugOutput: string }>;
   getBlockHeight(): Promise<bigint>;
   mineBlock(time?: number | bigint): Promise<void>;
-  mineBlocks(count: number | bigint): Promise<void>;
   close(): Promise<void>;
 }
 
@@ -210,11 +209,7 @@ export class CargoLocalNodeExecutor implements LocalNodeExecutor {
    * Use cargo to build the Blockstack node rust src.
    */
   async cargoBuild() {
-    const args = [
-      'build',
-      '--bin=blockstack-core',
-      '--package=blockstack-core'
-    ];
+    const args = ['build', '--bin=clarity'];
     const result = await executeCommand('cargo', args, {
       cwd: this.coreSrcDir
     });
@@ -229,15 +224,7 @@ export class CargoLocalNodeExecutor implements LocalNodeExecutor {
    * @param localArgs Local test node commands.
    */
   async cargoRunLocal(localArgs: string[], opts?: { stdin: string }) {
-    const args = [
-      'run',
-      '--bin=blockstack-core',
-      '--package=blockstack-core',
-      '--quiet',
-      '--',
-      'local',
-      ...localArgs
-    ];
+    const args = ['run', '--bin=clarity', '--quiet', '--', ...localArgs];
     const result = await executeCommand('cargo', args, {
       cwd: this.coreSrcDir,
       stdin: opts && opts.stdin
@@ -462,11 +449,12 @@ export class CargoLocalNodeExecutor implements LocalNodeExecutor {
   }
 
   async mineBlock(time?: number | bigint): Promise<void> {
-    const args = ['mine_block', `--data=${this.dbFilePath}`];
-    if (time) {
-      args.push(`--time=${time.toString()}`);
-    }
-    const result = await this.cargoRunLocal(args);
+    const timeArg = (time || Math.round(Date.now() / 1000)).toString();
+    const result = await this.cargoRunLocal([
+      'mine_block',
+      timeArg,
+      this.dbFilePath
+    ]);
 
     if (result.exitCode !== 0) {
       throw new LocalExecutionError(
@@ -481,33 +469,6 @@ export class CargoLocalNodeExecutor implements LocalNodeExecutor {
     if (result.stdout !== 'Simulated block mine!') {
       throw new LocalExecutionError(
         `Mine block failed with bad output: ${result.stdout}`,
-        result.exitCode,
-        result.stdout,
-        result.stderr
-      );
-    }
-  }
-
-  async mineBlocks(count: number | bigint): Promise<void> {
-    const result = await this.cargoRunLocal([
-      'mine_blocks',
-      `--data=${this.dbFilePath}`,
-      `--count=${count.toString()}`
-    ]);
-
-    if (result.exitCode !== 0) {
-      throw new LocalExecutionError(
-        `Mine blocks failed with bad exit code ${result.exitCode}: ${
-          result.stderr
-        }`,
-        result.exitCode,
-        result.stdout,
-        result.stderr
-      );
-    }
-    if (result.stdout !== 'Simulated block mine!') {
-      throw new LocalExecutionError(
-        `Mine blocks failed with bad output: ${result.stdout}`,
         result.exitCode,
         result.stdout,
         result.stderr
