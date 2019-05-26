@@ -147,14 +147,32 @@ async function checkCargoStatus(): Promise<boolean> {
   return false;
 }
 
-async function installNode({ forceRebuild = false }: { forceRebuild?: boolean } = {}) {
+function getClarityBinDir() {
+  const thisPackageDir = getPackageDir();
+  const binDir = path.join(thisPackageDir, `.clarity-bin-${CORE_SRC_GIT_SDK_TAG}`);
+  return binDir;
+}
+
+function getClarityBinFilePath() {
+  return path.join(getClarityBinDir(), "bin", "clarity");
+}
+
+async function installNode({ forceRebuild = false }: { forceRebuild?: boolean } = {}): Promise<
+  boolean
+> {
   if (!(await checkCargoStatus())) {
-    process.exit(1);
-    return;
+    return false;
+  }
+
+  const clarityBinPath = getClarityBinFilePath();
+  if (fs.existsSync(clarityBinPath)) {
+    console.error(`Clarity bin already exists at "${clarityBinPath}".`);
+    console.error("Use the 'force' argument to rebuild and overwrite.");
+    return false;
   }
 
   const thisPackageDir = getPackageDir();
-  const binDir = path.join(thisPackageDir, `.clarity-bin-${CORE_SRC_GIT_SDK_TAG}`);
+  const binDir = getClarityBinDir();
 
   try {
     fs.accessSync(thisPackageDir, fs.constants.R_OK | fs.constants.W_OK);
@@ -195,6 +213,7 @@ async function installNode({ forceRebuild = false }: { forceRebuild?: boolean } 
   if (result.exitCode !== 0) {
     throw new Error(`Cargo build failed: ${result.stderr}, ${result.stdout}`);
   }
+  return true;
 }
 
 export interface ExecutionResult {

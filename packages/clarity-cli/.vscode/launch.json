@@ -12,7 +12,8 @@
         "args": [
           "setup"
         ],
-        "console": "integratedTerminal"
+        "console": "integratedTerminal",
+        "preLaunchTask": "npm: tsc"
       }
     ]
 }
