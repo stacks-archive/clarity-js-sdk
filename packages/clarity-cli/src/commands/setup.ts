@@ -1,7 +1,13 @@
+import * as fs from "fs-extra";
+import * as path from "path";
 import { Command, flags } from "@oclif/command";
 import { promisify } from "util";
 import { SpawnOptions, spawn } from "child_process";
-import { pipeline, Writable, WritableOptions, Readable } from "stream";
+import { pipeline, Writable, WritableOptions, Readable, Transform } from "stream";
+import { PACKAGE_DIR } from "../index";
+
+const CORE_SRC_GIT_REPO = "https://github.com/blockstack/blockstack-core.git";
+const CORE_SRC_SDK_GIT_TAG = "clarity-sdk-v0.0.1";
 
 export default class Setup extends Command {
   static description = "Install blockstack-core and its dependencies";
@@ -34,8 +40,8 @@ async function executeCommand(
   }
   const proc = spawn(command, args, spawnOpts);
 
-  const readStdout = readStream(proc.stdout, true);
-  const readStderr = readStream(proc.stderr, true);
+  const readStdout = readStream(proc.stdout, true, opts && opts.monitorStdoutCallback);
+  const readStderr = readStream(proc.stderr, true, opts && opts.monitorStderrCallback);
 
   let writeStdin: Promise<void> = Promise.resolve();
   if (opts && opts.stdin) {
@@ -103,36 +109,94 @@ class MemoryStream extends Writable {
 
 async function readStream(
   stream: Readable,
-  ignoreErrors = false
+  ignoreErrors = false,
+  monitorCallback?: (data: Buffer) => void
 ): Promise<Buffer> {
   const memStream = new MemoryStream();
+  async function startReadInternal() {
+    const streamArr: (NodeJS.ReadableStream | NodeJS.WritableStream)[] = [stream];
+    if (monitorCallback) {
+      const monitorStream = new Transform({
+        transform: (chunk, encoding, callback) => {
+          monitorCallback(chunk instanceof Buffer ? chunk : Buffer.from(chunk, encoding));
+          callback(undefined, chunk);
+        }
+      });
+      streamArr.push(monitorStream);
+    }
+    streamArr.push(memStream);
+    await pipelineAsync(streamArr);
+  }
   if (ignoreErrors) {
     try {
-      await pipelineAsync(stream, memStream);
+      await startReadInternal();
     } catch (error) {
-      console.debug(`readStream error: ${error}`);
+      console.log(`ignored readStream error: ${error}`);
     }
   } else {
-    await pipelineAsync(stream, memStream);
+    await startReadInternal();
   }
   return memStream.getData();
 }
 
+async function checkCargoStatus(): Promise<boolean> {
+  const result = await executeCommand("cargo", ["--version"]);
+  if (result.exitCode == 0 && result.stdout.startsWith("cargo ")) {
+    return true;
+  }
+  if (result.stdout) {
+    console.error(result.stdout);
+  }
+  if (result.stderr) {
+    console.error(result.stderr);
+  }
+  console.error("Rust's cargo is required and does not appear to be installed.");
+  console.error("Install cargo with rustup: https://rustup.rs/");
+  return false;
+}
+
 async function installNode() {
-  var args = [
-    "clone",
-    "--single-branch",
-    "--branch=develop",
-    "https://github.com/blockstack/blockstack-core.git"
+
+  if (!await checkCargoStatus()) {
+    process.exit(1);
+    return;
+  }
+
+  const binDir = path.join(PACKAGE_DIR, `.clarity-bin-${CORE_SRC_SDK_GIT_TAG}`);
+
+  try {
+    fs.accessSync(PACKAGE_DIR, fs.constants.R_OK | fs.constants.W_OK);
+  } catch (err) {
+    console.error(err);
+    console.error(`Permission error: cannot write to directory "${binDir}"`);
+    console.error("Try running with sudo or elevated permissions.");
+  }
+
+  if (!fs.existsSync(binDir)) {
+    fs.mkdirpSync(binDir)
+  }
+
+  const args = [
+    "install",
+    "--git",
+    CORE_SRC_GIT_REPO,
+    "--tag",
+    CORE_SRC_SDK_GIT_TAG,
+    "--bin=clarity",
+    "--root",
+    binDir
   ];
-  var result = await executeCommand("git", args, {
-    cwd: "/tmp"
+  console.log(`Running: cargo ${args.join(" ")}`);
+  const result = await executeCommand("cargo", args, {
+    cwd: binDir,
+    monitorStdoutCallback: (stdoutData) => {
+      process.stdout.write(stdoutData);
+    },
+    monitorStderrCallback: (stderrData) => {
+      process.stderr.write(stderrData);
+    }
   });
 
-  args = ["install", "--force", "--bin=blockstack-core"];
-  result = await executeCommand("cargo", args, {
-    cwd: "/tmp/blockstack-core"
-  });
   if (result.exitCode !== 0) {
     throw new Error(`Cargo build failed: ${result.stderr}, ${result.stdout}`);
   }
@@ -148,4 +212,6 @@ export interface ExecuteOptions {
   cwd?: string;
   env?: NodeJS.ProcessEnv;
   stdin?: Readable | string;
+  monitorStdoutCallback?: (data: Buffer) => void;
+  monitorStderrCallback?: (data: Buffer) => void;
 }

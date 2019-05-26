@@ -62,3 +62,6 @@ typings/
 
 lib
 .DS_Store
+packages/clarity-cli/.clarity-bin
+tsconfig.tsbuildinfo
+*.clarity-bin-clarity-sdk*
