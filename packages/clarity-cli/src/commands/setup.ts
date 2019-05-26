@@ -1,13 +1,13 @@
+import { Command, flags } from "@oclif/command";
+import { spawn, SpawnOptions } from "child_process";
 import * as fs from "fs-extra";
 import * as path from "path";
-import { Command, flags } from "@oclif/command";
+import { pipeline, Readable, Transform, Writable, WritableOptions } from "stream";
 import { promisify } from "util";
-import { SpawnOptions, spawn } from "child_process";
-import { pipeline, Writable, WritableOptions, Readable, Transform } from "stream";
-import { PACKAGE_DIR } from "../index";
+import { getPackageDir } from "../index";
 
 const CORE_SRC_GIT_REPO = "https://github.com/blockstack/blockstack-core.git";
-const CORE_SRC_SDK_GIT_TAG = "clarity-sdk-v0.0.1";
+const CORE_SRC_GIT_SDK_TAG = "clarity-sdk-v0.0.1";
 
 export default class Setup extends Command {
   static description = "Install blockstack-core and its dependencies";
@@ -64,11 +64,7 @@ async function executeCommand(
     });
   });
 
-  const [stdoutData, stderrData] = await Promise.all([
-    readStdout,
-    readStderr,
-    writeStdin
-  ]);
+  const [stdoutData, stderrData] = await Promise.all([readStdout, readStderr, writeStdin]);
 
   const stdoutStr = stdoutData.toString("utf8");
   const stderrStr = stderrData.toString("utf8");
@@ -87,11 +83,7 @@ class MemoryStream extends Writable {
   constructor(opts?: WritableOptions) {
     super(opts);
   }
-  _write(
-    chunk: any,
-    encoding: string,
-    callback: (error?: Error | null) => void
-  ): void {
+  _write(chunk: any, encoding: string, callback: (error?: Error | null) => void): void {
     if (chunk instanceof Buffer) {
       this.buffers.push(chunk);
     } else {
@@ -141,7 +133,7 @@ async function readStream(
 
 async function checkCargoStatus(): Promise<boolean> {
   const result = await executeCommand("cargo", ["--version"]);
-  if (result.exitCode == 0 && result.stdout.startsWith("cargo ")) {
+  if (result.exitCode === 0 && result.stdout.startsWith("cargo ")) {
     return true;
   }
   if (result.stdout) {
@@ -155,17 +147,17 @@ async function checkCargoStatus(): Promise<boolean> {
   return false;
 }
 
-async function installNode() {
-
-  if (!await checkCargoStatus()) {
+async function installNode({ forceRebuild = false }: { forceRebuild?: boolean } = {}) {
+  if (!(await checkCargoStatus())) {
     process.exit(1);
     return;
   }
 
-  const binDir = path.join(PACKAGE_DIR, `.clarity-bin-${CORE_SRC_SDK_GIT_TAG}`);
+  const thisPackageDir = getPackageDir();
+  const binDir = path.join(thisPackageDir, `.clarity-bin-${CORE_SRC_GIT_SDK_TAG}`);
 
   try {
-    fs.accessSync(PACKAGE_DIR, fs.constants.R_OK | fs.constants.W_OK);
+    fs.accessSync(thisPackageDir, fs.constants.R_OK | fs.constants.W_OK);
   } catch (err) {
     console.error(err);
     console.error(`Permission error: cannot write to directory "${binDir}"`);
@@ -173,7 +165,7 @@ async function installNode() {
   }
 
   if (!fs.existsSync(binDir)) {
-    fs.mkdirpSync(binDir)
+    fs.mkdirpSync(binDir);
   }
 
   const args = [
@@ -181,18 +173,21 @@ async function installNode() {
     "--git",
     CORE_SRC_GIT_REPO,
     "--tag",
-    CORE_SRC_SDK_GIT_TAG,
+    CORE_SRC_GIT_SDK_TAG,
     "--bin=clarity",
     "--root",
     binDir
   ];
+  if (forceRebuild === true) {
+    args.push("--force");
+  }
   console.log(`Running: cargo ${args.join(" ")}`);
   const result = await executeCommand("cargo", args, {
     cwd: binDir,
-    monitorStdoutCallback: (stdoutData) => {
+    monitorStdoutCallback: stdoutData => {
       process.stdout.write(stdoutData);
     },
-    monitorStderrCallback: (stderrData) => {
+    monitorStderrCallback: stderrData => {
       process.stderr.write(stderrData);
     }
   });
