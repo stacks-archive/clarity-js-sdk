@@ -1,66 +1,14 @@
 {
-  "name": "smart-contract-sdk",
+  "name": "clarity-monorepo-wrapper",
   "version": "1.0.0",
-  "description": "",
-  "main": "lib/index.js",
-  "scripts": {
-    "compile": "tsc -p tsconfig.dist.json",
-    "test": "nyc mocha --timeout 10000 --require ts-node/register/transpile-only --require source-map-support/register --recursive ./src/test/**/*.ts",
-    "codecovUpload": "codecov",
-    "lint": "eslint --ext .ts ./src",
-    "lint-fix": "eslint --ext .ts ./src --fix",
-    "prettier-fix": "prettier --write \"./src/**/*.ts\""
+  "description": "Monorepo for the Clarity Javascript SDK",
+  "keywords": [],
+  "author": "Blockstack <engineering@blockstack.com> (https://blockstack.com/)",
+  "repository": {
+    "type": "git",
+    "url": ""
   },
-  "engines": {
-    "node": ">=10"
-  },
-  "author": "",
-  "license": "GPL-3.0",
-  "dependencies": {
-    "@types/chai-string": "^1.4.1",
-    "big-integer": "^1.6.43",
-    "chai-string": "^1.5.0",
-    "fs-extra": "^8.0.1"
-  },
-  "devDependencies": {
-    "@types/chai": "^4.1.7",
-    "@types/fs-extra": "^7.0.0",
-    "@types/mocha": "^5.2.6",
-    "@types/node": "^10.14.6",
-    "@typescript-eslint/eslint-plugin": "^1.9.0",
-    "@typescript-eslint/parser": "^1.9.0",
-    "chai": "^4.2.0",
-    "codecov": "^3.5.0",
-    "eslint": "^5.16.0",
-    "eslint-config-prettier": "^4.2.0",
-    "eslint-plugin-prettier": "^3.1.0",
-    "mocha": "^6.1.4",
-    "nyc": "^13.3.0",
-    "prettier": "1.17.1",
-    "source-map-support": "^0.5.12",
-    "ts-node": "^8.1.0",
-    "typescript": "^3.4.5"
-  },
-  "nyc": {
-    "cache": false,
-    "all": true,
-    "extension": [
-      ".ts"
-    ],
-    "include": [
-      "src/**/*.ts"
-    ],
-    "exclude": [
-      "**/*.d.ts",
-      "src/test"
-    ],
-    "require": [
-      "ts-node/register/transpile-only",
-      "source-map-support/register"
-    ],
-    "reporter": [
-      "text",
-      "lcov"
-    ]
-  }
+  "license": "MIT",
+  "scripts": {},
+  "devDependencies": {}
 }

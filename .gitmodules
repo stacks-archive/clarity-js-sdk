@@ -1,4 +1,0 @@
-[submodule "blockstack-core"]
-	path = blockstack-core
-	url = https://github.com/blockstack/blockstack-core.git
-	branch = feature/smart-contract-sdk

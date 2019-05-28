@@ -1,0 +1,24 @@
+{
+  "extends": ["tslint:recommended", "tslint-config-prettier"],
+  "rulesDirectory": ["tslint-plugin-prettier"],
+  "rules": {
+    "prettier": true,
+    "no-unused-expression": {
+      "severity": "warn"
+    },
+    "max-line-length": {
+      "options": [100]
+   },
+    "no-shadowed-variable": false,
+    "member-access": false,
+    "no-console": false,
+    "object-literal-sort-keys": false,
+    "interface-name": false,
+    "no-bitwise": false,
+    "array-type": {
+      "options": "array"
+    },
+    "max-classes-per-file": false,
+    "object-literal-shorthand": false
+  }
+}

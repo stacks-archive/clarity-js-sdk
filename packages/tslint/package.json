@@ -1,0 +1,27 @@
+{
+  "name": "@blockstack/tslint",
+  "description": "tslint rules for blockstack",
+  "version": "1.0.0",
+  "author": "Blockstack <engineering@blockstack.com> (https://blockstack.com/)",
+  "dependencies": {
+    "tslint-eslint-rules": "^5.4.0",
+    "tslint-xo": "^0.9.0"
+  },
+  "devDependencies": {
+    "tslint": "^5.11.0",
+    "typescript": "^3.1.3"
+  },
+  "engines": {
+    "node": ">=10.0.0"
+  },
+  "files": [
+    "/tslint.json"
+  ],
+  "license": "MIT",
+  "main": "tslint.json",
+  "repository": "blockstack/tslint",
+  "scripts": {
+    "test": "tslint -p ."
+  },
+  "types": "lib/index.d.ts"
+}
