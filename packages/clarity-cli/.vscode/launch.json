@@ -7,13 +7,12 @@
       {
         "type": "node",
         "request": "launch",
-        "name": "Launch Program",
+        "name": "Setup",
         "program": "${workspaceFolder}/bin/run",
         "args": [
           "setup"
         ],
-        "console": "integratedTerminal",
-        "preLaunchTask": "npm: tsc"
+        "console": "integratedTerminal"
       }
     ]
 }

@@ -7,7 +7,7 @@ import { promisify } from "util";
 import { getPackageDir } from "../index";
 
 const CORE_SRC_GIT_REPO = "https://github.com/blockstack/blockstack-core.git";
-const CORE_SRC_GIT_SDK_TAG = "clarity-sdk-v0.0.1";
+const CORE_SRC_GIT_SDK_TAG = "clarity-sdk-v0.0.2";
 
 export default class Setup extends Command {
   static description = "Install blockstack-core and its dependencies";
@@ -154,12 +154,12 @@ async function checkCargoStatus(): Promise<boolean> {
 
 function getClarityBinDir() {
   const thisPackageDir = getPackageDir();
-  const binDir = path.join(thisPackageDir, `.clarity-bin-${CORE_SRC_GIT_SDK_TAG}`);
+  const binDir = path.join(thisPackageDir, `.clarity-bin_${CORE_SRC_GIT_SDK_TAG}`);
   return binDir;
 }
 
 function getClarityBinFilePath() {
-  return path.join(getClarityBinDir(), "bin", "clarity");
+  return path.join(getClarityBinDir(), "bin", "clarity-cli");
 }
 
 async function installNode({ forceRebuild = false }: { forceRebuild?: boolean } = {}): Promise<
@@ -197,7 +197,7 @@ async function installNode({ forceRebuild = false }: { forceRebuild?: boolean } 
     CORE_SRC_GIT_REPO,
     "--tag",
     CORE_SRC_GIT_SDK_TAG,
-    "--bin=clarity",
+    "--bin=clarity-bin",
     "--root",
     binDir
   ];
