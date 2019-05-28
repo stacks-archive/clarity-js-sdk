@@ -131,6 +131,11 @@ async function readStream(
   return memStream.getData();
 }
 
+// TODO: Implement a github releases-download based bin provider, using same git tag.
+
+// TODO: Implement a "install from src" provider, and move these rust toolchain dependent
+//       functions into that provider.
+
 async function checkCargoStatus(): Promise<boolean> {
   const result = await executeCommand("cargo", ["--version"]);
   if (result.exitCode === 0 && result.stdout.startsWith("cargo ")) {
