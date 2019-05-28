@@ -197,7 +197,7 @@ async function installNode({ forceRebuild = false }: { forceRebuild?: boolean } 
     CORE_SRC_GIT_REPO,
     "--tag",
     CORE_SRC_GIT_SDK_TAG,
-    "--bin=clarity-bin",
+    "--bin=clarity-cli",
     "--root",
     binDir
   ];
