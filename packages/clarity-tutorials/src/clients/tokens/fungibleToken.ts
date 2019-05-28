@@ -1,4 +1,4 @@
-import { Client, Receipt } from "../../../clarity/src";
+import { Client, Receipt } from "../../../../clarity/src";
 
 export class FungibleTokenClient extends Client {
   name = "rkt-token";
