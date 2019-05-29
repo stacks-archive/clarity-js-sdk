@@ -15,9 +15,9 @@
 ;;  You should have received a copy of the GNU General Public License
 ;;  along with Blockstack. If not, see <http://www.gnu.org/licenses/>.
 
-;; Rocket-Market
+;;;; Rocket-Market
 
-;; Storage
+;;; Storage
 (define-map rockets-info
   ((rocket-id int)) 
   ((owner principal)))
@@ -28,27 +28,39 @@
   ((id int))
   ((address principal)))
 
-;; Internals
+;;; Internals
 
-;; Gets the amount of rockets owned by the specified address.
+;; Gets the amount of rockets owned by the specified address
+;; args:
+;; @account (principal) the principal of the user
+;; returns: int
 (define (balance-of (account principal))
   (let ((balance
       (get count 
         (fetch-entry rockets-count (tuple (owner account))))))
     (if (eq? balance 'null) 0 balance)))
 
+;; Check if the transaction has been sent by the factory-address
+;; returns: boolean
 (define (is-tx-from-factory)
   (let ((address
     (get address 
         (fetch-entry factory-address (tuple (id 0))))))
     (eq? tx-sender address)))
 
-;; Gets the owner of the specified rocket ID.
+;; Gets the owner of the specified rocket ID
+;; args:
+;; @rocket-id (int) the id of the rocket to identify
+;; returns: principal
 (define (owner-of (rocket-id int)) 
   (get owner 
     (fetch-entry rockets-info (tuple (rocket-id rocket-id)))))
 
-;; Internal - Register rocket
+;; Register a rocket
+;; args:
+;; @new-owner (principal) the principal of the new owner
+;; @rocket-id (int) the id of the rocket to transfer
+;; returns: boolean
 (define (register-rocket! (new-owner principal) (rocket-id int))
   (let ((current-balance (balance-of new-owner)))
     (begin
@@ -60,7 +72,11 @@
         (tuple (count (+ 1 current-balance)))) 
       'true)))
 
-;; Internal - Release rocket
+;; Release a rocket
+;; args:
+;; @owner (principal) the principal of the current owner
+;; @rocket-id (int) the id of the rocket to release
+;; returns: boolean
 (define (release-rocket! (owner principal) (rocket-id int))
   (let ((current-balance (balance-of owner)))
     (begin
@@ -69,9 +85,14 @@
         (tuple (count (- current-balance 1)))) 
       'true)))
 
-;; Public functions
+;;; Public functions
 
-;; Transfers rocket to a specified principal.
+;; Transfers rocket to a specified principal
+;; Once owned, users can trade their rockets on any unregulated black market
+;; args:
+;; @recipient (principal) the principal of the new owner of the rocket
+;; @rocket-id (int) the id of the rocket to trade
+;; returns: boolean
 (define-public (transfer (recipient principal) (rocket-id int))
   (if (and 
         (eq? (owner-of rocket-id) tx-sender)
@@ -81,7 +102,13 @@
       (register-rocket! recipient rocket-id))
     'false))
 
-;; Mint new rockets.
+;; Mint new rockets
+;; This function can only be called by the factory.
+;; args:
+;; @owner (principal) the principal of the owner of the new rocket
+;; @rocket-id (int) the id of the rocket to mint
+;; @size (int) the size of the rocket to mint
+;; returns: boolean
 (define-public (mint! (owner principal) (rocket-id int) (size int))
   (and
     (is-tx-from-factory)
@@ -96,6 +123,9 @@
         'true))))
 
 ;; Set Factory
+;; This function can only be called once.
+;; args:
+;; returns: boolean
 (define-public (set-factory)
   (let ((address
       (get address 
