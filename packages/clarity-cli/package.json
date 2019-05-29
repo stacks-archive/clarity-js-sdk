@@ -1,7 +1,7 @@
 {
   "name": "@blockstack/clarity-cli",
   "description": "The Clarity CLI is used to manage Clarity smart contracts from the command line.",
-  "version": "0.1.0-alpha.1",
+  "version": "0.1.1-alpha.0",
   "author": "Blockstack <engineering@blockstack.com> (https://blockstack.com/)",
   "bin": {
     "clarity": "./bin/run"
