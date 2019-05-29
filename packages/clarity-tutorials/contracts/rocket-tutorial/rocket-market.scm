@@ -110,8 +110,7 @@
 ;; @size (int) the size of the rocket to mint
 ;; returns: boolean
 (define-public (mint! (owner principal) (rocket-id int) (size int))
-  (and
-    (is-tx-from-factory)
+  (if (is-tx-from-factory)
     (let ((current-balance (balance-of owner)))
         (begin
         (insert-entry! rockets-info 
@@ -120,7 +119,8 @@
         (set-entry! rockets-count 
             (tuple (owner owner))
             (tuple (count (+ 1 current-balance)))) 
-        'true))))
+        'true))
+    'false))
 
 ;; Set Factory
 ;; This function can only be called once.
