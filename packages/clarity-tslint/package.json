@@ -22,8 +22,8 @@
   "repository": "blockstack/tslint",
   "scripts": {
     "build": "npm run clean && npm run compile",
-    "clean": "npx shx rm -rf ./lib tsconfig.build.tsbuildinfo",
-    "compile": "tsc --build tsconfig.build.json",
+    "clean": "npx shx rm -rf ./lib tsconfig.tsbuildinfo",
+    "compile": "tsc --build tsconfig.json",
     "prepublishOnly": "npm run build",
     "test": "tslint -p ."
   },
