@@ -1,26 +1,48 @@
 import { Command, flags } from "@oclif/command";
 import { spawn, SpawnOptions } from "child_process";
+// @ts-ignore
+import { isNonGlibcLinux } from "detect-libc";
 import * as fs from "fs-extra";
+import * as https from "https";
+import fetch from "node-fetch";
+import * as os from "os";
 import * as path from "path";
 import { pipeline, Readable, Transform, Writable, WritableOptions } from "stream";
+import * as tar from "tar";
 import { promisify } from "util";
 import { getPackageDir } from "../index";
 
-const CORE_SRC_GIT_REPO = "https://github.com/blockstack/blockstack-core.git";
 const CORE_SRC_GIT_SDK_TAG = "clarity-sdk-v0.0.2";
+
+const GITHUB_RELEASES_URL =
+  "https://github.com/blockstack/smart-contract-sdk/releases/" +
+  "download/{tag}/clarity-cli-{platform}-{arch}.tar.gz";
+
+const CORE_SRC_GIT_REPO = "https://github.com/blockstack/blockstack-core.git";
 
 export default class Setup extends Command {
   static description = "Install blockstack-core and its dependencies";
 
   static examples = [`$ clarity setup`];
 
-  static flags = {};
+  static flags = {
+    fromSource: flags.boolean({
+      name: "from_source",
+      description: "Compile binary from Rust source using Cargo.",
+      default: false
+    }),
+    forceRebuild: flags.boolean({
+      name: "force_rebuild",
+      description: "Runs Cargo install with the --force option.",
+      dependsOn: ["from_source"]
+    })
+  };
 
   static args = [];
 
   async run() {
     const { args, flags } = this.parse(Setup);
-    installNode();
+    installNode({ fromSource: flags.fromSource, forceRebuild: flags.forceRebuild });
   }
 }
 
@@ -136,6 +158,73 @@ async function readStream(
 // TODO: Implement a "install from src" provider, and move these rust toolchain dependent
 //       functions into that provider.
 
+function getClarityBinDir() {
+  const thisPackageDir = getPackageDir();
+  const binDir = path.join(thisPackageDir, `.clarity-bin_${CORE_SRC_GIT_SDK_TAG}`);
+  return binDir;
+}
+
+function getClarityBinFilePath() {
+  return path.join(getClarityBinDir(), "bin", "clarity-cli");
+}
+
+async function installNode(opts: { fromSource: boolean; forceRebuild: boolean }): Promise<boolean> {
+  if (opts.fromSource) {
+    return cargoInstall(opts);
+  } else {
+    return fetchGithubRelease();
+  }
+
+  return false;
+}
+
+async function fetchGithubRelease(): Promise<boolean> {
+  if (os.arch() !== "x64") {
+    throw new Error(`System arch "${os.arch()}" not supported. Must build from source.`);
+  }
+
+  let platform: string;
+  switch (os.platform()) {
+    case "win32":
+    case "cygwin":
+      platform = "win";
+      break;
+    case "darwin":
+      platform = "mac";
+      break;
+    case "linux":
+      if (isNonGlibcLinux) {
+        platform = "linux-musl";
+      } else {
+        platform = "linux";
+      }
+      break;
+    default:
+      throw new Error(`System platform "${os.platform()}" not supported. Must build from source.`);
+  }
+
+  const clarityBinPath = getClarityBinFilePath();
+  if (fs.existsSync(clarityBinPath)) {
+    fs.unlinkSync(clarityBinPath);
+  }
+
+  const downloadUrl = GITHUB_RELEASES_URL.replace("{tag}", CORE_SRC_GIT_SDK_TAG)
+    .replace("{platform}", platform)
+    .replace("{arch}", "x64");
+
+  const httpResponse = await fetch(downloadUrl, { redirect: "follow" });
+  if (!httpResponse.ok) {
+    throw new Error(`Bad http response ${httpResponse.status} ${httpResponse.statusText}`);
+  }
+
+  const extractDir = path.join(getClarityBinDir(), "bin");
+  fs.mkdirpSync(extractDir);
+  const tarStream = tar.extract({ cwd: extractDir });
+  await pipelineAsync(httpResponse.body, tarStream);
+
+  return false;
+}
+
 async function checkCargoStatus(): Promise<boolean> {
   const result = await executeCommand("cargo", ["--version"]);
   if (result.exitCode === 0 && result.stdout.startsWith("cargo ")) {
@@ -152,25 +241,16 @@ async function checkCargoStatus(): Promise<boolean> {
   return false;
 }
 
-function getClarityBinDir() {
-  const thisPackageDir = getPackageDir();
-  const binDir = path.join(thisPackageDir, `.clarity-bin_${CORE_SRC_GIT_SDK_TAG}`);
-  return binDir;
-}
-
-function getClarityBinFilePath() {
-  return path.join(getClarityBinDir(), "bin", "clarity-cli");
-}
-
-async function installNode({ forceRebuild = false }: { forceRebuild?: boolean } = {}): Promise<
-  boolean
-> {
+async function cargoInstall(opts: {
+  fromSource: boolean;
+  forceRebuild: boolean;
+}): Promise<boolean> {
   if (!(await checkCargoStatus())) {
     return false;
   }
 
   const clarityBinPath = getClarityBinFilePath();
-  if (fs.existsSync(clarityBinPath)) {
+  if (!opts.forceRebuild && fs.existsSync(clarityBinPath)) {
     console.error(`Clarity bin already exists at "${clarityBinPath}".`);
     console.error("Use the 'force' argument to rebuild and overwrite.");
     return false;
@@ -201,7 +281,7 @@ async function installNode({ forceRebuild = false }: { forceRebuild?: boolean } 
     "--root",
     binDir
   ];
-  if (forceRebuild === true) {
+  if (opts.forceRebuild) {
     args.push("--force");
   }
   console.log(`Running: cargo ${args.join(" ")}`);
