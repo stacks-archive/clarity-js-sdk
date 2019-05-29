@@ -85,6 +85,28 @@ describe("RocketTokenClient Test Suite", () => {
     });
   });
 
+  describe("Alice transfering 5 RKT to herself", () => {
+    let receipt: Receipt;
+
+    before(async () => {
+      receipt = await rocketTokenClient.transfer(alice, 5, { sender: alice });
+    });
+
+    it("should return an invalid receipt", async () => {
+      expect(receipt.success).to.be.false;
+    });
+
+    it("should not increase Alice's balance (15 RKT)", async () => {
+      const balanceAlice = await rocketTokenClient.balanceOf(alice);
+      expect(balanceAlice).to.equal(15);
+    });
+
+    it("should not decrease Bob's balance (15 RKT)", async () => {
+      const balanceBob = await rocketTokenClient.balanceOf(bob);
+      expect(balanceBob).to.equal(15);
+    });
+  });
+
   describe("Bob transfering 16 RKT to Alice", () => {
     let receipt: Receipt;
 
