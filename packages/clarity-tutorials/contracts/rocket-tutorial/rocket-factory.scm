@@ -72,7 +72,7 @@
   (let ((down-payment (/ size 2)))
     (and 
       (> size 1)
-      (< size 20)
+      (<= size 20)
       (can-user-buy tx-sender)
       (contract-call! rocket-token transfer funds-address down-payment)
       (insert-entry! orderbook
