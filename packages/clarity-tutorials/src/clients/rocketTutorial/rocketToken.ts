@@ -18,4 +18,10 @@ export class RocketTokenClient extends Client {
     const res = await this.submitQuery(query);
     return parseInt(res.data.result);
   }
+
+  async totalSupply(): Promise<number> {
+    const query = this.createQuery({ method: { name: "get-total-supply", args: [] } });
+    const res = await this.submitQuery(query);
+    return parseInt(res.data.result);
+  }
 }

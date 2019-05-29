@@ -41,6 +41,11 @@ describe("RocketTokenClient Test Suite", () => {
       expect(balanceBob).to.equal(10);
     });
 
+    it("should initialize the total supply of RKT to 30", async () => {
+      const totalSupply = await rocketTokenClient.totalSupply();
+      expect(totalSupply).to.equal(30);
+    });
+
     it("should initialize Zoe's balance (0 RKT)", async () => {
       const balanceZoe = await rocketTokenClient.balanceOf(zoe);
       expect(balanceZoe).to.equal(0);

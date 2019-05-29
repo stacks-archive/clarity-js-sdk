@@ -112,7 +112,7 @@
           (tuple (balance (+ balance amount))))
         (set-entry! total-supply 
           (tuple (id 0))
-          (tuple (value amount))) 
+          (tuple (value (+ (get-total-supply) amount)))) 
         'true))))
 
 ;; Initialize the contract
