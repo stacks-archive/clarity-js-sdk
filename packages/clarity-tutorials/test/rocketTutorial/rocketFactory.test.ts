@@ -83,7 +83,7 @@ describe("RocketFactoryClient Test Suite", () => {
     let minedAt: bigint;
 
     before(async () => {
-      await rocketFactoryClient.buyRocket(2, { sender: alice });
+      await rocketFactoryClient.orderRocket(2, { sender: alice });
       minedAt = await provider.getBlockHeight();
     });
 
@@ -130,7 +130,7 @@ describe("RocketFactoryClient Test Suite", () => {
           receipt = await rocketFactoryClient.claimRocket({ sender: alice });
         });
 
-        it("should return an invalid receipt", async () => {
+        it("should return a valid receipt", async () => {
           expect(receipt.success).to.be.true;
         });
 
@@ -158,7 +158,7 @@ describe("RocketFactoryClient Test Suite", () => {
     let minedAt: bigint;
 
     before(async () => {
-      await rocketFactoryClient.buyRocket(10, { sender: alice });
+      await rocketFactoryClient.orderRocket(10, { sender: alice });
       minedAt = await provider.getBlockHeight();
     });
 
@@ -250,48 +250,4 @@ describe("RocketFactoryClient Test Suite", () => {
       });
     });
   });
-
-  //   describe("Alice transfering -5 RKT to Bob", () => {
-  //     let receipt: Receipt;
-
-  //     before(async () => {
-  //       receipt = await rocketFactoryClient.transfer(bob, 16, { sender: alice });
-  //     });
-
-  //     it("should return an invalid receipt", async () => {
-  //       expect(receipt.success).to.be.false;
-  //     });
-
-  //     it("should not increase Alice's balance (15 RKT)", async () => {
-  //       const balanceAlice = await rocketFactoryClient.balanceOf(alice);
-  //       expect(balanceAlice).to.equal(15);
-  //     });
-
-  //     it("should not decrease Bob's balance (15 RKT)", async () => {
-  //       const balanceBob = await rocketFactoryClient.balanceOf(bob);
-  //       expect(balanceBob).to.equal(15);
-  //     });
-  //   });
-
-  //   describe("Bob transfering 16 RKT to Alice", () => {
-  //     let receipt: Receipt;
-
-  //     before(async () => {
-  //       receipt = await rocketFactoryClient.transfer(bob, 16, { sender: alice });
-  //     });
-
-  //     it("should return an invalid receipt", async () => {
-  //       expect(receipt.success).to.be.false;
-  //     });
-
-  //     it("should not increase Alice's balance (15 RKT)", async () => {
-  //       const balanceAlice = await rocketFactoryClient.balanceOf(alice);
-  //       expect(balanceAlice).to.equal(15);
-  //     });
-
-  //     it("should not decrease Bob's balance (15 RKT)", async () => {
-  //       const balanceBob = await rocketFactoryClient.balanceOf(bob);
-  //       expect(balanceBob).to.equal(15);
-  //     });
-  //   });
 });
