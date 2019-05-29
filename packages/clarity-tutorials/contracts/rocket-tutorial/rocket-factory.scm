@@ -70,19 +70,21 @@
 ;; returns: boolean
 (define-public (order-rocket (size int))
   (let ((down-payment (/ size 2)))
-    (and 
-      (> size 1)
-      (<= size 20)
-      (can-user-buy tx-sender)
-      (contract-call! rocket-token transfer funds-address down-payment)
-      (insert-entry! orderbook
-        (tuple (buyer tx-sender))
-        (tuple 
-          (rocket-id (new-rocket-id))
-          (ordered-at-block block-height) 
-          (ready-at-block (+ block-height size)) 
-          (size size)
-          (balance (- size down-payment)))))))
+    (if (and 
+          (> size 1)
+          (<= size 20)
+          (can-user-buy tx-sender))
+      (and
+        (contract-call! rocket-token transfer funds-address down-payment)
+        (insert-entry! orderbook
+          (tuple (buyer tx-sender))
+          (tuple 
+            (rocket-id (new-rocket-id))
+            (ordered-at-block block-height) 
+            (ready-at-block (+ block-height size)) 
+            (size size)
+            (balance (- size down-payment)))))
+      'false)))
 
 ;; Claim a rocket
 ;; This function can only be executed when the rocket is ready.
@@ -100,11 +102,12 @@
         (rocket-id
           (get rocket-id 
             (fetch-entry orderbook (tuple (buyer tx-sender))))))
-    (and 
-      (can-user-claim tx-sender)
-      (contract-call! rocket-token transfer funds-address balance)
-      (as-contract (contract-call! rocket-market mint! buyer rocket-id size))
-      (delete-entry! orderbook (tuple (buyer tx-sender))))))
+    (if (can-user-claim tx-sender)
+      (and
+        (contract-call! rocket-token transfer funds-address balance)
+        (as-contract (contract-call! rocket-market mint! buyer rocket-id size))
+        (delete-entry! orderbook (tuple (buyer tx-sender))))
+      'false)))
 
 ;; Initialize the contract by
 ;; - initializing auto-increments
