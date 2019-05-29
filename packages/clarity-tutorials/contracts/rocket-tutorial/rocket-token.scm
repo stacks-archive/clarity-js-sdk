@@ -15,9 +15,9 @@
 ;;  You should have received a copy of the GNU General Public License
 ;;  along with Blockstack. If not, see <http://www.gnu.org/licenses/>.
 
-;; Rocket-Token
+;;;; Rocket-Token
 
-;; Storage
+;;; Storage
 (define-map balances 
   ((owner principal)) 
   ((balance int)))
@@ -25,21 +25,29 @@
   ((id int))
   ((value int)))
 
-;; Internals
+;;; Internals
 
-;; Total number of tokens in existence.
+;; Gets the total number of tokens in existence
+;; returns: int
 (define (get-total-supply)
   (get value 
     (fetch-entry total-supply (tuple (id 0)))))
 
-;; Gets the amount of tokens owned by the specified address.
+;; Gets the amount of tokens owned by the specified address
+;; args:
+;; @account (principal) the principal of the user
+;; returns: int
 (define (balance-of (account principal))
   (let ((balance
       (get balance 
         (fetch-entry balances (tuple (owner account))))))
     (if (eq? balance 'null) 0 balance)))
 
-;; Credits balance of a specified principal.
+;; Credits balance of a specified principal
+;; args:
+;; @account (principal) the principal of the account to credit
+;; @amount (int) the amount of tokens to credit
+;; returns: boolean
 (define (credit-balance! (account principal) (amount int))
   (if (<= amount 0)
     'false
@@ -50,7 +58,11 @@
           (tuple (balance (+ amount current-balance)))) 
         'true)))) ;; Overflow management?
 
-;; Debits balance of a specified principal.
+;; Debits balance of a specified principal
+;; args:
+;; @account (principal) the principal of the account to debit
+;; @amount (int) the amount of tokens to debit
+;; returns: boolean
 (define (debit-balance! (account principal) (amount int))
   (let ((balance (balance-of account)))
     (if (or (> amount balance) (<= amount 0))
@@ -61,7 +73,12 @@
           (tuple (balance (- balance amount))))
         'true))))
 
-;; Transfers tokens to a specified principal.
+;; Transfers tokens to a specified principal
+;; args:
+;; @sender (principal) the principal of the account to debit
+;; @recipient (principal) the principal of the account to credit
+;; @amount (int) the amount of tokens to transfer
+;; returns: boolean
 (define (transfer! (sender principal) (recipient principal) (amount int))
   (if (and  
         (not (eq? sender recipient)) 
@@ -70,13 +87,21 @@
     'true
     'false))
 
-;; Public functions
+;;; Public functions
 
-;; Transfers tokens to a specified principal.
+;; Transfers tokens to a specified principal
+;; args:
+;; @recipient (principal) the principal of the account to credit
+;; @amount (int) the amount of tokens to transfer
+;; returns: boolean
 (define-public (transfer (recipient principal) (amount int))
   (transfer! tx-sender recipient amount))
 
-;; Mint new tokens.
+;; Mint new tokens
+;; args:
+;; @account (principal) the principal of the account owning the new tokens
+;; @amount (int) the amount of tokens to transfer
+;; returns: boolean
 (define (mint! (account principal) (amount int))
   (if (<= amount 0)
     'false
