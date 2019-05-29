@@ -21,13 +21,16 @@
 (define-map balances 
   ((owner principal)) 
   ((balance int)))
-(define total-supply 0)
+(define-map total-supply
+  ((id int))
+  ((value int)))
 
 ;; Internals
 
 ;; Total number of tokens in existence.
 (define (get-total-supply)
-  total-supply)
+  (get value 
+    (fetch-entry total-supply (tuple (id 0)))))
 
 ;; Gets the amount of tokens owned by the specified address.
 (define (balance-of (account principal))
@@ -82,10 +85,17 @@
         (set-entry! balances
           (tuple (owner account))
           (tuple (balance (+ balance amount))))
+        (set-entry! total-supply 
+          (tuple (id 0))
+          (tuple (value amount))) 
         'true))))
 
 ;; Initialize the contract
 (begin
-  (mint! 'SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7 20)
-  (mint! 'S02J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKPVKG2CE 10)
+  (set-entry! total-supply 
+    (tuple (id 0))
+    (tuple (value 0))) 
+  (mint! 'SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7 20) ;; Alice
+  (mint! 'S02J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKPVKG2CE 10) ;; Bob
+
   'null)
