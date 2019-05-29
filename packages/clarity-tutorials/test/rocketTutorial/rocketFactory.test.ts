@@ -67,6 +67,91 @@ describe("RocketFactoryClient Test Suite", () => {
       const bobBalance = await rocketMarketClient.balanceOf(bob);
       expect(bobBalance).to.equal(0);
     });
+
+    it("should initialize Alice's balance (20 RKT)", async () => {
+      const balanceAlice = await rocketTokenClient.balanceOf(alice);
+      expect(balanceAlice).to.equal(20);
+    });
+
+    it("should initialize Bob's balance (10 RKT)", async () => {
+      const balanceBob = await rocketTokenClient.balanceOf(bob);
+      expect(balanceBob).to.equal(10);
+    });
+  });
+
+  describe("Alice buying a rocket of size 2", () => {
+    let minedAt: bigint;
+
+    before(async () => {
+      await rocketFactoryClient.buyRocket(2, { sender: alice });
+      minedAt = await provider.getBlockHeight();
+    });
+
+    it("should make Alice unable to buy a new rocket", async () => {
+      const canAliceBuy = await rocketFactoryClient.canUserBuy(alice);
+      expect(canAliceBuy).to.be.false;
+    });
+
+    it("should decrease Alice's balance to 19 RKT", async () => {
+      const balanceAlice = await rocketTokenClient.balanceOf(alice);
+      expect(balanceAlice).to.equal(19);
+    });
+
+    it("should not produce a claimable rocket", async () => {
+      const isRocketClaimable = await rocketFactoryClient.canUserBuy(alice);
+      expect(isRocketClaimable).to.be.false;
+    });
+
+    it("should not impact Bob's ability to buy a new rocket", async () => {
+      const canBobBuy = await rocketFactoryClient.canUserBuy(bob);
+      expect(canBobBuy).to.be.true;
+    });
+
+    it("should not impact Bob's balance (10 RKT)", async () => {
+      const balanceBob = await rocketTokenClient.balanceOf(bob);
+      expect(balanceBob).to.equal(10);
+    });
+
+    describe("2 blocks after the transaction, Alice's rocket", () => {
+      before(async () => {
+        await provider.mineBlock();
+        await provider.mineBlock();
+      });
+
+      it("should be claimable", async () => {
+        const isRocketClaimable = await rocketFactoryClient.canUserClaim(alice);
+        expect(isRocketClaimable).to.be.true;
+      });
+
+      describe("Alice claiming her rocket", () => {
+        let receipt: Receipt;
+
+        before(async () => {
+          receipt = await rocketFactoryClient.claimRocket({ sender: alice });
+        });
+
+        it("should return an invalid receipt", async () => {
+          expect(receipt.success).to.be.true;
+        });
+
+        it("should make Alice able to buy a new rocket", async () => {
+          const canAliceBuy = await rocketFactoryClient.canUserBuy(alice);
+          expect(canAliceBuy).to.be.true;
+        });
+
+        it("should decrease Alice's balance of 1 RKT (18 RKT remaining)", async () => {
+          const balanceAlice = await rocketTokenClient.balanceOf(alice);
+          expect(balanceAlice).to.equal(18);
+        });
+
+        it("should increment the market size");
+
+        it("should update Alice's number of rockets to 1", async () => {
+          const aliceBalance = await rocketMarketClient.balanceOf(alice);
+          expect(aliceBalance).to.equal(1);
+        });
+      });
+    });
   });
 
   describe("Alice buying a rocket of size 10", () => {
@@ -82,9 +167,9 @@ describe("RocketFactoryClient Test Suite", () => {
       expect(canAliceBuy).to.be.false;
     });
 
-    it("should decrease Alice's balance to 15 RKT", async () => {
+    it("should decrease Alice's balance to 13 RKT", async () => {
       const balanceAlice = await rocketTokenClient.balanceOf(alice);
-      expect(balanceAlice).to.equal(15);
+      expect(balanceAlice).to.equal(13);
     });
 
     it("should not produce a claimable rocket", async () => {
@@ -151,16 +236,16 @@ describe("RocketFactoryClient Test Suite", () => {
           expect(canAliceBuy).to.be.true;
         });
 
-        it("should decrease Alice's balance of 5 RKT (10 RKT remaining)", async () => {
+        it("should decrease Alice's balance of 5 RKT (8 RKT remaining)", async () => {
           const balanceAlice = await rocketTokenClient.balanceOf(alice);
-          expect(balanceAlice).to.equal(10);
+          expect(balanceAlice).to.equal(8);
         });
 
         it("should increment the market size");
 
         it("should update Alice's number of rockets to 1", async () => {
           const aliceBalance = await rocketMarketClient.balanceOf(alice);
-          expect(aliceBalance).to.equal(1);
+          expect(aliceBalance).to.equal(2);
         });
       });
     });
