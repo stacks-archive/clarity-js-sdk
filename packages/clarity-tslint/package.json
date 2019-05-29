@@ -20,7 +20,10 @@
   ],
   "license": "MIT",
   "main": "tslint.json",
-  "repository": "blockstack/tslint",
+  "repository": "blockstack/clarity-js-sdk",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "npm run clean && npm run compile",
     "clean": "shx rm -rf ./lib tsconfig.tsbuildinfo",

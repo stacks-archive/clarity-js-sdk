@@ -5,6 +5,10 @@
   "author": "Blockstack <engineering@blockstack.com> (https://blockstack.com/)",
   "license": "MIT",
   "main": "lib/index.js",
+  "repository": "blockstack/clarity-js-sdk",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "npm run clean && npm run compile",
     "clean": "shx rm -rf ./lib tsconfig.tsbuildinfo",

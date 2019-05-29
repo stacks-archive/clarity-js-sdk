@@ -61,6 +61,9 @@
     "repositoryPrefix": "https://github.com/blockstack/clarity-js-sdk/blob/master/packages/clarity-cli/<%- commandPath %>"
   },
   "repository": "blockstack/clarity-js-sdk",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "npm run clean && npm run compile",
     "clean": "shx rm -rf ./lib tsconfig.tsbuildinfo",

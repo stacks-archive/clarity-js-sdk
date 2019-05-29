@@ -13,8 +13,7 @@
   "scripts": {
     "prepare": "lerna bootstrap",
     "lerna": "lerna",
-    "build": "lerna run build",
-    "publish": "lerna publish"
+    "build": "lerna run build"
   },
   "devDependencies": {
     "@types/node": "^10",
