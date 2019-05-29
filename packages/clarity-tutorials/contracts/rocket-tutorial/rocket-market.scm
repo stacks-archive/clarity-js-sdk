@@ -24,6 +24,9 @@
 (define-map rockets-count
   ((owner principal))
   ((count int)))
+(define-map factory-address
+  ((id int))
+  ((address principal)))
 
 ;; Internals
 
@@ -33,6 +36,12 @@
       (get count 
         (fetch-entry rockets-count (tuple (owner account))))))
     (if (eq? balance 'null) 0 balance)))
+
+(define (is-tx-from-factory)
+  (let ((address
+    (get address 
+        (fetch-entry factory-address (tuple (id 0))))))
+    (eq? tx-sender address)))
 
 ;; Gets the owner of the specified rocket ID.
 (define (owner-of (rocket-id int)) 
@@ -74,12 +83,26 @@
 
 ;; Mint new rockets.
 (define-public (mint! (owner principal) (rocket-id int) (size int))
-  (let ((current-balance (balance-of owner)))
-    (begin
-      (insert-entry! rockets-info 
-        (tuple (rocket-id rocket-id))
-        (tuple (owner owner))) 
-      (set-entry! rockets-count 
-        (tuple (owner owner))
-        (tuple (count (+ 1 current-balance)))) 
-      'true)))
+  (and
+    (is-tx-from-factory)
+    (let ((current-balance (balance-of owner)))
+        (begin
+        (insert-entry! rockets-info 
+            (tuple (rocket-id rocket-id))
+            (tuple (owner owner))) 
+        (set-entry! rockets-count 
+            (tuple (owner owner))
+            (tuple (count (+ 1 current-balance)))) 
+        'true))))
+
+;; Set Factory
+(define-public (set-factory)
+  (let ((address
+      (get address 
+        (fetch-entry factory-address (tuple (id 0))))))
+    (if (eq? address 'null) 
+        (insert-entry! factory-address 
+          (tuple (id 0))
+          (tuple (address tx-sender)))
+        'false)))
+
