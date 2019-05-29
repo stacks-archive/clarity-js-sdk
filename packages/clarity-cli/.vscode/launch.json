@@ -7,10 +7,23 @@
       {
         "type": "node",
         "request": "launch",
-        "name": "Setup",
+        "name": "Setup from_source",
         "program": "${workspaceFolder}/bin/run",
         "args": [
-          "setup"
+          "setup",
+          "--overwrite",
+          "--from_source"
+        ],
+        "console": "integratedTerminal"
+      },
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "Setup from_dist",
+        "program": "${workspaceFolder}/bin/run",
+        "args": [
+          "setup",
+          "--overwrite"
         ],
         "console": "integratedTerminal"
       }

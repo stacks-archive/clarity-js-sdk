@@ -26,15 +26,13 @@ export default class Setup extends Command {
   static examples = [`$ clarity setup`];
 
   static flags = {
-    fromSource: flags.boolean({
-      name: "from_source",
-      description: "Compile binary from Rust source using Cargo.",
+    from_source: flags.boolean({
+      description: "Compile binary from Rust source instead of downloading distributable.",
       default: false
     }),
-    forceRebuild: flags.boolean({
-      name: "force_rebuild",
-      description: "Runs Cargo install with the --force option.",
-      dependsOn: ["from_source"]
+    overwrite: flags.boolean({
+      description: "Overwrites an existing installed clarity-cli bin file.",
+      default: false
     })
   };
 
@@ -42,8 +40,26 @@ export default class Setup extends Command {
 
   async run() {
     const { args, flags } = this.parse(Setup);
-    installNode({ fromSource: flags.fromSource, forceRebuild: flags.forceRebuild });
+
+    let success: boolean;
+    if (flags.from_source) {
+      success = await cargoInstall(this, flags);
+    } else {
+      success = await fetchGithubRelease(this, flags);
+    }
+
+    if (!success) {
+      this.exit(1);
+    } else {
+      this.log("Installed clarity-cli successful.");
+    }
   }
+}
+
+interface CmdLogger {
+  warn(input: string | Error): void;
+  error(input: string | Error): void;
+  log(message?: string, ...args: any[]): void;
 }
 
 async function executeCommand(
@@ -71,7 +87,7 @@ async function executeCommand(
       proc.stdin.end(opts.stdin, "utf8");
     } else {
       writeStdin = pipelineAsync(opts.stdin, proc.stdin).catch((error: any) => {
-        console.debug(`spawn stdin error: ${error}`);
+        console.error(`spawn stdin error: ${error}`);
       });
     }
   }
@@ -168,19 +184,21 @@ function getClarityBinFilePath() {
   return path.join(getClarityBinDir(), "bin", "clarity-cli");
 }
 
-async function installNode(opts: { fromSource: boolean; forceRebuild: boolean }): Promise<boolean> {
-  if (opts.fromSource) {
-    return cargoInstall(opts);
-  } else {
-    return fetchGithubRelease();
+async function fetchGithubRelease(
+  logger: CmdLogger,
+  opts: {
+    overwrite: boolean;
   }
+): Promise<boolean> {
 
-  return false;
-}
-
-async function fetchGithubRelease(): Promise<boolean> {
-  if (os.arch() !== "x64") {
-    throw new Error(`System arch "${os.arch()}" not supported. Must build from source.`);
+  let arch: string;
+  switch (os.arch()) {
+    case "x64":
+      arch = "x64";
+      break;
+    default:
+      logger.error(`System arch "${os.arch()}" not supported. Must build from source.`);
+      return false;
   }
 
   let platform: string;
@@ -200,73 +218,92 @@ async function fetchGithubRelease(): Promise<boolean> {
       }
       break;
     default:
-      throw new Error(`System platform "${os.platform()}" not supported. Must build from source.`);
+      logger.error(`System platform "${os.platform()}" not supported. Must build from source.`);
+      return false;
   }
 
   const clarityBinPath = getClarityBinFilePath();
   if (fs.existsSync(clarityBinPath)) {
+    if (!opts.overwrite) {
+      logger.error(`Clarity bin already exists at "${clarityBinPath}".`);
+      logger.error("Use the 'overwrite' argument to rebuild and overwrite.");
+      return false;
+    }
     fs.unlinkSync(clarityBinPath);
   }
 
   const downloadUrl = GITHUB_RELEASES_URL.replace("{tag}", CORE_SRC_GIT_SDK_TAG)
     .replace("{platform}", platform)
-    .replace("{arch}", "x64");
+    .replace("{arch}", arch);
 
+  logger.log(`Fetching ${downloadUrl}`);
   const httpResponse = await fetch(downloadUrl, { redirect: "follow" });
   if (!httpResponse.ok) {
-    throw new Error(`Bad http response ${httpResponse.status} ${httpResponse.statusText}`);
+    logger.error(`Bad http response ${httpResponse.status} ${httpResponse.statusText}`);
+    return false;
   }
 
   const extractDir = path.join(getClarityBinDir(), "bin");
+  logger.log(`Extracting to ${extractDir}`);
   fs.mkdirpSync(extractDir);
   const tarStream = tar.extract({ cwd: extractDir });
   await pipelineAsync(httpResponse.body, tarStream);
 
-  return false;
+  return true;
 }
 
-async function checkCargoStatus(): Promise<boolean> {
+async function checkCargoStatus(logger: CmdLogger): Promise<boolean> {
   const result = await executeCommand("cargo", ["--version"]);
   if (result.exitCode === 0 && result.stdout.startsWith("cargo ")) {
     return true;
   }
   if (result.stdout) {
-    console.error(result.stdout);
+    logger.error(result.stdout);
   }
   if (result.stderr) {
-    console.error(result.stderr);
+    logger.error(result.stderr);
   }
-  console.error("Rust's cargo is required and does not appear to be installed.");
-  console.error("Install cargo with rustup: https://rustup.rs/");
+  logger.error("Rust's cargo is required and does not appear to be installed.");
+  logger.error("Install cargo with rustup: https://rustup.rs/");
   return false;
 }
 
-async function cargoInstall(opts: {
-  fromSource: boolean;
-  forceRebuild: boolean;
-}): Promise<boolean> {
-  if (!(await checkCargoStatus())) {
+function checkDirWritePermissions(logger: CmdLogger, dir: string): boolean {
+  try {
+    fs.accessSync(dir, fs.constants.R_OK | fs.constants.W_OK);
+  } catch (err) {
+    logger.error(err);
+    logger.error(`Permission error: cannot write to directory "${dir}"`);
+    logger.error("Try running with sudo or elevated permissions.");
+    return false;
+  }
+  return true;
+}
+
+async function cargoInstall(
+  logger: CmdLogger,
+  opts: {
+    from_source: boolean;
+    overwrite: boolean;
+  }
+): Promise<boolean> {
+  if (!(await checkCargoStatus(logger))) {
     return false;
   }
 
   const clarityBinPath = getClarityBinFilePath();
-  if (!opts.forceRebuild && fs.existsSync(clarityBinPath)) {
-    console.error(`Clarity bin already exists at "${clarityBinPath}".`);
-    console.error("Use the 'force' argument to rebuild and overwrite.");
+  if (!opts.overwrite && fs.existsSync(clarityBinPath)) {
+    logger.error(`Clarity bin already exists at "${clarityBinPath}".`);
+    logger.error("Use the 'overwrite' argument to rebuild and overwrite.");
     return false;
   }
 
   const thisPackageDir = getPackageDir();
-  const binDir = getClarityBinDir();
-
-  try {
-    fs.accessSync(thisPackageDir, fs.constants.R_OK | fs.constants.W_OK);
-  } catch (err) {
-    console.error(err);
-    console.error(`Permission error: cannot write to directory "${binDir}"`);
-    console.error("Try running with sudo or elevated permissions.");
+  if (!checkDirWritePermissions(logger, thisPackageDir)) {
+    return false;
   }
 
+  const binDir = getClarityBinDir();
   if (!fs.existsSync(binDir)) {
     fs.mkdirpSync(binDir);
   }
@@ -281,10 +318,10 @@ async function cargoInstall(opts: {
     "--root",
     binDir
   ];
-  if (opts.forceRebuild) {
+  if (opts.overwrite) {
     args.push("--force");
   }
-  console.log(`Running: cargo ${args.join(" ")}`);
+  logger.log(`Running: cargo ${args.join(" ")}`);
   const result = await executeCommand("cargo", args, {
     cwd: binDir,
     monitorStdoutCallback: stdoutData => {
@@ -296,7 +333,8 @@ async function cargoInstall(opts: {
   });
 
   if (result.exitCode !== 0) {
-    throw new Error(`Cargo build failed: ${result.stderr}, ${result.stdout}`);
+    logger.error(`Cargo build failed: ${result.stderr}, ${result.stdout}`);
+    return false;
   }
   return true;
 }
