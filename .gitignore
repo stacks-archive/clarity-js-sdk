@@ -65,3 +65,4 @@ lib
 tsconfig.tsbuildinfo
 *.clarity-bin*
 *.tsbuildinfo
+oclif.manifest.json

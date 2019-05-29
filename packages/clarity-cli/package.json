@@ -6,7 +6,7 @@
   "bin": {
     "clarity": "./bin/run"
   },
-  "bugs": "https://github.com/blockstack/clarity-cli/issues",
+  "bugs": "https://github.com/blockstack/clarity-js-sdk/issues",
   "dependencies": {
     "@oclif/command": "^1.5.13",
     "@oclif/config": "^1.13.0",
@@ -49,7 +49,7 @@
     "/npm-shrinkwrap.json",
     "/oclif.manifest.json"
   ],
-  "homepage": "https://github.com/blockstack/clarity-cli",
+  "homepage": "https://github.com/blockstack/clarity-js-sdk/tree/master/packages/clarity-cli",
   "license": "MIT",
   "main": "lib/index.js",
   "oclif": {
@@ -57,22 +57,22 @@
     "bin": "clarity",
     "plugins": [
       "@oclif/plugin-help"
-    ]
+    ],
+    "repositoryPrefix": "https://github.com/blockstack/clarity-js-sdk/blob/master/packages/clarity-cli/<%- commandPath %>"
   },
-  "repository": "blockstack/clarity-cli",
+  "repository": "blockstack/clarity-js-sdk",
   "scripts": {
     "build": "npm run clean && npm run compile",
     "clean": "shx rm -rf ./lib tsconfig.tsbuildinfo",
     "compile": "tsc --build tsconfig.json",
-    "prepublishOnly": "npm run build",
+    "prepublishOnly": "npm run build && npm run build-oclif",
     "lint": "tslint -c tslint.json 'src/**/*.ts'",
     "lint-fix": "tslint --fix -c tslint.json 'src/**/*.ts'",
     "dev": "bin/run",
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "tslint -p test -t stylish",
-    "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
-    "test": "nyc --extension .ts mocha --forbid-only \"test/**/*.test.ts\"",
-    "version": "oclif-dev readme && git add README.md"
+    "build-oclif": "oclif-dev manifest && oclif-dev readme",
+    "test": "nyc --extension .ts mocha --forbid-only \"test/**/*.test.ts\""
   },
   "types": "lib/index.d.ts"
 }
