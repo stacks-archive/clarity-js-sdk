@@ -20,7 +20,8 @@
 ;; Storage
 (define-map current-orders
   ((buyer principal))
-  ((ordered-at-block int) (ready-at-block int) (claimed bool)))
+  ((rocket-id int) (ordered-at-block int) (ready-at-block int) (balance int) (size int)))
+(define rocket-market-size 0)
 
 (define funds-address 'SZ2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKQ9H6DPR)
 
@@ -32,54 +33,42 @@
     (if (eq? ordered-at-block 'null) 'true 'false)))
 
 ;; Check if a given order is ready
-(define (is-order-ready (user principal))
+(define (can-user-claim (user principal))
   (let ((ready-at-block
       (get ready-at-block 
         (fetch-entry current-orders (tuple (buyer user))))))
     (>= block-height ready-at-block)))
 
+;; Check if a given order is ready
+(define (rocket-claimable-at (user principal))
+  (get ready-at-block 
+    (fetch-entry current-orders (tuple (buyer user)))))
+
 ;; Buy a rocket. 
 (define-public (buy-rocket (size int))
-  (let ((amount-upfront (/ size 2)))
+  (let ((down-payment (/ size 2)))
     (and 
       (can-user-buy tx-sender)
-      (contract-call! rocket-token transfer funds-address amount-upfront)
+      (contract-call! rocket-token transfer funds-address down-payment)
       (insert-entry! current-orders
         (tuple (buyer tx-sender))
         (tuple 
+          (rocket-id 1)
           (ordered-at-block block-height) 
           (ready-at-block (+ block-height size)) 
-          (claimed 'false))))))
+          (size size)
+          (balance (- size down-payment)))))))
 
-;; (define-public (register 
-;;                 (recipient-principal principal)
-;;                 (name int)
-;;                 (salt int))
-;;   (let ((preorder-entry
-;;          (fetch-entry preorder-map
-;;                       (tuple (name-hash (hash160 (xor name salt))))))
-;;         (name-entry 
-;;          (fetch-entry name-map (tuple (name name)))))
-;;     (if (and
-;;          ;; must be preordered
-;;          (not (eq? preorder-entry 'null))
-;;          ;; name shouldn't *already* exist
-;;          (eq? name-entry 'null)
-;;          ;; preorder must have paid enough
-;;          (<= (price-function name) 
-;;              (get paid preorder-entry))
-;;          ;; preorder must have been the current principal
-;;          (eq? tx-sender
-;;               (get buyer preorder-entry)))
-;;         (and
-;;          (insert-entry! name-map
-;;                         (tuple (name name))
-;;                         (tuple (owner recipient-principal)))
-;;          (delete-entry! preorder-map
-;;                         (tuple (name-hash (hash160 (xor name salt))))))
-;;         'false)))
-
-
-;; maybe it's a function of rocket size and price paid
-;; so like, I can get a size 10 rocket in 1 block if I pay 10 stacks
-;; or I can get a size 10 rocket in 10 blocks if I pay 1 stack
+;; Claim a rocket. 
+(define-public (claim-rocket)
+  (let ((balance
+          (get balance 
+            (fetch-entry current-orders (tuple (buyer tx-sender)))))
+        (size
+          (get size 
+            (fetch-entry current-orders (tuple (buyer tx-sender))))))
+    (and 
+      (can-user-claim tx-sender)
+      (contract-call! rocket-token transfer funds-address balance)
+      (contract-call! rocket-market mint! tx-sender 1 size)
+      (delete-entry! current-orders (tuple (buyer tx-sender))))))
