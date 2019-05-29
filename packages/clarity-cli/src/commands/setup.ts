@@ -14,7 +14,7 @@ import { getPackageDir } from "../index";
 
 const CORE_SRC_GIT_SDK_TAG = "clarity-sdk-v0.0.2";
 
-const GITHUB_RELEASES_URL =
+const DIST_DOWNLOAD_URL =
   "https://github.com/blockstack/smart-contract-sdk/releases/" +
   "download/{tag}/clarity-cli-{platform}-{arch}.tar.gz";
 
@@ -36,7 +36,7 @@ export default class Setup extends Command {
     })
   };
 
-  static args = [];
+  static args: any[] = [];
 
   async run() {
     const { args, flags } = this.parse(Setup);
@@ -45,7 +45,7 @@ export default class Setup extends Command {
     if (flags.from_source) {
       success = await cargoInstall(this, flags);
     } else {
-      success = await fetchGithubRelease(this, flags);
+      success = await fetchDistributable(this, flags);
     }
 
     if (!success) {
@@ -169,8 +169,6 @@ async function readStream(
   return memStream.getData();
 }
 
-// TODO: Implement a github releases-download based bin provider, using same git tag.
-
 // TODO: Implement a "install from src" provider, and move these rust toolchain dependent
 //       functions into that provider.
 
@@ -184,13 +182,12 @@ function getClarityBinFilePath() {
   return path.join(getClarityBinDir(), "bin", "clarity-cli");
 }
 
-async function fetchGithubRelease(
+async function fetchDistributable(
   logger: CmdLogger,
   opts: {
     overwrite: boolean;
   }
 ): Promise<boolean> {
-
   let arch: string;
   switch (os.arch()) {
     case "x64":
@@ -232,7 +229,7 @@ async function fetchGithubRelease(
     fs.unlinkSync(clarityBinPath);
   }
 
-  const downloadUrl = GITHUB_RELEASES_URL.replace("{tag}", CORE_SRC_GIT_SDK_TAG)
+  const downloadUrl = DIST_DOWNLOAD_URL.replace("{tag}", CORE_SRC_GIT_SDK_TAG)
     .replace("{platform}", platform)
     .replace("{arch}", arch);
 

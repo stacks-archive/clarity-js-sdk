@@ -1,4 +1,5 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "moduleResolution": "node",
     "target": "es2018",
@@ -12,5 +13,5 @@
     "esModuleInterop": true,
     "outDir": "lib"
   },
-  "include": ["src"]
+  "include": ["src/**/*"]
 }

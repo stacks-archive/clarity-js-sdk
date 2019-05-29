@@ -14,7 +14,8 @@
           "--overwrite",
           "--from_source"
         ],
-        "console": "integratedTerminal"
+        "console": "integratedTerminal",
+        "preLaunchTask": "tsc-build-lib"
       },
       {
         "type": "node",
@@ -25,7 +26,8 @@
           "setup",
           "--overwrite"
         ],
-        "console": "integratedTerminal"
+        "console": "integratedTerminal",
+        "preLaunchTask": "tsc-build-lib"
       }
     ]
 }

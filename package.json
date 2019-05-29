@@ -9,6 +9,13 @@
     "url": ""
   },
   "license": "MIT",
-  "scripts": {},
-  "devDependencies": {}
+  "scripts": {
+    "lerna": "lerna",
+    "build": "lerna run build"
+  },
+  "devDependencies": {
+    "@types/node": "^10",
+    "lerna": "^3.14.1",
+    "typescript": "^3.4.5"
+  }
 }
