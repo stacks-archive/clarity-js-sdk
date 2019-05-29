@@ -21,9 +21,18 @@
 (define-map current-orders
   ((buyer principal))
   ((rocket-id int) (ordered-at-block int) (ready-at-block int) (balance int) (size int)))
-(define rocket-market-size 0)
-
+(define-map auto-increments
+  ((id int))
+  ((value int)))
 (define funds-address 'SZ2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKQ9H6DPR)
+
+(define (new-rocket-id)
+  (let ((rocket-id
+      (+ 1 (get value (fetch-entry auto-increments (tuple (id 0)))))))
+    (begin (set-entry! auto-increments
+      (tuple (id 0))
+      (tuple (value rocket-id)))
+    rocket-id)))
 
 ;; Check if a given user can buy
 (define (can-user-buy (user principal))
@@ -53,7 +62,7 @@
       (insert-entry! current-orders
         (tuple (buyer tx-sender))
         (tuple 
-          (rocket-id 1)
+          (rocket-id (new-rocket-id))
           (ordered-at-block block-height) 
           (ready-at-block (+ block-height size)) 
           (size size)
@@ -61,14 +70,27 @@
 
 ;; Claim a rocket. 
 (define-public (claim-rocket)
-  (let ((balance
+  (let ((buyer tx-sender)
+        (balance
           (get balance 
             (fetch-entry current-orders (tuple (buyer tx-sender)))))
         (size
           (get size 
+            (fetch-entry current-orders (tuple (buyer tx-sender)))))
+
+        (rocket-id
+          (get rocket-id 
             (fetch-entry current-orders (tuple (buyer tx-sender))))))
     (and 
       (can-user-claim tx-sender)
       (contract-call! rocket-token transfer funds-address balance)
-      (contract-call! rocket-market mint! tx-sender 1 size)
+      (as-contract (contract-call! rocket-market mint! buyer rocket-id size))
       (delete-entry! current-orders (tuple (buyer tx-sender))))))
+
+;; Initialize the contract
+(begin
+  (set-entry! auto-increments 
+    (tuple (id 0))
+    (tuple (value 0))) 
+  (as-contract (contract-call! rocket-market set-factory))
+  'null)
