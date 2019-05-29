@@ -1,13 +1,13 @@
 {
   "name": "@blockstack/clarity-tutorials",
-  "version": "0.1.0",
+  "version": "0.1.0-alpha.1",
   "description": "Getting started with Clarity",
   "author": "Blockstack <engineering@blockstack.com> (https://blockstack.com/)",
   "license": "MIT",
   "main": "lib/index.js",
   "scripts": {
     "build": "npm run clean && npm run compile",
-    "clean": "npx shx rm -rf ./lib tsconfig.tsbuildinfo",
+    "clean": "shx rm -rf ./lib tsconfig.tsbuildinfo",
     "compile": "tsc --build tsconfig.json",
     "prepublishOnly": "npm run build",
     "test": "nyc mocha",
@@ -18,7 +18,7 @@
     "node": ">=10"
   },
   "dependencies": {
-    "@blockstack/clarity": "^0.1.0"
+    "@blockstack/clarity": "^0.1.0-alpha.1"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
@@ -26,6 +26,7 @@
     "chai": "^4.2.0",
     "mocha": "^6.1.4",
     "nyc": "^14.1.1",
+    "shx": "^0.3.2",
     "ts-node": "^8.1.0",
     "typescript": "^3.4.5"
   }
