@@ -1,5 +1,6 @@
 {
   "name": "clarity-monorepo-wrapper",
+  "private": true,
   "version": "1.0.0",
   "description": "Monorepo for the Clarity Javascript SDK",
   "keywords": [],

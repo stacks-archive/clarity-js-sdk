@@ -1,7 +1,7 @@
 {
   "name": "@blockstack/clarity-cli",
   "description": "The Clarity CLI is used to manage Clarity smart contracts from the command line.",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "author": "Blockstack <engineering@blockstack.com> (https://blockstack.com/)",
   "bin": {
     "clarity": "./bin/run"
@@ -61,8 +61,9 @@
   "repository": "blockstack/clarity-cli",
   "scripts": {
     "build": "npm run clean && npm run compile",
-    "clean": "npx shx rm -rf ./lib",
+    "clean": "npx shx rm -rf ./lib tsconfig.build.tsbuildinfo",
     "compile": "tsc --build tsconfig.build.json",
+    "prepublishOnly": "npm run build",
     "lint": "tslint -c tslint.json 'src/**/*.ts'",
     "lint-fix": "tslint --fix -c tslint.json 'src/**/*.ts'",
     "dev": "bin/run",

@@ -1,4 +1,4 @@
-import { Client, Receipt } from "../../../clarity/src";
+import { Client, Receipt } from "@blockstack/clarity";
 
 export class NonFungibleTokenClient extends Client {
   name = "rkt-stock";

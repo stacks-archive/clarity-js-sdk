@@ -1,16 +1,10 @@
 {
-  "extends": "../../tsconfig.build.json",
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "declaration": true,
-    "importHelpers": true,
-    "module": "commonjs",
-    "outDir": "lib",
-    "rootDir": "src",
-    "strict": true,
-    "target": "es2017",
+    "outDir": "./lib",
+    "rootDir": "./src",
     "composite": true,
-    "sourceMap": true,
-    "esModuleInterop": true
+    "declaration": true
   },
   "include": [
     "src/**/*"

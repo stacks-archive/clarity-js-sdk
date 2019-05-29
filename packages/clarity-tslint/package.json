@@ -1,7 +1,7 @@
 {
   "name": "@blockstack/clarity-tslint",
   "description": "tslint rules for blockstack",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "author": "Blockstack <engineering@blockstack.com> (https://blockstack.com/)",
   "dependencies": {
     "tslint-eslint-rules": "^5.4.0",
@@ -22,8 +22,9 @@
   "repository": "blockstack/tslint",
   "scripts": {
     "build": "npm run clean && npm run compile",
-    "clean": "npx shx rm -rf ./lib",
+    "clean": "npx shx rm -rf ./lib tsconfig.build.tsbuildinfo",
     "compile": "tsc --build tsconfig.build.json",
+    "prepublishOnly": "npm run build",
     "test": "tslint -p ."
   },
   "types": "lib/index.d.ts"
