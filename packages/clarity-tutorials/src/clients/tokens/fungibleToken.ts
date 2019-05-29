@@ -1,7 +1,7 @@
 import { Client, Receipt } from "../../../../clarity/src";
 
 export class FungibleTokenClient extends Client {
-  name = "rkt-token";
+  name = "fungible-token";
   filePath = "contracts/tokens/fungible-token.scm";
 
   async transfer(to: string, value: number, params: { sender: string }): Promise<Receipt> {

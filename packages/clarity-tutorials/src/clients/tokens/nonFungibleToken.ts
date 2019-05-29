@@ -1,7 +1,7 @@
 import { Client, Receipt } from "../../../../clarity/src";
 
 export class NonFungibleTokenClient extends Client {
-  name = "rkt-stock";
+  name = "non-fungible-stock";
   filePath = "contracts/tokens/non-fungible-token.scm";
 
   async balanceOf(owner: string): Promise<number> {
