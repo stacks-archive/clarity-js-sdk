@@ -2,11 +2,15 @@ import { it, before } from "mocha";
 import { expect } from "chai";
 import { RocketFactoryClient } from "../../src/clients/rocketTutorial/rocketFactory";
 import { RocketTokenClient } from "../../src/clients/rocketTutorial/rocketToken";
+import { RocketMarketClient } from "../../src/clients/rocketTutorial/rocketMarket";
 import { CargoBuildProvider, Receipt } from "../../../clarity/src";
+import { Provider } from "../../../clarity/src/core/provider";
 
 describe("RocketFactoryClient Test Suite", () => {
   let rocketFactoryClient: RocketFactoryClient;
   let rocketTokenClient: RocketTokenClient;
+  let rocketMarketClient: RocketMarketClient;
+  let provider: Provider;
 
   const addresses = [
     "SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7",
@@ -18,12 +22,16 @@ describe("RocketFactoryClient Test Suite", () => {
   const factory = addresses[2];
 
   before(async () => {
-    const provider = await CargoBuildProvider.createEphemeral();
+    provider = await CargoBuildProvider.createEphemeral();
+
     rocketFactoryClient = new RocketFactoryClient();
     await rocketFactoryClient.tearUp(provider);
 
     rocketTokenClient = new RocketTokenClient();
     await rocketTokenClient.tearUp(provider);
+
+    rocketMarketClient = new RocketMarketClient();
+    await rocketMarketClient.tearUp(provider);
   });
 
   it("should have a valid syntax", async () => {
@@ -36,6 +44,7 @@ describe("RocketFactoryClient Test Suite", () => {
   describe("Deploying an instance of the contract", () => {
     before(async () => {
       await rocketTokenClient.deployContract();
+      await rocketMarketClient.deployContract();
       await rocketFactoryClient.deployContract();
     });
 
@@ -48,11 +57,24 @@ describe("RocketFactoryClient Test Suite", () => {
       const canBobBuy = await rocketFactoryClient.canUserBuy(bob);
       expect(canBobBuy).to.be.true;
     });
+
+    it("should initialize Alice's number of rockets to 0", async () => {
+      const aliceBalance = await rocketMarketClient.balanceOf(alice);
+      expect(aliceBalance).to.equal(0);
+    });
+
+    it("should initialize Bob's number of rockets to 0", async () => {
+      const bobBalance = await rocketMarketClient.balanceOf(bob);
+      expect(bobBalance).to.equal(0);
+    });
   });
 
   describe("Alice buying a rocket of size 10", () => {
+    let minedAt: bigint;
+
     before(async () => {
       await rocketFactoryClient.buyRocket(10, { sender: alice });
+      minedAt = await provider.getBlockHeight();
     });
 
     it("should make Alice unable to buy a new rocket", async () => {
@@ -65,9 +87,82 @@ describe("RocketFactoryClient Test Suite", () => {
       expect(balanceAlice).to.equal(15);
     });
 
+    it("should not produce a claimable rocket", async () => {
+      const isRocketClaimable = await rocketFactoryClient.canUserBuy(alice);
+      expect(isRocketClaimable).to.be.false;
+    });
+
     it("should not impact Bob's ability to buy a new rocket", async () => {
       const canBobBuy = await rocketFactoryClient.canUserBuy(bob);
       expect(canBobBuy).to.be.true;
+    });
+
+    it("should not impact Bob's balance (10 RKT)", async () => {
+      const balanceBob = await rocketTokenClient.balanceOf(bob);
+      expect(balanceBob).to.equal(10);
+    });
+
+    describe("1 block after the transaction, Alice's rocket", () => {
+      before(async () => {
+        await provider.mineBlock();
+      });
+
+      it("should not be claimable", async () => {
+        const isRocketClaimable = await rocketFactoryClient.canUserClaim(alice);
+        expect(isRocketClaimable).to.be.false;
+      });
+    });
+
+    describe("5 blocks after the transaction, Alice's rocket", () => {
+      before(async () => {
+        await provider.mineBlock();
+        await provider.mineBlock();
+        await provider.mineBlock();
+        await provider.mineBlock();
+      });
+
+      it("should not be claimable", async () => {
+        const isRocketClaimable = await rocketFactoryClient.canUserClaim(alice);
+        expect(isRocketClaimable).to.be.false;
+      });
+    });
+
+    describe("10 block after the transaction, Alice's rocket", () => {
+      before(async () => {
+        await provider.mineBlock();
+        await provider.mineBlock();
+        await provider.mineBlock();
+        await provider.mineBlock();
+        await provider.mineBlock();
+      });
+
+      it("should be claimable", async () => {
+        const isRocketClaimable = await rocketFactoryClient.canUserClaim(alice);
+        expect(isRocketClaimable).to.be.true;
+      });
+
+      describe("Alice claiming her rocket", () => {
+        before(async () => {
+          await rocketFactoryClient.claimRocket({ sender: alice });
+        });
+
+        it("should make Alice able to buy a new rocket", async () => {
+          const canAliceBuy = await rocketFactoryClient.canUserBuy(alice);
+          expect(canAliceBuy).to.be.true;
+        });
+
+        it("should decrease Alice's balance of 5 RKT (10 RKT remaining)", async () => {
+          const balanceAlice = await rocketTokenClient.balanceOf(alice);
+          expect(balanceAlice).to.equal(10);
+        });
+
+        it("should increment the market size");
+
+        it("should update Alice's number of rockets to 1", async () => {
+          const aliceBalance = await rocketMarketClient.balanceOf(alice);
+          expect(aliceBalance).to.equal(1);
+        });
+      });
     });
   });
 
