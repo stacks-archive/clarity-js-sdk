@@ -22,9 +22,9 @@ export class RocketFactoryClient extends Client {
     return parseInt(res.data.result);
   }
 
-  async buyRocket(size: number, params: { sender: string }): Promise<Receipt> {
+  async orderRocket(size: number, params: { sender: string }): Promise<Receipt> {
     const tx = this.createTransaction({
-      method: { name: "buy-rocket", args: [`${size}`] }
+      method: { name: "order-rocket", args: [`${size}`] }
     });
     tx.sign(params.sender);
     const res = await this.submitTransaction(tx);
