@@ -5,20 +5,22 @@ export class RocketFactoryClient extends Client {
   filePath = "contracts/rocket-tutorial/rocket-factory.scm";
 
   async canUserBuy(user: string): Promise<boolean> {
-    const query = this.createQuery({ method: { name: "can-user-buy", args: [`'${user}`] } });
-    const res = await this.submitQuery(query);
+    const query = this.createEvaluation({ method: { name: "can-user-buy", args: [`'${user}`] } });
+    const res = await this.submitEvaluation(query);
     return res.data.result === "true";
   }
 
   async canUserClaim(user: string): Promise<boolean> {
-    const query = this.createQuery({ method: { name: "can-user-claim", args: [`'${user}`] } });
-    const res = await this.submitQuery(query);
+    const query = this.createEvaluation({ method: { name: "can-user-claim", args: [`'${user}`] } });
+    const res = await this.submitEvaluation(query);
     return res.data.result === "true";
   }
 
   async rocketClaimableAt(user: string): Promise<number> {
-    const query = this.createQuery({ method: { name: "rocket-claimable-at", args: [`'${user}`] } });
-    const res = await this.submitQuery(query);
+    const query = this.createEvaluation({
+      method: { name: "rocket-claimable-at", args: [`'${user}`] }
+    });
+    const res = await this.submitEvaluation(query);
     return parseInt(res.data.result);
   }
 

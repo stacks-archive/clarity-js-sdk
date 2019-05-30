@@ -1,6 +1,6 @@
 import { Receipt, Method } from ".";
 
-export class Query {
+export class Evaluation {
   receipt?: Receipt;
   method?: Method;
 

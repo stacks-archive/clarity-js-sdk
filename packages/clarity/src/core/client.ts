@@ -1,4 +1,4 @@
-import { Receipt, Method, Transaction, Query } from ".";
+import { Receipt, Method, Transaction, Evaluation } from ".";
 import { Provider } from "./provider";
 
 export class Client {
@@ -42,20 +42,15 @@ export class Client {
     return receipt;
   };
 
-  createQuery = (params: { method?: Method }): Query => {
-    let query = new Query(params.method);
-    return query;
+  createEvaluation = (params: { method?: Method }): Evaluation => {
+    let evaluation = new Evaluation(params.method);
+    return evaluation;
   };
 
-  submitQuery = async (query: Query): Promise<Receipt> => {
-    // let res = await this.node.execute(
-    //     this.name,
-    //     query.method.name,
-    //     "SZ2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKQ9H6DPR",
-    //     ...query.method.args)
+  submitEvaluation = async (evaluation: Evaluation): Promise<Receipt> => {
     let res = await this.provider.eval(
       this.name,
-      `(${query.method.name} ${query.method.args.join(" ")})`,
+      `(${evaluation.method.name} ${evaluation.method.args.join(" ")})`,
       true
     );
     return res;
