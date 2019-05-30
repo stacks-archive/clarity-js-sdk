@@ -14,14 +14,6 @@ export abstract class Provider {
     ...args: string[]
   ): Promise<Receipt>;
 
-  abstract eval(contractName: string, evalStatement: string): Promise<Receipt>;
-
-  abstract eval(
-    contractName: string,
-    evalStatement: string,
-    includeDebugOutput: true
-  ): Promise<Receipt>;
-
   abstract eval(
     contractName: string,
     evalStatement: string,
