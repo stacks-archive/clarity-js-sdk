@@ -1,0 +1,35 @@
+{
+  "name": "@blockstack/clarity-tslint",
+  "description": "tslint rules for blockstack",
+  "version": "0.1.1-alpha.0",
+  "author": "Blockstack <engineering@blockstack.com> (https://blockstack.com/)",
+  "dependencies": {
+    "tslint-eslint-rules": "^5.4.0",
+    "tslint-xo": "^0.16.0"
+  },
+  "devDependencies": {
+    "shx": "^0.3.2",
+    "tslint": "^5.16.0",
+    "typescript": "^3.4.5"
+  },
+  "engines": {
+    "node": ">=10.0.0"
+  },
+  "files": [
+    "/tslint.json"
+  ],
+  "license": "MIT",
+  "main": "tslint.json",
+  "repository": "blockstack/clarity-js-sdk",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "npm run clean && npm run compile",
+    "clean": "shx rm -rf ./lib tsconfig.tsbuildinfo",
+    "compile": "tsc --build tsconfig.json",
+    "prepublishOnly": "npm run build",
+    "test": "tslint -p ."
+  },
+  "types": "lib/index.d.ts"
+}

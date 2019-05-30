@@ -1,27 +1,65 @@
 import { Command, flags } from "@oclif/command";
 import { spawn, SpawnOptions } from "child_process";
+// @ts-ignore
+import { isNonGlibcLinux } from "detect-libc";
 import * as fs from "fs-extra";
+import * as https from "https";
+import fetch from "node-fetch";
+import * as os from "os";
 import * as path from "path";
 import { pipeline, Readable, Transform, Writable, WritableOptions } from "stream";
+import * as tar from "tar";
 import { promisify } from "util";
 import { getPackageDir } from "../index";
 
+const CORE_SRC_GIT_SDK_TAG = "clarity-sdk-v0.0.2";
+
+const DIST_DOWNLOAD_URL =
+  "https://github.com/blockstack/smart-contract-sdk/releases/" +
+  "download/{tag}/clarity-cli-{platform}-{arch}.tar.gz";
+
 const CORE_SRC_GIT_REPO = "https://github.com/blockstack/blockstack-core.git";
-const CORE_SRC_GIT_SDK_TAG = "clarity-sdk-v0.0.1";
 
 export default class Setup extends Command {
   static description = "Install blockstack-core and its dependencies";
 
   static examples = [`$ clarity setup`];
 
-  static flags = {};
+  static flags = {
+    from_source: flags.boolean({
+      description: "Compile binary from Rust source instead of downloading distributable.",
+      default: false
+    }),
+    overwrite: flags.boolean({
+      description: "Overwrites an existing installed clarity-cli bin file.",
+      default: false
+    })
+  };
 
-  static args = [];
+  static args: any[] = [];
 
   async run() {
     const { args, flags } = this.parse(Setup);
-    installNode();
+
+    let success: boolean;
+    if (flags.from_source) {
+      success = await cargoInstall(this, flags);
+    } else {
+      success = await fetchDistributable(this, flags);
+    }
+
+    if (!success) {
+      this.exit(1);
+    } else {
+      this.log("Installed clarity-cli successful.");
+    }
   }
+}
+
+interface CmdLogger {
+  warn(input: string | Error): void;
+  error(input: string | Error): void;
+  log(message?: string, ...args: any[]): void;
 }
 
 async function executeCommand(
@@ -49,7 +87,7 @@ async function executeCommand(
       proc.stdin.end(opts.stdin, "utf8");
     } else {
       writeStdin = pipelineAsync(opts.stdin, proc.stdin).catch((error: any) => {
-        console.debug(`spawn stdin error: ${error}`);
+        console.error(`spawn stdin error: ${error}`);
       });
     }
   }
@@ -131,62 +169,138 @@ async function readStream(
   return memStream.getData();
 }
 
-// TODO: Implement a github releases-download based bin provider, using same git tag.
-
 // TODO: Implement a "install from src" provider, and move these rust toolchain dependent
 //       functions into that provider.
 
-async function checkCargoStatus(): Promise<boolean> {
+function getClarityBinDir() {
+  const thisPackageDir = getPackageDir();
+  const binDir = path.join(thisPackageDir, `.clarity-bin_${CORE_SRC_GIT_SDK_TAG}`);
+  return binDir;
+}
+
+function getClarityBinFilePath() {
+  return path.join(getClarityBinDir(), "bin", "clarity-cli");
+}
+
+async function fetchDistributable(
+  logger: CmdLogger,
+  opts: {
+    overwrite: boolean;
+  }
+): Promise<boolean> {
+  let arch: string;
+  switch (os.arch()) {
+    case "x64":
+      arch = "x64";
+      break;
+    default:
+      logger.error(`System arch "${os.arch()}" not supported. Must build from source.`);
+      return false;
+  }
+
+  let platform: string;
+  switch (os.platform()) {
+    case "win32":
+    case "cygwin":
+      platform = "win";
+      break;
+    case "darwin":
+      platform = "mac";
+      break;
+    case "linux":
+      if (isNonGlibcLinux) {
+        platform = "linux-musl";
+      } else {
+        platform = "linux";
+      }
+      break;
+    default:
+      logger.error(`System platform "${os.platform()}" not supported. Must build from source.`);
+      return false;
+  }
+
+  const clarityBinPath = getClarityBinFilePath();
+  if (fs.existsSync(clarityBinPath)) {
+    if (!opts.overwrite) {
+      logger.error(`Clarity bin already exists at "${clarityBinPath}".`);
+      logger.error("Use the 'overwrite' argument to rebuild and overwrite.");
+      return false;
+    }
+    fs.unlinkSync(clarityBinPath);
+  }
+
+  const downloadUrl = DIST_DOWNLOAD_URL.replace("{tag}", CORE_SRC_GIT_SDK_TAG)
+    .replace("{platform}", platform)
+    .replace("{arch}", arch);
+
+  logger.log(`Fetching ${downloadUrl}`);
+  const httpResponse = await fetch(downloadUrl, { redirect: "follow" });
+  if (!httpResponse.ok) {
+    logger.error(`Bad http response ${httpResponse.status} ${httpResponse.statusText}`);
+    return false;
+  }
+
+  const extractDir = path.join(getClarityBinDir(), "bin");
+  logger.log(`Extracting to ${extractDir}`);
+  fs.mkdirpSync(extractDir);
+  const tarStream = tar.extract({ cwd: extractDir });
+  await pipelineAsync(httpResponse.body, tarStream);
+
+  return true;
+}
+
+async function checkCargoStatus(logger: CmdLogger): Promise<boolean> {
   const result = await executeCommand("cargo", ["--version"]);
   if (result.exitCode === 0 && result.stdout.startsWith("cargo ")) {
     return true;
   }
   if (result.stdout) {
-    console.error(result.stdout);
+    logger.error(result.stdout);
   }
   if (result.stderr) {
-    console.error(result.stderr);
+    logger.error(result.stderr);
   }
-  console.error("Rust's cargo is required and does not appear to be installed.");
-  console.error("Install cargo with rustup: https://rustup.rs/");
+  logger.error("Rust's cargo is required and does not appear to be installed.");
+  logger.error("Install cargo with rustup: https://rustup.rs/");
   return false;
 }
 
-function getClarityBinDir() {
-  const thisPackageDir = getPackageDir();
-  const binDir = path.join(thisPackageDir, `.clarity-bin-${CORE_SRC_GIT_SDK_TAG}`);
-  return binDir;
+function checkDirWritePermissions(logger: CmdLogger, dir: string): boolean {
+  try {
+    fs.accessSync(dir, fs.constants.R_OK | fs.constants.W_OK);
+  } catch (err) {
+    logger.error(err);
+    logger.error(`Permission error: cannot write to directory "${dir}"`);
+    logger.error("Try running with sudo or elevated permissions.");
+    return false;
+  }
+  return true;
 }
 
-function getClarityBinFilePath() {
-  return path.join(getClarityBinDir(), "bin", "clarity");
-}
-
-async function installNode({ forceRebuild = false }: { forceRebuild?: boolean } = {}): Promise<
-  boolean
-> {
-  if (!(await checkCargoStatus())) {
+async function cargoInstall(
+  logger: CmdLogger,
+  opts: {
+    from_source: boolean;
+    overwrite: boolean;
+  }
+): Promise<boolean> {
+  if (!(await checkCargoStatus(logger))) {
     return false;
   }
 
   const clarityBinPath = getClarityBinFilePath();
-  if (fs.existsSync(clarityBinPath)) {
-    console.error(`Clarity bin already exists at "${clarityBinPath}".`);
-    console.error("Use the 'force' argument to rebuild and overwrite.");
+  if (!opts.overwrite && fs.existsSync(clarityBinPath)) {
+    logger.error(`Clarity bin already exists at "${clarityBinPath}".`);
+    logger.error("Use the 'overwrite' argument to rebuild and overwrite.");
     return false;
   }
 
   const thisPackageDir = getPackageDir();
-  const binDir = getClarityBinDir();
-
-  try {
-    fs.accessSync(thisPackageDir, fs.constants.R_OK | fs.constants.W_OK);
-  } catch (err) {
-    console.error(err);
-    console.error(`Permission error: cannot write to directory "${binDir}"`);
-    console.error("Try running with sudo or elevated permissions.");
+  if (!checkDirWritePermissions(logger, thisPackageDir)) {
+    return false;
   }
 
+  const binDir = getClarityBinDir();
   if (!fs.existsSync(binDir)) {
     fs.mkdirpSync(binDir);
   }
@@ -197,14 +311,14 @@ async function installNode({ forceRebuild = false }: { forceRebuild?: boolean } 
     CORE_SRC_GIT_REPO,
     "--tag",
     CORE_SRC_GIT_SDK_TAG,
-    "--bin=clarity",
+    "--bin=clarity-cli",
     "--root",
     binDir
   ];
-  if (forceRebuild === true) {
+  if (opts.overwrite) {
     args.push("--force");
   }
-  console.log(`Running: cargo ${args.join(" ")}`);
+  logger.log(`Running: cargo ${args.join(" ")}`);
   const result = await executeCommand("cargo", args, {
     cwd: binDir,
     monitorStdoutCallback: stdoutData => {
@@ -216,7 +330,8 @@ async function installNode({ forceRebuild = false }: { forceRebuild?: boolean } 
   });
 
   if (result.exitCode !== 0) {
-    throw new Error(`Cargo build failed: ${result.stderr}, ${result.stdout}`);
+    logger.error(`Cargo build failed: ${result.stderr}, ${result.stdout}`);
+    return false;
   }
   return true;
 }

@@ -7,32 +7,32 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "sdk",
+      "name": "clarity-cli: Setup from_dist",
+      "program": "${workspaceFolder}/packages/clarity-cli/bin/run",
       "args": [
-        "${workspaceFolder}/src/index.ts"
+        "setup",
+        "--overwrite"
       ],
-      "runtimeArgs": [
-        "--nolazy",
-        "-r",
-        "ts-node/register/transpile-only"
-      ],
-      "cwd": "${workspaceFolder}",
-      "outputCapture": "std",
       "console": "integratedTerminal"
     },
     {
       "type": "node",
       "request": "launch",
-      "name": "sdk-tests",
-      "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+      "name": "clarity-cli: Setup from_source",
+      "program": "${workspaceFolder}/packages/clarity-cli/bin/run",
       "args": [
-        "--require",
-        "ts-node/register/transpile-only",
-        "--colors",
-        "--recursive",
-        "--timeout=0",
-        "${workspaceFolder}/src/test/**/*.ts"
+        "setup",
+        "--overwrite",
+        "--from_source"
       ],
+      "console": "integratedTerminal",
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "clarity-tutorials: test",
+      "program": "${workspaceFolder}/packages/clarity-tutorials/node_modules/mocha/bin/_mocha",
+      "cwd": "${workspaceFolder}/packages/clarity-tutorials",
       "console": "integratedTerminal"
     }
   ]

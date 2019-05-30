@@ -1,6 +1,7 @@
 {
   "name": "clarity-monorepo-wrapper",
-  "version": "1.0.0",
+  "private": true,
+  "version": "0.0.0",
   "description": "Monorepo for the Clarity Javascript SDK",
   "keywords": [],
   "author": "Blockstack <engineering@blockstack.com> (https://blockstack.com/)",
@@ -9,6 +10,14 @@
     "url": ""
   },
   "license": "MIT",
-  "scripts": {},
-  "devDependencies": {}
+  "scripts": {
+    "prepare": "lerna bootstrap",
+    "lerna": "lerna",
+    "build": "lerna run build"
+  },
+  "devDependencies": {
+    "@types/node": "^10",
+    "lerna": "^3.14.1",
+    "typescript": "^3.4.5"
+  }
 }
