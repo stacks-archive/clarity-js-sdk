@@ -56,35 +56,6 @@
   (get owner 
     (fetch-entry rockets-info (tuple (rocket-id rocket-id)))))
 
-;; Register a rocket
-;; args:
-;; @new-owner (principal) the principal of the new owner
-;; @rocket-id (int) the id of the rocket to transfer
-;; returns: boolean
-(define (register-rocket! (new-owner principal) (rocket-id int))
-  (let ((current-balance (balance-of new-owner)))
-    (begin
-      (set-entry! rockets-info 
-        (tuple (rocket-id rocket-id))
-        (tuple (owner new-owner))) 
-      (set-entry! rockets-count 
-        (tuple (owner new-owner))
-        (tuple (count (+ 1 current-balance)))) 
-      'true)))
-
-;; Release a rocket
-;; args:
-;; @owner (principal) the principal of the current owner
-;; @rocket-id (int) the id of the rocket to release
-;; returns: boolean
-(define (release-rocket! (owner principal) (rocket-id int))
-  (let ((current-balance (balance-of owner)))
-    (begin
-      (set-entry! rockets-count 
-        (tuple (owner owner))
-        (tuple (count (- current-balance 1)))) 
-      'true)))
-
 ;;; Public functions
 
 ;; Transfers rocket to a specified principal
@@ -94,13 +65,24 @@
 ;; @rocket-id (int) the id of the rocket to trade
 ;; returns: boolean
 (define-public (transfer (recipient principal) (rocket-id int))
-  (if (and 
-        (eq? (owner-of rocket-id) tx-sender)
-        (not (eq? recipient tx-sender)))
-    (and
-      (release-rocket! tx-sender rocket-id)
-      (register-rocket! recipient rocket-id))
-    'false))
+  (let ((balance-sender (balance-of tx-sender)))
+    (let ((balance-recipient (balance-of recipient)))
+      (if (and 
+            (eq? (owner-of rocket-id) tx-sender)
+            (> balance-sender 0)
+            (not (eq? recipient tx-sender)))
+        (begin
+          (set-entry! rockets-info 
+            (tuple (rocket-id rocket-id))
+            (tuple (owner recipient))) 
+          (set-entry! rockets-count 
+            (tuple (owner recipient))
+            (tuple (count (+ balance-recipient 1)))) 
+          (set-entry! rockets-count 
+            (tuple (owner tx-sender))
+            (tuple (count (- balance-sender 1))))
+          'true)
+        'false))))
 
 ;; Mint new rockets
 ;; This function can only be called by the factory.
