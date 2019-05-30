@@ -1,4 +1,4 @@
-import { Receipt, Method, Transaction, Query } from ".";
+import { Method, Query, Receipt, Transaction } from ".";
 import { Provider } from "./provider";
 
 export class Client {
@@ -18,12 +18,12 @@ export class Client {
   };
 
   deployContract = async (): Promise<any> => {
-    let receipt = await this.provider.launchContract(this.name, this.filePath);
+    const receipt = await this.provider.launchContract(this.name, this.filePath);
     return receipt;
   };
 
   createTransaction = (params?: { method: Method }): Transaction => {
-    let tx = new Transaction(params.method);
+    const tx = new Transaction(params.method);
     return tx;
   };
 
@@ -43,7 +43,7 @@ export class Client {
   };
 
   createQuery = (params: { method?: Method }): Query => {
-    let query = new Query(params.method);
+    const query = new Query(params.method);
     return query;
   };
 
@@ -53,7 +53,7 @@ export class Client {
     //     query.method.name,
     //     "SZ2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKQ9H6DPR",
     //     ...query.method.args)
-    let res = await this.provider.eval(
+    const res = await this.provider.eval(
       this.name,
       `(${query.method.name} ${query.method.args.join(" ")})`,
       true

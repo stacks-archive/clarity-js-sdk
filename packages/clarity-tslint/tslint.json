@@ -1,19 +1,26 @@
 {
   "extends": [
     "tslint:recommended",
-    "tslint-eslint-rules",
     "tslint-config-prettier"
   ],
-  "rulesDirectory": ["tslint-plugin-prettier"],
+  "rulesDirectory": [
+    "tslint-plugin-prettier"
+  ],
   "rules": {
     "prettier": true,
     "no-unused-expression": {
       "severity": "warn"
     },
     "max-line-length": {
-      "options": [100]
-   },
+      "options": [
+        100
+      ]
+    },
     "no-shadowed-variable": false,
+    "no-empty": {
+      "severity": "warn"
+    },
+    "radix": false,
     "member-access": false,
     "no-console": false,
     "object-literal-sort-keys": false,

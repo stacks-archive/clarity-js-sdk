@@ -1,5 +1,5 @@
-import { Provider } from "../../core/provider";
 import { Receipt } from "../../core";
+import { Provider } from "../../core/provider";
 
 export class JsonRpcProvider implements Provider {
   async initialize(): Promise<void> {}
@@ -33,12 +33,10 @@ export class JsonRpcProvider implements Provider {
     };
   }
 
-  eval(contractName: string, evalStatement: string): Promise<Receipt>;
-  eval(contractName: string, evalStatement: string, includeDebugOutput: true): Promise<Receipt>;
   async eval(
     contractName: string,
     evalStatement: string,
-    includeDebugOutput?: boolean
+    includeDebugOutput = true
   ): Promise<Receipt> {
     return {
       success: false

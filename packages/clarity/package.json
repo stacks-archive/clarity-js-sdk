@@ -10,10 +10,10 @@
     "clean": "shx rm -rf ./lib tsconfig.tsbuildinfo",
     "compile": "tsc --build tsconfig.json",
     "prepublishOnly": "npm run build",
-    "test": "nyc mocha",
-    "tdd": "nodemon -e ts -w ./src -x npm run test",
     "lint": "tslint -p tsconfig.json 'src/**/*.ts' 'test/**/*.ts'",
     "lint-fix": "tslint --fix -p tsconfig.json 'src/**/*.ts' 'test/**/*.ts'",
+    "test": "nyc mocha",
+    "tdd": "nodemon -e ts -w ./src -x npm run test"
   },
   "repository": "blockstack/clarity-js-sdk",
   "publishConfig": {
