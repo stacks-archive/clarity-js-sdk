@@ -1,16 +1,17 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "moduleResolution": "node",
-    "target": "es2018",
-    "module": "commonjs",
-    "lib": ["es2018", "esnext.bigint"],
-    "noImplicitAny": true,
-    "noImplicitThis": true,
-    "noImplicitReturns": true,
-    "sourceMap": true,
-    "declaration": true,
-    "esModuleInterop": true,
-    "outDir": "lib"
+    "outDir": "./lib",
+    "rootDir": "./src",
+    "composite": true,
+    "declaration": true
   },
-  "include": ["src"]
+  "references": [
+    {
+      "path": "../clarity/tsconfig.json"
+    }
+  ],
+  "include": [
+    "src/**/*"
+  ]
 }

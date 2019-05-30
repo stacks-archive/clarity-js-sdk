@@ -1,17 +1,20 @@
 {
-  "name": "clarity-cli",
+  "name": "@blockstack/clarity-cli",
   "description": "The Clarity CLI is used to manage Clarity smart contracts from the command line.",
-  "version": "0.0.0",
+  "version": "0.1.1-alpha.0",
   "author": "Blockstack <engineering@blockstack.com> (https://blockstack.com/)",
   "bin": {
     "clarity": "./bin/run"
   },
-  "bugs": "https://github.com/blockstack/clarity-cli/issues",
+  "bugs": "https://github.com/blockstack/clarity-js-sdk/issues",
   "dependencies": {
     "@oclif/command": "^1.5.13",
     "@oclif/config": "^1.13.0",
     "@oclif/plugin-help": "^2.1.6",
+    "detect-libc": "^1.0.3",
     "fs-extra": "^8.0.1",
+    "node-fetch": "^2.6.0",
+    "tar": "^4.4.8",
     "tslib": "^1.9.3"
   },
   "devDependencies": {
@@ -22,12 +25,15 @@
     "@types/fs-extra": "^7.0.0",
     "@types/mocha": "^5.2.6",
     "@types/node": "^10",
+    "@types/node-fetch": "^2.3.4",
+    "@types/tar": "^4.0.0",
     "chai": "^4.2.0",
     "globby": "^9.2.0",
     "mocha": "^6.1.4",
-    "nyc": "^14.1.1",
+    "nyc": "^13.3.0",
     "prettier": "^1.17.1",
     "prettier-tslint": "^0.4.2",
+    "shx": "^0.3.2",
     "ts-node": "^8.2.0",
     "tslint": "^5.16.0",
     "tslint-config-prettier": "^1.18.0",
@@ -43,7 +49,7 @@
     "/npm-shrinkwrap.json",
     "/oclif.manifest.json"
   ],
-  "homepage": "https://github.com/blockstack/clarity-cli",
+  "homepage": "https://github.com/blockstack/clarity-js-sdk/tree/master/packages/clarity-cli",
   "license": "MIT",
   "main": "lib/index.js",
   "oclif": {
@@ -51,19 +57,25 @@
     "bin": "clarity",
     "plugins": [
       "@oclif/plugin-help"
-    ]
+    ],
+    "repositoryPrefix": "https://github.com/blockstack/clarity-js-sdk/blob/master/packages/clarity-cli/<%- commandPath %>"
   },
-  "repository": "blockstack/clarity-cli",
+  "repository": "blockstack/clarity-js-sdk",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
-    "tsc": "tsc",
+    "build": "npm run clean && npm run compile",
+    "clean": "shx rm -rf ./lib tsconfig.tsbuildinfo",
+    "compile": "tsc --build tsconfig.json",
+    "prepublishOnly": "npm run build && npm run build-oclif",
     "lint": "tslint -c tslint.json 'src/**/*.ts'",
     "lint-fix": "tslint --fix -c tslint.json 'src/**/*.ts'",
     "dev": "bin/run",
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "tslint -p test -t stylish",
-    "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
-    "test": "nyc --extension .ts mocha --forbid-only \"test/**/*.test.ts\"",
-    "version": "oclif-dev readme && git add README.md"
+    "build-oclif": "oclif-dev manifest && oclif-dev readme",
+    "test": "nyc --extension .ts mocha --forbid-only \"test/**/*.test.ts\""
   },
   "types": "lib/index.d.ts"
 }
