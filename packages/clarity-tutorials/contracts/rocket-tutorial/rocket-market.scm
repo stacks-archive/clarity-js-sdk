@@ -65,8 +65,8 @@
 ;; @rocket-id (int) the id of the rocket to trade
 ;; returns: boolean
 (define-public (transfer (recipient principal) (rocket-id int))
-  (let ((balance-sender (balance-of tx-sender)))
-    (let ((balance-recipient (balance-of recipient)))
+  (let ((balance-sender (balance-of tx-sender))
+    (balance-recipient (balance-of recipient)))
       (if (and 
             (eq? (owner-of rocket-id) tx-sender)
             (> balance-sender 0)
@@ -82,7 +82,7 @@
             (tuple (owner tx-sender))
             (tuple (count (- balance-sender 1))))
           'true)
-        'false))))
+        'false)))
 
 ;; Mint new rockets
 ;; This function can only be called by the factory.
