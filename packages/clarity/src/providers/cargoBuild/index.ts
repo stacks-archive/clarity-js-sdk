@@ -1,11 +1,11 @@
-import { Provider } from "../../core/provider";
-import path from "path";
+import { spawn, SpawnOptions } from "child_process";
 import fs from "fs";
 import os from "os";
+import path from "path";
+import { pipeline, Readable, Writable, WritableOptions } from "stream";
 import { promisify } from "util";
-import { SpawnOptions, spawn } from "child_process";
-import { pipeline, Writable, WritableOptions, Readable } from "stream";
 import { Receipt } from "../../core";
+import { Provider } from "../../core/provider";
 
 const CONTRACT_FILE_EXT = ".scm";
 
@@ -137,9 +137,9 @@ export function getContractFilePath(contractFile: string): string {
   }
 
   // Normalize OS path separators.
-  if (path.sep == path.posix.sep && contractFile.includes(path.win32.sep)) {
+  if (path.sep === path.posix.sep && contractFile.includes(path.win32.sep)) {
     contractFile = contractFile.replace(/\\/g, path.sep);
-  } else if (path.sep == path.win32.sep && contractFile.includes(path.posix.sep)) {
+  } else if (path.sep === path.win32.sep && contractFile.includes(path.posix.sep)) {
     contractFile = contractFile.replace(/\//g, path.sep);
   }
 
@@ -176,10 +176,6 @@ class LocalExecutionError extends Error {
 }
 
 export class CargoBuildProvider implements Provider {
-  public readonly dbFilePath: string;
-  readonly coreSrcDir: string;
-  private closeActions: (() => Promise<any>)[] = [];
-
   static getCoreSrcDir() {
     const dir = require("os").homedir() + "/.cargo/bin/";
     return dir;
@@ -207,6 +203,9 @@ export class CargoBuildProvider implements Provider {
     instance.closeActions.push(() => fs.promises.unlink(instance.dbFilePath));
     return instance;
   }
+  public readonly dbFilePath: string;
+  readonly coreSrcDir: string;
+  private closeActions: (() => Promise<any>)[] = [];
 
   constructor(dbFilePath: string, coreSrcDir = CargoBuildProvider.getCoreSrcDir()) {
     this.dbFilePath = dbFilePath;
@@ -378,8 +377,6 @@ export class CargoBuildProvider implements Provider {
     };
   }
 
-  eval(contractName: string, evalStatement: string): Promise<Receipt>;
-  eval(contractName: string, evalStatement: string, includeDebugOutput: true): Promise<Receipt>;
   async eval(
     contractName: string,
     evalStatement: string,

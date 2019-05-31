@@ -14,9 +14,10 @@
     "clean": "shx rm -rf ./lib tsconfig.tsbuildinfo",
     "compile": "tsc --build tsconfig.json",
     "prepublishOnly": "npm run build",
+    "lint": "tslint -p tsconfig.json 'src/**/*.ts' 'test/**/*.ts'",
+    "lint-fix": "tslint --fix -p tsconfig.json 'src/**/*.ts' 'test/**/*.ts'",
     "test": "nyc mocha",
-    "tdd": "nodemon -e ts -w ./src -w ./test -x npm run test",
-    "lint": "tslint  --project tsconfig.json -t codeFrame 'src/**/*.ts' 'test/**/*.ts'"
+    "tdd": "nodemon -e ts -w ./src -w ./test -x npm run test"
   },
   "engines": {
     "node": ">=10"
@@ -32,6 +33,7 @@
     "nyc": "^14.1.1",
     "shx": "^0.3.2",
     "ts-node": "^8.1.0",
+    "tslint": "^5.16.0",
     "typescript": "^3.4.5"
   }
 }

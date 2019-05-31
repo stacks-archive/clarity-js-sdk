@@ -1,4 +1,4 @@
-import { Receipt, Method } from ".";
+import { Method, Receipt } from ".";
 
 export class Query {
   receipt?: Receipt;

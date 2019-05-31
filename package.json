@@ -12,7 +12,7 @@
   "license": "MIT",
   "scripts": {
     "prepare": "lerna bootstrap",
-    "lerna": "lerna",
+    "clean": "lerna clean --yes",
     "build": "lerna run build"
   },
   "devDependencies": {
