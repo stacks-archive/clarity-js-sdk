@@ -1,4 +1,5 @@
-export { Client } from "./client";
+export { Contract } from "./contract";
 export { Transaction } from "./transaction";
 export { Evaluation } from "./evaluation";
-export { Method, Var, Receipt } from "./types";
+export { Principal } from "./principal";
+export * from "./types";

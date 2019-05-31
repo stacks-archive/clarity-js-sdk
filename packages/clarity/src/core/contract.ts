@@ -1,4 +1,4 @@
-import { Receipt, Method, Transaction, Evaluation } from ".";
+import { Receipt, Method, Transaction, Evaluation, CheckResult } from ".";
 import { Provider } from "./provider";
 import { Principal } from "./principal";
 
@@ -18,9 +18,9 @@ export class Contract {
     this.provider = opts.provider;
   }
 
-  check = async (): Promise<boolean> => {
+  check = async (): Promise<CheckResult> => {
     const res = await this.provider.checkContract(this.filePath);
-    return res.success;
+    return { success: res.success, SCI: JSON.parse(res.data.stdout) };
   };
 
   deploy = async (): Promise<any> => {
