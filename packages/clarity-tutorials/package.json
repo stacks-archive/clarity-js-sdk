@@ -15,7 +15,7 @@
     "compile": "tsc --build tsconfig.json",
     "prepublishOnly": "npm run build",
     "test": "nyc mocha",
-    "tdd": "nodemon -e ts -w ./src -w ./test -x npm run test",
+    "tdd": "nodemon -e ts -w ./src -x npm run test",
     "lint": "tslint  --project tsconfig.json -t codeFrame 'src/**/*.ts' 'test/**/*.ts'"
   },
   "engines": {
