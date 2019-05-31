@@ -1,17 +1,26 @@
 import { Receipt, Method } from ".";
+import { Provider } from "./provider";
+import { Submittable } from "./submittable";
 
-export class Evaluation {
+export class Evaluation implements Submittable {
+  contractPrincipal: string;
+  method: Method;
+  provider?: Provider;
   receipt?: Receipt;
-  method?: Method;
 
   constructor(method?: Method) {
     this.method = method;
   }
 
-  validate = async (): Promise<boolean> => {
-    if (!this.method) {
-      throw Error("Query should target a method");
-    }
-    return true;
-  };
+  async sign(): Promise<boolean> {
+    return Promise.resolve(true);
+  }
+
+  async submit(): Promise<Receipt> {
+    throw Error("TO DO");
+  }
+
+  async signAndSubmit(): Promise<Receipt> {
+    throw Error("TO DO");
+  }
 }
