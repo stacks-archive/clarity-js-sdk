@@ -1,7 +1,7 @@
 import { Command, flags } from "@oclif/command";
 
 export default class New extends Command {
-  static description = "Generate new project";
+  static description = "generate new project";
 
   static examples = [`$ clarity new <PROJECT_NAME>`];
 

@@ -21,7 +21,7 @@ const DIST_DOWNLOAD_URL =
 const CORE_SRC_GIT_REPO = "https://github.com/blockstack/blockstack-core.git";
 
 export default class Setup extends Command {
-  static description = "Install blockstack-core and its dependencies";
+  static description = "install blockstack-core and its dependencies";
 
   static examples = [`$ clarity setup`];
 
