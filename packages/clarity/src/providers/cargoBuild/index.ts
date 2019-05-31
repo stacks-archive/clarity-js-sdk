@@ -428,10 +428,10 @@ export class CargoBuildProvider implements Provider {
   }
 
   async mineBlock(time?: number | bigint): Promise<void> {
-    const args = ["mine_block", `--data=${this.dbFilePath}`];
-    if (time) {
-      args.push(`--time=${time.toString()}`);
-    }
+    const args = ["mine_block"];
+    const timeArg = time || Math.round(Date.now() / 1000);
+    args.push(timeArg.toString());
+    args.push(this.dbFilePath);
     const result = await this.cargoRunLocal(args);
 
     if (result.exitCode !== 0) {
