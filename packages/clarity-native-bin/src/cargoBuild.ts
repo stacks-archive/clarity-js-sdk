@@ -1,7 +1,12 @@
 import * as fs from "fs-extra";
+import * as path from "path";
 import { executeCommand } from "./execUtil";
+import { getExecutableFileName, makeUniqueTempDir } from "./fsUtil";
+import { ILogger } from "./logger";
 
-async function checkCargoStatus(logger: CmdLogger): Promise<boolean> {
+const CORE_GIT_REPO = "https://github.com/blockstack/blockstack-core.git";
+
+async function checkCargoStatus(logger: ILogger): Promise<boolean> {
   const result = await executeCommand("cargo", ["--version"]);
   if (result.exitCode === 0 && result.stdout.startsWith("cargo ")) {
     return true;
@@ -17,61 +22,55 @@ async function checkCargoStatus(logger: CmdLogger): Promise<boolean> {
   return false;
 }
 
-export async function cargoInstall(
-  logger: CmdLogger,
-  opts: {
-    from_source: boolean;
-    overwrite: boolean;
-  }
-): Promise<boolean> {
-  if (!(await checkCargoStatus(logger))) {
+export async function cargoInstall(opts: {
+  logger: ILogger;
+  overwriteExisting: boolean;
+  outputFilePath: string;
+  versionTag: string;
+}): Promise<boolean> {
+  if (!(await checkCargoStatus(opts.logger))) {
     return false;
   }
 
-  const clarityBinPath = getClarityBinFilePath();
-  if (!opts.overwrite && fs.existsSync(clarityBinPath)) {
-    logger.error(`Clarity bin already exists at "${clarityBinPath}".`);
-    logger.error("Use the 'overwrite' argument to rebuild and overwrite.");
-    return false;
-  }
-
-  const thisPackageDir = getPackageDir();
-  if (!checkDirWritePermissions(logger, thisPackageDir)) {
-    return false;
-  }
-
-  const binDir = getClarityBinDir();
-  if (!fs.existsSync(binDir)) {
-    fs.mkdirpSync(binDir);
-  }
+  const tempCompileDir = makeUniqueTempDir();
+  opts.logger.log(`Compiling to temp dir ${tempCompileDir}`);
 
   const args = [
     "install",
     "--git",
-    CORE_SRC_GIT_REPO,
+    CORE_GIT_REPO,
     "--tag",
-    CORE_SRC_GIT_SDK_TAG,
+    opts.versionTag,
     "--bin=clarity-cli",
     "--root",
-    binDir
+    tempCompileDir
   ];
-  if (opts.overwrite) {
+  if (opts.overwriteExisting) {
     args.push("--force");
   }
-  logger.log(`Running: cargo ${args.join(" ")}`);
+
+  opts.logger.log(`Running: cargo ${args.join(" ")}`);
   const result = await executeCommand("cargo", args, {
-    cwd: binDir,
+    cwd: tempCompileDir,
     monitorStdoutCallback: stdoutData => {
-      process.stdout.write(stdoutData);
+      opts.logger.log(stdoutData);
     },
     monitorStderrCallback: stderrData => {
-      process.stderr.write(stderrData);
+      opts.logger.error(stderrData);
     }
   });
 
   if (result.exitCode !== 0) {
-    logger.error(`Cargo build failed: ${result.stderr}, ${result.stdout}`);
+    opts.logger.error(`Cargo build failed with exit code ${result.exitCode}`);
     return false;
   }
+
+  const binFileName = getExecutableFileName("clarity-cli");
+  const tempCompileBinDir = path.join(tempCompileDir, "bin");
+  const tempBinFilePath = path.join(tempCompileBinDir, binFileName);
+
+  opts.logger.log(`Moving ${tempBinFilePath} to ${opts.outputFilePath}`);
+  fs.renameSync(tempBinFilePath, opts.outputFilePath);
+
   return true;
 }

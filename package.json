@@ -14,11 +14,12 @@
     "prepare": "lerna bootstrap",
     "clean": "lerna clean",
     "build": "lerna run build",
-    "lerna": "lerna"
+    "lint": "lerna run lint",
+    "lint-fix": "lerna run lint-fix"
   },
   "devDependencies": {
     "@types/node": "^10",
     "lerna": "^3.14.1",
-    "typescript": "^3.4.5"
+    "typescript": "^3.5.1"
   }
 }

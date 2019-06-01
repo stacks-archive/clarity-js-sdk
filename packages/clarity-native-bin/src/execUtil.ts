@@ -1,8 +1,6 @@
 import { spawn, SpawnOptions } from "child_process";
-import { promisify } from "util";
-import { pipeline, Readable, Transform, Writable, WritableOptions } from "stream";
-
-const pipelineAsync = promisify(pipeline);
+import { Readable } from "stream";
+import { pipelineAsync, readStream } from "./streamUtil";
 
 export interface ExecutionResult {
   stdout: string;
@@ -14,61 +12,8 @@ export interface ExecuteOptions {
   cwd?: string;
   env?: NodeJS.ProcessEnv;
   stdin?: Readable | string;
-  monitorStdoutCallback?: (data: Buffer) => void;
-  monitorStderrCallback?: (data: Buffer) => void;
-}
-
-class MemoryStream extends Writable {
-  buffers: Buffer[] = [];
-  constructor(opts?: WritableOptions) {
-    super(opts);
-  }
-  _write(chunk: any, encoding: string, callback: (error?: Error | null) => void): void {
-    if (chunk instanceof Buffer) {
-      this.buffers.push(chunk);
-    } else {
-      this.buffers.push(Buffer.from(chunk, encoding));
-    }
-    callback(null);
-  }
-  getData() {
-    if (this.buffers.length === 1) {
-      return this.buffers[0];
-    }
-    return Buffer.concat(this.buffers);
-  }
-}
-
-async function readStream(
-  stream: Readable,
-  ignoreErrors = false,
-  monitorCallback?: (data: Buffer) => void
-): Promise<Buffer> {
-  const memStream = new MemoryStream();
-  async function startReadInternal() {
-    const streamArr: (NodeJS.ReadableStream | NodeJS.WritableStream)[] = [stream];
-    if (monitorCallback) {
-      const monitorStream = new Transform({
-        transform: (chunk, encoding, callback) => {
-          monitorCallback(chunk instanceof Buffer ? chunk : Buffer.from(chunk, encoding));
-          callback(undefined, chunk);
-        }
-      });
-      streamArr.push(monitorStream);
-    }
-    streamArr.push(memStream);
-    await pipelineAsync(streamArr);
-  }
-  if (ignoreErrors) {
-    try {
-      await startReadInternal();
-    } catch (error) {
-      console.log(`ignored readStream error: ${error}`);
-    }
-  } else {
-    await startReadInternal();
-  }
-  return memStream.getData();
+  monitorStdoutCallback?: (data: string) => void;
+  monitorStderrCallback?: (data: string) => void;
 }
 
 export async function executeCommand(

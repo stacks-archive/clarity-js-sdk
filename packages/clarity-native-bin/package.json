@@ -11,8 +11,9 @@
     "clean": "shx rm -rf ./lib tsconfig.tsbuildinfo",
     "compile": "tsc --build tsconfig.json",
     "prepublishOnly": "npm run build",
-    "test": "nyc mocha",
-    "lint": "tslint --project tsconfig.json -t codeFrame 'src/**/*.ts' 'test/**/*.ts'"
+    "lint": "tslint -p tsconfig.json 'src/**/*.ts' 'test/**/*.ts'",
+    "lint-fix": "tslint --fix -p tsconfig.json 'src/**/*.ts' 'test/**/*.ts'",
+    "test": "nyc mocha"
   },
   "publishConfig": {
     "access": "public"
@@ -23,7 +24,7 @@
   "devDependencies": {
     "@types/chai": "^4.1.7",
     "@types/fs-extra": "^7.0.0",
-    "@types/mocha": "^5.2.6",
+    "@types/mocha": "^5.2.7",
     "@types/node": "^10",
     "@types/node-fetch": "^2.3.4",
     "@types/tar": "^4.0.0",
@@ -31,13 +32,28 @@
     "mocha": "^6.1.4",
     "nyc": "^14.1.1",
     "shx": "^0.3.2",
-    "ts-node": "^8.1.0",
-    "typescript": "^3.4.5"
+    "source-map-support": "^0.5.12",
+    "ts-node": "^8.2.0",
+    "tslint": "^5.17.0",
+    "typescript": "^3.5.1"
   },
   "dependencies": {
-    "detect-libc": "^1.0.3",
     "fs-extra": "^8.0.1",
     "node-fetch": "^2.6.0",
     "tar": "^4.4.8"
+  },
+  "nyc": {
+    "all": true,
+    "cache": false,
+    "extension": [
+      ".ts"
+    ],
+    "include": [
+      "src"
+    ],
+    "reporter": [
+      "text",
+      "lcov"
+    ]
   }
 }

@@ -1,45 +1,58 @@
-import * as os from "os";
-// @ts-ignore
-import { isNonGlibcLinux } from "detect-libc";
-import * as path from "path";
 import * as fs from "fs-extra";
 import fetch from "node-fetch";
+import * as os from "os";
+import * as path from "path";
 import * as tar from "tar";
-import { promisify } from "util";
-import { pipeline } from "stream";
+import { detectLibc } from "./detectLibc";
+import { getExecutableFileName, makeUniqueTempDir } from "./fsUtil";
+import { ILogger } from "./logger";
+import { pipelineAsync } from "./streamUtil";
 
-const pipelineAsync = promisify(pipeline);
+const DIST_DOWNLOAD_URL_TEMPLATE =
+  "https://github.com/blockstack/smart-contract-sdk/releases/" +
+  "download/{tag}/clarity-cli-{platform}-{arch}.tar.gz";
 
-export async function fetchDistributable(
-  logger: CmdLogger,
-  opts: {
-    overwrite: boolean;
-  }
-): Promise<boolean> {
-  let arch: string;
+const enum SupportedDistPlatform {
+  WINDOWS = "win",
+  MACOS = "mac",
+  LINUX = "linux",
+  LINUX_MUSL = "linux-musl"
+}
+
+const enum SupportedDistArch {
+  x64 = "x64"
+}
+
+/**
+ * Gets a download url for a dist archive containing a binary that
+ * can run in the currently executing system OS and architecture.
+ * Returns false if system is incompatible with known available distributables.
+ */
+function getDownloadUrl(logger: ILogger, versionTag: string): string | false {
+  let arch: SupportedDistArch;
   switch (os.arch()) {
     case "x64":
-      arch = "x64";
+      arch = SupportedDistArch.x64;
       break;
     default:
       logger.error(`System arch "${os.arch()}" not supported. Must build from source.`);
       return false;
   }
 
-  let platform: string;
+  let platform: SupportedDistPlatform;
   switch (os.platform()) {
     case "win32":
     case "cygwin":
-      platform = "win";
+      platform = SupportedDistPlatform.WINDOWS;
       break;
     case "darwin":
-      platform = "mac";
+      platform = SupportedDistPlatform.MACOS;
       break;
     case "linux":
-      if (isNonGlibcLinux) {
-        platform = "linux-musl";
+      if (detectLibc().isNonGlibcLinux) {
+        platform = SupportedDistPlatform.LINUX_MUSL;
       } else {
-        platform = "linux";
+        platform = SupportedDistPlatform.LINUX;
       }
       break;
     default:
@@ -47,32 +60,46 @@ export async function fetchDistributable(
       return false;
   }
 
-  const clarityBinPath = getClarityBinFilePath();
-  if (fs.existsSync(clarityBinPath)) {
-    if (!opts.overwrite) {
-      logger.error(`Clarity bin already exists at "${clarityBinPath}".`);
-      logger.error("Use the 'overwrite' argument to rebuild and overwrite.");
-      return false;
-    }
-    fs.unlinkSync(clarityBinPath);
-  }
-
-  const downloadUrl = DIST_DOWNLOAD_URL.replace("{tag}", CORE_SRC_GIT_SDK_TAG)
+  const downloadUrl = DIST_DOWNLOAD_URL_TEMPLATE.replace("{tag}", versionTag)
     .replace("{platform}", platform)
     .replace("{arch}", arch);
+  return downloadUrl;
+}
 
-  logger.log(`Fetching ${downloadUrl}`);
-  const httpResponse = await fetch(downloadUrl, { redirect: "follow" });
-  if (!httpResponse.ok) {
-    logger.error(`Bad http response ${httpResponse.status} ${httpResponse.statusText}`);
+/**
+ * Returns true if install was successful.
+ * @param opts
+ */
+export async function fetchDistributable(opts: {
+  logger: ILogger;
+  overwriteExisting: boolean;
+  outputFilePath: string;
+  versionTag: string;
+}): Promise<boolean> {
+  const downloadUrl = getDownloadUrl(opts.logger, opts.versionTag);
+  if (!downloadUrl) {
     return false;
   }
 
-  const extractDir = path.join(getClarityBinDir(), "bin");
-  logger.log(`Extracting to ${extractDir}`);
-  fs.mkdirpSync(extractDir);
-  const tarStream = tar.extract({ cwd: extractDir });
+  opts.logger.log(`Fetching ${downloadUrl}`);
+  const httpResponse = await fetch(downloadUrl, { redirect: "follow" });
+  if (!httpResponse.ok) {
+    opts.logger.error(`Bad http response ${httpResponse.status} ${httpResponse.statusText}`);
+    return false;
+  }
+
+  const tempExtractDir = makeUniqueTempDir();
+  opts.logger.log(`Extracting to temp dir ${tempExtractDir}`);
+
+  const tarStream = tar.extract({ cwd: tempExtractDir });
   await pipelineAsync(httpResponse.body, tarStream);
+
+  const binFileName = getExecutableFileName("clarity-cli");
+  const tempBinFilePath = path.join(tempExtractDir, binFileName);
+
+  opts.logger.log(`Moving ${tempBinFilePath} to ${opts.outputFilePath}`);
+  fs.renameSync(tempBinFilePath, opts.outputFilePath);
+  fs.rmdirSync(tempExtractDir);
 
   return true;
 }

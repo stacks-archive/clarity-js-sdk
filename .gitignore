@@ -66,3 +66,4 @@ tsconfig.tsbuildinfo
 *.clarity-bin*
 *.tsbuildinfo
 oclif.manifest.json
+*.native-bin
