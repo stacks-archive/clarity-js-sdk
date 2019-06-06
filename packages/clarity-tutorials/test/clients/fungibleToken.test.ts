@@ -1,4 +1,4 @@
-import { CargoBuildProvider } from "@blockstack/clarity";
+import { DefaultProvider, Receipt } from "@blockstack/clarity";
 import { expect } from "chai";
 import { before, it } from "mocha";
 import { FungibleTokenClient } from "../../src/clients/fungibleToken";
@@ -16,7 +16,7 @@ describe("FungibleTokenClient Test Suite", () => {
   const zoe = addresses[2];
 
   before(async () => {
-    const provider = await CargoBuildProvider.createEphemeral();
+    const provider = await DefaultProvider.createEphemeral();
     rocketTokenClient = new FungibleTokenClient();
     await rocketTokenClient.tearUp(provider);
   });

@@ -13,7 +13,7 @@
     "prepublishOnly": "npm run build",
     "lint": "tslint -p tsconfig.json 'src/**/*.ts' 'test/**/*.ts'",
     "lint-fix": "tslint --fix -p tsconfig.json 'src/**/*.ts' 'test/**/*.ts'",
-    "test": "npm run clean && nyc mocha",
+    "test": "npm run build && nyc mocha",
     "postinstall": "node postInstallScript.js"
   },
   "publishConfig": {

@@ -1,4 +1,4 @@
-import { CargoBuildProvider, Receipt } from "@blockstack/clarity";
+import { DefaultProvider, Receipt } from "@blockstack/clarity";
 import { expect } from "chai";
 import { NonFungibleTokenClient } from "../../src/clients/nonFungibleToken";
 
@@ -18,7 +18,7 @@ describe("NonFungibleTokenClient Test Suite", () => {
   const yann = addresses[3];
 
   before(async () => {
-    const provider = await CargoBuildProvider.createEphemeral();
+    const provider = await DefaultProvider.createEphemeral();
     rocketStockClient = new NonFungibleTokenClient();
     await rocketStockClient.tearUp(provider);
   });
