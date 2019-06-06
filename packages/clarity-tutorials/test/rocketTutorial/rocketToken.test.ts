@@ -1,7 +1,7 @@
-import { it, before } from "mocha";
+import { DefaultProvider, Receipt } from "@blockstack/clarity";
 import { expect } from "chai";
+import "mocha";
 import { RocketTokenClient } from "../../src/clients/rocketTutorial/rocketToken";
-import { CargoBuildProvider, Receipt } from "../../../clarity/src";
 
 describe("RocketTokenClient Test Suite", () => {
   let rocketTokenClient: RocketTokenClient;
@@ -16,7 +16,7 @@ describe("RocketTokenClient Test Suite", () => {
   const zoe = addresses[2];
 
   before(async () => {
-    const provider = await CargoBuildProvider.createEphemeral();
+    const provider = await DefaultProvider.createEphemeral();
     rocketTokenClient = new RocketTokenClient();
     await rocketTokenClient.tearUp(provider);
   });

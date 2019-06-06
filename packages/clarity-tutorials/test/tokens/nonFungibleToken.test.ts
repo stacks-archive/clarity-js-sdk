@@ -1,5 +1,6 @@
 import { DefaultProvider, Receipt } from "@blockstack/clarity";
 import { expect } from "chai";
+import "mocha";
 import { NonFungibleTokenClient } from "../../src/clients/tokens/nonFungibleToken";
 
 describe("NonFungibleTokenClient Test Suite", () => {
