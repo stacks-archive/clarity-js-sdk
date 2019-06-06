@@ -26,8 +26,8 @@
   },
   "scripts": {
     "build": "npm run clean && npm run compile",
-    "clean": "shx rm -rf ./lib tsconfig.tsbuildinfo",
-    "compile": "tsc --build tsconfig.json",
+    "clean": "shx rm -rf ./lib tsconfig.build.tsbuildinfo",
+    "compile": "tsc --build tsconfig.build.json",
     "prepublishOnly": "npm run build",
     "test": "tslint -p ."
   },

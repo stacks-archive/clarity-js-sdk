@@ -1,10 +1,10 @@
+
 {
-  "files": [],
-  "references": [
-      { "path": "packages/clarity" },
-      { "path": "packages/clarity-cli" },
-      { "path": "packages/clarity-native-bin" },
-      { "path": "packages/clarity-tslint" },
-      { "path": "packages/clarity-tutorials" }
-  ]
+  "extends": "./tsconfig.build.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@blockstack/*": ["packages/*/src"]
+    }
+  }
 }

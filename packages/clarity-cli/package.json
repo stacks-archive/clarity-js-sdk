@@ -64,8 +64,8 @@
   },
   "scripts": {
     "build": "npm run clean && npm run compile",
-    "clean": "shx rm -rf ./lib tsconfig.tsbuildinfo",
-    "compile": "tsc --build tsconfig.json",
+    "clean": "shx rm -rf ./lib tsconfig.build.tsbuildinfo",
+    "compile": "tsc --build tsconfig.build.json",
     "prepublishOnly": "npm run build && npm run build-oclif",
     "lint": "tslint -p tsconfig.json 'src/**/*.ts' 'test/**/*.ts'",
     "lint-fix": "tslint --fix -p tsconfig.json 'src/**/*.ts' 'test/**/*.ts'",
@@ -73,8 +73,7 @@
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "tslint -p test -t stylish",
     "build-oclif": "oclif-dev manifest && oclif-dev readme",
-    "test_old": "nyc --extension .ts mocha --forbid-only \"test/**/*.test.ts\"",
-    "test": "npm run clean && nyc mocha"
+    "test": "npm run build && nyc mocha"
   },
   "types": "lib/index.d.ts"
 }
