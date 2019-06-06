@@ -48,7 +48,7 @@ export class NonFungibleTokenClient extends Client {
     const tx = this.createTransaction({
       method: { name: "set-spender-approval", args: [`'${spender}`, `${tokenId}`] }
     });
-    tx.sign(params.sender);
+    await tx.sign(params.sender);
     const res = await this.submitTransaction(tx);
     return res;
   }
@@ -61,7 +61,7 @@ export class NonFungibleTokenClient extends Client {
     const tx = this.createTransaction({
       method: { name: "set-operator-approval", args: [`'${operator}`, `'${isApproved}`] }
     });
-    tx.sign(params.sender);
+    await tx.sign(params.sender);
     const res = await this.submitTransaction(tx);
     return res;
   }
@@ -75,7 +75,7 @@ export class NonFungibleTokenClient extends Client {
     const tx = this.createTransaction({
       method: { name: "transfer-from", args: [`'${from}`, `'${to}`, `${tokenId}`] }
     });
-    tx.sign(params.sender);
+    await tx.sign(params.sender);
     const res = await this.submitTransaction(tx);
     return res;
   }
@@ -84,7 +84,7 @@ export class NonFungibleTokenClient extends Client {
     const tx = this.createTransaction({
       method: { name: "transfer", args: [`'${to}`, `${tokenId}`] }
     });
-    tx.sign(params.sender);
+    await tx.sign(params.sender);
     const res = await this.submitTransaction(tx);
     return res;
   }

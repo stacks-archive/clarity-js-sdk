@@ -26,7 +26,7 @@ export class RocketFactoryClient extends Client {
     const tx = this.createTransaction({
       method: { name: "order-rocket", args: [`${size}`] }
     });
-    tx.sign(params.sender);
+    await tx.sign(params.sender);
     const res = await this.submitTransaction(tx);
     return res;
   }
@@ -35,7 +35,7 @@ export class RocketFactoryClient extends Client {
     const tx = this.createTransaction({
       method: { name: "claim-rocket", args: [] }
     });
-    tx.sign(params.sender);
+    await tx.sign(params.sender);
     const res = await this.submitTransaction(tx);
     return res;
   }
