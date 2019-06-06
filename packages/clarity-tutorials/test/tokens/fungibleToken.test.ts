@@ -1,10 +1,11 @@
-import { DefaultProvider, Receipt } from "@blockstack/clarity";
+import { Provider, ProviderRegistry, Receipt } from "@blockstack/clarity";
 import { expect } from "chai";
 import "mocha";
 import { FungibleTokenClient } from "../../src/clients/tokens/fungibleToken";
 
 describe("FungibleTokenClient Test Suite", () => {
   let stacksTokenClient: FungibleTokenClient;
+  let provider: Provider;
 
   const addresses = [
     "SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7",
@@ -16,7 +17,7 @@ describe("FungibleTokenClient Test Suite", () => {
   const zoe = addresses[2];
 
   before(async () => {
-    const provider = await DefaultProvider.createEphemeral();
+    provider = await ProviderRegistry.createProvider();
     stacksTokenClient = new FungibleTokenClient();
     await stacksTokenClient.tearUp(provider);
   });
@@ -268,5 +269,9 @@ describe("FungibleTokenClient Test Suite", () => {
       const allowanceZoe = await stacksTokenClient.allowanceOf(zoe, alice);
       expect(allowanceZoe).to.equal(0);
     });
+  });
+
+  after(async () => {
+    await provider.close();
   });
 });

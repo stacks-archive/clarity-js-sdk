@@ -7,6 +7,9 @@
   "references": [
     {
       "path": "../clarity/tsconfig.json"
+    },
+    {
+      "path": "../clarity-native-bin/tsconfig.json"
     }
   ],
   "include": [

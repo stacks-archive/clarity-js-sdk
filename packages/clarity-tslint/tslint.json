@@ -8,7 +8,6 @@
   ],
   "rules": {
     "prettier": true,
-    "promise-function-async": true,
     "await-promise": true,
     "no-floating-promises": true,
     "no-unused-expression": {

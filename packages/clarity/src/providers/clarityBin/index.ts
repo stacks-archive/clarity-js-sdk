@@ -1,4 +1,3 @@
-import * as nativeClarityBin from "@blockstack/clarity-native-bin";
 import fs from "fs";
 import { Receipt } from "../../core";
 import { Provider } from "../../core/provider";
@@ -23,12 +22,13 @@ export class ExecutionError extends Error {
 
 export class NativeClarityBinProvider implements Provider {
   /**
-   * Instantiates a new executor.
-   * Before returning, ensures db is ready with `initialize`.
+   * Instantiates a new executor. Before returning, ensures db is ready with `initialize`.
+   * @param dbFilePath File path to the db. If not specified then a temporary file is created
+   *                   and gets deleted when `close` is invoked.
    */
   static async create(
     dbFilePath: string,
-    clarityBinPath?: string
+    clarityBinPath: string
   ): Promise<NativeClarityBinProvider> {
     const executor = new NativeClarityBinProvider(dbFilePath, clarityBinPath);
     await executor.initialize();
@@ -40,7 +40,7 @@ export class NativeClarityBinProvider implements Provider {
    * The temp file is deleted when `close` is invoked.
    * Before returning, ensures db is ready with `initialize`.
    */
-  static async createEphemeral(clarityBinPath?: string): Promise<Provider> {
+  static async createEphemeral(clarityBinPath: string): Promise<Provider> {
     const tempDbPath = getTempFilePath("blockstack-local-{uniqueID}.db");
     const instance = await this.create(tempDbPath, clarityBinPath);
     instance.closeActions.push(() => fs.promises.unlink(instance.dbFilePath));
@@ -51,7 +51,7 @@ export class NativeClarityBinProvider implements Provider {
   readonly clarityBinPath: string;
   private closeActions: (() => Promise<any>)[] = [];
 
-  constructor(dbFilePath: string, clarityBinPath = nativeClarityBin.getDefaultBinaryFilePath()) {
+  constructor(dbFilePath: string, clarityBinPath: string) {
     this.dbFilePath = dbFilePath;
     this.clarityBinPath = clarityBinPath;
   }

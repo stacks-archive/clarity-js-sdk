@@ -23,7 +23,7 @@ function getThisPackageDir(): string {
 /**
  * Returns the full file path of the native clarity-cli executable.
  * Throws an error if it does not exist.
- * @param checkExists If true then an error is thrown if the file does not exist.
+ * @param checkExists [Default = true] If true then an error is thrown if the file does not exist.
  */
 export function getDefaultBinaryFilePath({
   checkExists = true

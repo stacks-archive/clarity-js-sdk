@@ -23,9 +23,13 @@
     "node": ">=10"
   },
   "dependencies": {
+
+  },
+  "peerDependencies": {
     "@blockstack/clarity-native-bin": "^0.1.1-alpha.0"
   },
   "devDependencies": {
+    "@blockstack/clarity-native-bin": "^0.1.1-alpha.0",
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.7",
     "chai": "^4.2.0",

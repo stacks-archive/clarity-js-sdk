@@ -1,4 +1,4 @@
-import { DefaultProvider, Provider, Receipt } from "@blockstack/clarity";
+import { Provider, ProviderRegistry, Receipt } from "@blockstack/clarity";
 import { expect } from "chai";
 import "mocha";
 import { RocketFactoryClient } from "../../src/clients/rocketTutorial/rocketFactory";
@@ -21,7 +21,7 @@ describe("RocketFactoryClient Test Suite", () => {
   const factory = addresses[2];
 
   before(async () => {
-    provider = await DefaultProvider.createEphemeral();
+    provider = await ProviderRegistry.createProvider();
 
     rocketFactoryClient = new RocketFactoryClient();
     await rocketFactoryClient.tearUp(provider);
@@ -354,5 +354,9 @@ describe("RocketFactoryClient Test Suite", () => {
         });
       });
     });
+  });
+
+  after(async () => {
+    await provider.close();
   });
 });

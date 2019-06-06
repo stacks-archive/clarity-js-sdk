@@ -1,10 +1,11 @@
-import { DefaultProvider, Receipt } from "@blockstack/clarity";
+import { Provider, ProviderRegistry, Receipt } from "@blockstack/clarity";
 import { expect } from "chai";
 import "mocha";
 import { RocketTokenClient } from "../../src/clients/rocketTutorial/rocketToken";
 
 describe("RocketTokenClient Test Suite", () => {
   let rocketTokenClient: RocketTokenClient;
+  let provider: Provider;
 
   const addresses = [
     "SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7",
@@ -16,7 +17,7 @@ describe("RocketTokenClient Test Suite", () => {
   const zoe = addresses[2];
 
   before(async () => {
-    const provider = await DefaultProvider.createEphemeral();
+    provider = await ProviderRegistry.createProvider();
     rocketTokenClient = new RocketTokenClient();
     await rocketTokenClient.tearUp(provider);
   });
@@ -132,5 +133,9 @@ describe("RocketTokenClient Test Suite", () => {
       const balanceBob = await rocketTokenClient.balanceOf(bob);
       expect(balanceBob).to.equal(15);
     });
+  });
+
+  after(async () => {
+    await provider.close();
   });
 });

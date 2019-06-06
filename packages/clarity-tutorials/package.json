@@ -23,7 +23,8 @@
     "node": ">=10"
   },
   "dependencies": {
-    "@blockstack/clarity": "^0.1.1-alpha.0"
+    "@blockstack/clarity": "^0.1.1-alpha.0",
+    "@blockstack/clarity-native-bin": "^0.1.1-alpha.0"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
