@@ -1,7 +1,7 @@
-import { it, before } from "mocha";
+import { CargoBuildProvider } from "@blockstack/clarity";
 import { expect } from "chai";
+import { before, it } from "mocha";
 import { FungibleTokenClient } from "../../src/clients/fungibleToken";
-import { CargoBuildProvider, Receipt } from "../../../clarity/src";
 
 describe("FungibleTokenClient Test Suite", () => {
   let rocketTokenClient: FungibleTokenClient;

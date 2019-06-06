@@ -1,6 +1,5 @@
 import { assert, expect, should } from "chai";
 import fs from "fs";
-import "mocha";
 import * as index from "../src";
 
 describe("install via dist", () => {

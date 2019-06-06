@@ -16,7 +16,7 @@
     "prepublishOnly": "npm run build",
     "lint": "tslint -p tsconfig.json 'src/**/*.ts' 'test/**/*.ts'",
     "lint-fix": "tslint --fix -p tsconfig.json 'src/**/*.ts' 'test/**/*.ts'",
-    "test": "nyc mocha",
+    "test": "npm run clean && nyc mocha",
     "tdd": "nodemon -e ts -w ./src -w ./test -x npm run test"
   },
   "engines": {

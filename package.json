@@ -12,8 +12,9 @@
   "license": "MIT",
   "scripts": {
     "prepare": "lerna bootstrap",
-    "clean": "lerna clean",
+    "clean": "lerna clean --yes",
     "build": "lerna run build",
+    "test": "lerna run test",
     "lint": "lerna run lint",
     "lint-fix": "lerna run lint-fix"
   },
