@@ -66,4 +66,5 @@ tsconfig.tsbuildinfo
 *.clarity-bin*
 *.tsbuildinfo
 oclif.manifest.json
+package.json.lerna_backup
 *.native-bin

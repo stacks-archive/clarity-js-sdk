@@ -1,9 +1,9 @@
 import { DefaultProvider, Receipt } from "@blockstack/clarity";
 import { expect } from "chai";
-import { NonFungibleTokenClient } from "../../src/clients/nonFungibleToken";
+import { NonFungibleTokenClient } from "../../src/clients/tokens/nonFungibleToken";
 
 describe("NonFungibleTokenClient Test Suite", () => {
-  let rocketStockClient: NonFungibleTokenClient;
+  let nftokenStockClient: NonFungibleTokenClient;
 
   const addresses = [
     "SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7",
@@ -19,63 +19,63 @@ describe("NonFungibleTokenClient Test Suite", () => {
 
   before(async () => {
     const provider = await DefaultProvider.createEphemeral();
-    rocketStockClient = new NonFungibleTokenClient();
-    await rocketStockClient.tearUp(provider);
+    nftokenStockClient = new NonFungibleTokenClient();
+    await nftokenStockClient.tearUp(provider);
   });
 
   it("should have a valid syntax", async () => {
-    const res = await rocketStockClient.checkContract();
+    const res = await nftokenStockClient.checkContract();
     expect(res).to.be.true;
   });
 
   describe("Deploying an instance of the contract", () => {
     before(async () => {
-      await rocketStockClient.deployContract();
+      await nftokenStockClient.deployContract();
     });
 
     it("should initialize Alice's balance (2 asset)", async () => {
-      const balanceAlice = await rocketStockClient.balanceOf(alice);
+      const balanceAlice = await nftokenStockClient.balanceOf(alice);
       expect(balanceAlice).to.equal(2);
     });
 
     it("should initialize Bob's balance (1 asset)", async () => {
-      const balanceBob = await rocketStockClient.balanceOf(bob);
+      const balanceBob = await nftokenStockClient.balanceOf(bob);
       expect(balanceBob).to.equal(1);
     });
 
     it("should make Alice owner of asset #10001", async () => {
-      const owner10001 = await rocketStockClient.ownerOf(10001);
+      const owner10001 = await nftokenStockClient.ownerOf(10001);
       expect(owner10001).to.equal(alice);
     });
 
     it("should make Alice owner of asset #10002", async () => {
-      const owner10002 = await rocketStockClient.ownerOf(10002);
+      const owner10002 = await nftokenStockClient.ownerOf(10002);
       expect(owner10002).to.equal(alice);
     });
 
     it("should make Bib owner of asset #10003", async () => {
-      const owner10003 = await rocketStockClient.ownerOf(10003);
+      const owner10003 = await nftokenStockClient.ownerOf(10003);
       expect(owner10003).to.equal(bob);
     });
   });
 
   describe("Alice transfering asset #10001 to Bob", () => {
     before(async () => {
-      await rocketStockClient.transfer(bob, 10001, { sender: alice });
+      await nftokenStockClient.transfer(bob, 10001, { sender: alice });
     });
 
     it("should decrease Alice's balance (1 asset)", async () => {
-      const balanceAlice = await rocketStockClient.balanceOf(alice);
+      const balanceAlice = await nftokenStockClient.balanceOf(alice);
       expect(balanceAlice).to.equal(1);
     });
 
     it("should increase Bob's balance (2 assets)", async () => {
-      const balanceBob = await rocketStockClient.balanceOf(bob);
+      const balanceBob = await nftokenStockClient.balanceOf(bob);
       expect(balanceBob).to.equal(2);
     });
 
     it("should make Bob owner of asset #10001", async () => {
-      const owner10001 = await rocketStockClient.ownerOf(10001);
+      const owner10001 = await nftokenStockClient.ownerOf(10001);
       expect(owner10001).to.equal(bob);
     });
   });
@@ -84,7 +84,7 @@ describe("NonFungibleTokenClient Test Suite", () => {
     let receipt: Receipt;
 
     before(async () => {
-      receipt = await rocketStockClient.transfer(bob, 10003, { sender: alice });
+      receipt = await nftokenStockClient.transfer(bob, 10003, { sender: alice });
     });
 
     it("should return an invalid receipt", async () => {
@@ -92,12 +92,12 @@ describe("NonFungibleTokenClient Test Suite", () => {
     });
 
     it("should not increase Yann's balance (0 assets)", async () => {
-      const balanceAlice = await rocketStockClient.balanceOf(yann);
-      expect(balanceAlice).to.equal(0);
+      const balanceYann = await nftokenStockClient.balanceOf(yann);
+      expect(balanceYann).to.equal(0);
     });
 
     it("should not decrease Bob's balance (2 assets)", async () => {
-      const balanceBob = await rocketStockClient.balanceOf(bob);
+      const balanceBob = await nftokenStockClient.balanceOf(bob);
       expect(balanceBob).to.equal(2);
     });
   });
@@ -106,7 +106,7 @@ describe("NonFungibleTokenClient Test Suite", () => {
     let receipt: Receipt;
 
     before(async () => {
-      receipt = await rocketStockClient.transfer(alice, 10002, { sender: alice });
+      receipt = await nftokenStockClient.transfer(alice, 10002, { sender: alice });
     });
 
     it("should return an invalid receipt", async () => {
@@ -114,12 +114,12 @@ describe("NonFungibleTokenClient Test Suite", () => {
     });
 
     it("should not increase Yann's balance (0 assets)", async () => {
-      const balanceAlice = await rocketStockClient.balanceOf(alice);
+      const balanceAlice = await nftokenStockClient.balanceOf(alice);
       expect(balanceAlice).to.equal(1);
     });
 
     it("should not decrease Bob's balance (2 assets)", async () => {
-      const balanceBob = await rocketStockClient.balanceOf(bob);
+      const balanceBob = await nftokenStockClient.balanceOf(bob);
       expect(balanceBob).to.equal(2);
     });
   });
@@ -128,7 +128,7 @@ describe("NonFungibleTokenClient Test Suite", () => {
     let receipt: Receipt;
 
     before(async () => {
-      receipt = await rocketStockClient.transfer(alice, 10003, { sender: alice });
+      receipt = await nftokenStockClient.transfer(alice, 10003, { sender: alice });
     });
 
     it("should return an invalid receipt", async () => {
@@ -136,28 +136,28 @@ describe("NonFungibleTokenClient Test Suite", () => {
     });
 
     it("should not increase Alice's balance (1 assets)", async () => {
-      const balanceAlice = await rocketStockClient.balanceOf(alice);
+      const balanceAlice = await nftokenStockClient.balanceOf(alice);
       expect(balanceAlice).to.equal(1);
     });
 
     it("should not decrease Bob's balance (2 assets)", async () => {
-      const balanceBob = await rocketStockClient.balanceOf(bob);
+      const balanceBob = await nftokenStockClient.balanceOf(bob);
       expect(balanceBob).to.equal(2);
     });
   });
 
   describe("Bob approving Zoe to trade the asset #10003 on his behalf", () => {
     before(async () => {
-      await rocketStockClient.setSpenderApproval(zoe, 10003, { sender: bob });
+      await nftokenStockClient.setSpenderApproval(zoe, 10003, { sender: bob });
     });
 
     it("should make Zoe able to transfer asset #10003", async () => {
-      const allowanceZoe = await rocketStockClient.canTransfer(zoe, 10003);
+      const allowanceZoe = await nftokenStockClient.canTransfer(zoe, 10003);
       expect(allowanceZoe).to.be.true;
     });
 
     it("should NOT make Zoe able to transfer asset #10001", async () => {
-      const allowanceZoe = await rocketStockClient.canTransfer(zoe, 10001);
+      const allowanceZoe = await nftokenStockClient.canTransfer(zoe, 10001);
       expect(allowanceZoe).to.be.false;
     });
 
@@ -165,7 +165,7 @@ describe("NonFungibleTokenClient Test Suite", () => {
       let receipt: Receipt;
 
       before(async () => {
-        receipt = await rocketStockClient.transferFrom(alice, bob, 10003, { sender: zoe });
+        receipt = await nftokenStockClient.transferFrom(alice, bob, 10003, { sender: zoe });
       });
 
       it("should return an invalid receipt", async () => {
@@ -173,38 +173,38 @@ describe("NonFungibleTokenClient Test Suite", () => {
       });
 
       it("should not increase Alice's balance (1 assets)", async () => {
-        const balanceAlice = await rocketStockClient.balanceOf(alice);
+        const balanceAlice = await nftokenStockClient.balanceOf(alice);
         expect(balanceAlice).to.equal(1);
       });
 
       it("should not decrease Bob's balance (2 assets)", async () => {
-        const balanceBob = await rocketStockClient.balanceOf(bob);
+        const balanceBob = await nftokenStockClient.balanceOf(bob);
         expect(balanceBob).to.equal(2);
       });
     });
 
     describe("Zoe transfering asset #10003 to Alice on Bob behalf", () => {
       before(async () => {
-        await rocketStockClient.transferFrom(bob, alice, 10003, { sender: zoe });
+        await nftokenStockClient.transferFrom(bob, alice, 10003, { sender: zoe });
       });
 
       it("should increase Alice's balance (2 asset)", async () => {
-        const balanceAlice = await rocketStockClient.balanceOf(alice);
+        const balanceAlice = await nftokenStockClient.balanceOf(alice);
         expect(balanceAlice).to.equal(2);
       });
 
       it("should decrease Bob's balance (1 asset)", async () => {
-        const balanceBob = await rocketStockClient.balanceOf(bob);
+        const balanceBob = await nftokenStockClient.balanceOf(bob);
         expect(balanceBob).to.equal(1);
       });
 
       it("should make Alice owner of asset #10002", async () => {
-        const owner10002 = await rocketStockClient.ownerOf(10002);
+        const owner10002 = await nftokenStockClient.ownerOf(10002);
         expect(owner10002).to.equal(alice);
       });
 
       it("should revoke Zoe's ability to trade asset #10002", async () => {
-        const allowanceZoe = await rocketStockClient.canTransfer(zoe, 10002);
+        const allowanceZoe = await nftokenStockClient.canTransfer(zoe, 10002);
         expect(allowanceZoe).to.be.false;
       });
     });
@@ -212,21 +212,21 @@ describe("NonFungibleTokenClient Test Suite", () => {
 
   describe("Alice approving Yann as an operator", () => {
     before(async () => {
-      await rocketStockClient.setOperatorApproval(yann, true, { sender: alice });
+      await nftokenStockClient.setOperatorApproval(yann, true, { sender: alice });
     });
 
     it("should NOT make Yann able to transfer asset #10001", async () => {
-      const allowanceYann = await rocketStockClient.canTransfer(yann, 10001);
+      const allowanceYann = await nftokenStockClient.canTransfer(yann, 10001);
       expect(allowanceYann).to.be.false;
     });
 
     it("should make Yann able to transfer asset #10002", async () => {
-      const allowanceYann = await rocketStockClient.canTransfer(yann, 10002);
+      const allowanceYann = await nftokenStockClient.canTransfer(yann, 10002);
       expect(allowanceYann).to.be.true;
     });
 
     it("should make Zoe able to transfer asset #10003", async () => {
-      const allowanceYann = await rocketStockClient.canTransfer(yann, 10003);
+      const allowanceYann = await nftokenStockClient.canTransfer(yann, 10003);
       expect(allowanceYann).to.be.true;
     });
 
@@ -234,7 +234,7 @@ describe("NonFungibleTokenClient Test Suite", () => {
       let receipt: Receipt;
 
       before(async () => {
-        receipt = await rocketStockClient.transferFrom(alice, bob, 10001, { sender: yann });
+        receipt = await nftokenStockClient.transferFrom(alice, bob, 10001, { sender: yann });
       });
 
       it("should return an invalid receipt", async () => {
@@ -242,12 +242,12 @@ describe("NonFungibleTokenClient Test Suite", () => {
       });
 
       it("should not increase Alice's balance (2 assets)", async () => {
-        const balanceAlice = await rocketStockClient.balanceOf(alice);
+        const balanceAlice = await nftokenStockClient.balanceOf(alice);
         expect(balanceAlice).to.equal(2);
       });
 
       it("should not decrease Bob's balance (1 assets)", async () => {
-        const balanceBob = await rocketStockClient.balanceOf(bob);
+        const balanceBob = await nftokenStockClient.balanceOf(bob);
         expect(balanceBob).to.equal(1);
       });
     });
@@ -256,7 +256,7 @@ describe("NonFungibleTokenClient Test Suite", () => {
       let receipt: Receipt;
 
       before(async () => {
-        receipt = await rocketStockClient.transferFrom(bob, alice, 10002, { sender: yann });
+        receipt = await nftokenStockClient.transferFrom(bob, alice, 10002, { sender: yann });
       });
 
       it("should return an invalid receipt", async () => {
@@ -264,12 +264,12 @@ describe("NonFungibleTokenClient Test Suite", () => {
       });
 
       it("should not increase Alice's balance (2 assets)", async () => {
-        const balanceAlice = await rocketStockClient.balanceOf(alice);
+        const balanceAlice = await nftokenStockClient.balanceOf(alice);
         expect(balanceAlice).to.equal(2);
       });
 
       it("should not decrease Bob's balance (1 assets)", async () => {
-        const balanceBob = await rocketStockClient.balanceOf(bob);
+        const balanceBob = await nftokenStockClient.balanceOf(bob);
         expect(balanceBob).to.equal(1);
       });
     });
@@ -278,7 +278,7 @@ describe("NonFungibleTokenClient Test Suite", () => {
       let receipt: Receipt;
 
       before(async () => {
-        receipt = await rocketStockClient.transferFrom(alice, bob, 10002, { sender: yann });
+        receipt = await nftokenStockClient.transferFrom(alice, bob, 10002, { sender: yann });
       });
 
       it("should return an invalid receipt", async () => {
@@ -286,32 +286,32 @@ describe("NonFungibleTokenClient Test Suite", () => {
       });
 
       it("should increase Alice's balance (1 assets)", async () => {
-        const balanceAlice = await rocketStockClient.balanceOf(alice);
+        const balanceAlice = await nftokenStockClient.balanceOf(alice);
         expect(balanceAlice).to.equal(1);
       });
 
       it("should decrease Bob's balance (2 assets)", async () => {
-        const balanceBob = await rocketStockClient.balanceOf(bob);
+        const balanceBob = await nftokenStockClient.balanceOf(bob);
         expect(balanceBob).to.equal(2);
       });
 
       it("should make Bob owner of asset #10002", async () => {
-        const owner10002 = await rocketStockClient.ownerOf(10002);
+        const owner10002 = await nftokenStockClient.ownerOf(10002);
         expect(owner10002).to.equal(bob);
       });
 
       it("should revoke Yann's ability to trade asset #10002", async () => {
-        const allowanceYann = await rocketStockClient.canTransfer(yann, 10002);
+        const allowanceYann = await nftokenStockClient.canTransfer(yann, 10002);
         expect(allowanceYann).to.be.false;
       });
     });
     describe("Alice revoking Yann as an operator", () => {
       before(async () => {
-        await rocketStockClient.setOperatorApproval(yann, false, { sender: alice });
+        await nftokenStockClient.setOperatorApproval(yann, false, { sender: alice });
       });
 
       it("should revoke Yann's ability to trade asset #10003", async () => {
-        const allowanceYann = await rocketStockClient.canTransfer(yann, 10003);
+        const allowanceYann = await nftokenStockClient.canTransfer(yann, 10003);
         expect(allowanceYann).to.be.false;
       });
     });
