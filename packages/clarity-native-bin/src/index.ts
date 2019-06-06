@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import { cargoInstall } from "./cargoBuild";
-import { fetchDistributable } from "./fetchDist";
+import { fetchDistributable, getDownloadUrl } from "./fetchDist";
 import { getExecutableFileName, verifyOutputFile } from "./fsUtil";
 import { ILogger } from "./logger";
 
@@ -37,10 +37,10 @@ export function getDefaultBinaryFilePath({
   return binFilePath;
 }
 
-export async function installDefault({
+export async function installDefaultPath({
   checkExists = false,
-  fromSource = false
-}: { checkExists?: boolean; fromSource?: boolean } = {}) {
+  fromSource = null
+}: { checkExists?: boolean; fromSource?: boolean } = {}): Promise<boolean> {
   const installPath = getDefaultBinaryFilePath({ checkExists: checkExists });
   const logger: ILogger = {
     error: (input: string | Error): void => {
@@ -50,6 +50,19 @@ export async function installDefault({
       console.log(message);
     }
   };
+  if (!fromSource) {
+    const distFileAvailable = getDownloadUrl(logger, CORE_SDK_TAG);
+    // If the distFile is not available, and `fromSource` is explicitly disabled
+    // then return false (failure).
+    if (!distFileAvailable && fromSource === false) {
+      logger.error("Dist files are not available and `fromSource` is explicitly disabled.");
+      return false;
+    } else if (!distFileAvailable) {
+      // Otherwise, if `fromSource` was left undefined/null then enable it.
+      fromSource = true;
+    }
+  }
+
   const success = await install({
     fromSource: fromSource,
     logger: logger,
@@ -57,9 +70,7 @@ export async function installDefault({
     outputFilePath: installPath,
     versionTag: CORE_SDK_TAG
   });
-  if (!success) {
-    process.exit(1);
-  }
+  return success;
 }
 
 export async function install(opts: {

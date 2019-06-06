@@ -28,7 +28,7 @@ const enum SupportedDistArch {
  * can run in the currently executing system OS and architecture.
  * Returns false if system is incompatible with known available distributables.
  */
-function getDownloadUrl(logger: ILogger, versionTag: string): string | false {
+export function getDownloadUrl(logger: ILogger, versionTag: string): string | false {
   let arch: SupportedDistArch;
   switch (os.arch()) {
     case "x64":
