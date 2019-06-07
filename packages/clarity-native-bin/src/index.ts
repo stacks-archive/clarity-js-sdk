@@ -9,7 +9,7 @@ import { ILogger } from "./logger";
  * Should correspond to both a git tag on the blockstack-core repo and a
  * set of clarity-binary distributables uploaded to the cloud storage endpoint.
  */
-export const CORE_SDK_TAG = "clarity-sdk-v0.0.2";
+export const CORE_SDK_TAG = "clarity-sdk-v0.0.3";
 
 /**
  * Resolve the directory of the currently executing package

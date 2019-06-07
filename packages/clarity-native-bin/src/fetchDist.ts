@@ -9,7 +9,7 @@ import { ILogger } from "./logger";
 import { pipelineAsync } from "./streamUtil";
 
 const DIST_DOWNLOAD_URL_TEMPLATE =
-  "https://github.com/blockstack/smart-contract-sdk/releases/" +
+  "https://github.com/blockstack/clarity-js-sdk/releases/" +
   "download/{tag}/clarity-cli-{platform}-{arch}.tar.gz";
 
 const enum SupportedDistPlatform {
