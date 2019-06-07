@@ -11,7 +11,7 @@ describe("install via build from source", () => {
     }
   });
 
-  it("get binary throws if not exists", async () => {
+  it("get binary throws if not exists after source install", async () => {
     assert.throws(() => {
       index.getDefaultBinaryFilePath({ checkExists: true });
     });
@@ -21,7 +21,7 @@ describe("install via build from source", () => {
     await index.installDefaultPath({ fromSource: true });
   });
 
-  it("native binary exists after default install", async () => {
+  it("native binary exists after install to default path from source", async () => {
     index.getDefaultBinaryFilePath({ checkExists: true });
   });
 });

@@ -11,17 +11,17 @@ describe("install via dist", () => {
     }
   });
 
-  it("get binary throws if not exists", async () => {
+  it("get binary throws if not exists after dist install", async () => {
     assert.throws(() => {
       index.getDefaultBinaryFilePath({ checkExists: true });
     });
   });
 
-  it("default install", async () => {
+  it("default install from dist", async () => {
     await index.installDefaultPath({ fromSource: false });
   });
 
-  it("native binary exists after default install", async () => {
+  it("native binary exists after install to default path from dist download", async () => {
     index.getDefaultBinaryFilePath({ checkExists: true });
   });
 });
