@@ -329,7 +329,7 @@ export class CargoBuildProvider implements Provider {
         result.stderr
       );
     }
-    if (result.stdout !== "Transaction executed and committed.") {
+    if (!result.stdout.startsWith("Transaction executed and committed.")) {
       throw new LocalExecutionError(
         `Execute expression on contract failed with bad output: ${result.stdout}`,
         result.exitCode,

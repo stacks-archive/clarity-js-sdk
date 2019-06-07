@@ -27,14 +27,22 @@
 
 ;;; Constants
 (define funds-address 'SZ2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKQ9H6DPR)
+(define not-enough-tokens-err (err 1))
+(define invalid-or-duplicate-order-err (err 2))
+(define no-order-on-books-err (err 3))
+(define order-fulfillment-err (err 4))
 
 ;;; Internals
+
+(define (current-rocket-id)
+  (default-to 0
+    (get value (fetch-entry auto-increments (tuple (id 0))))))
 
 ;; Fetch, increment, update and return new rocket-id 
 ;; returns: int
 (define (new-rocket-id)
   (let ((rocket-id
-      (+ 1 (get value (fetch-entry auto-increments (tuple (id 0)))))))
+      (+ 1 (current-rocket-id))))
     (begin (set-entry! auto-increments
       (tuple (id 0))
       (tuple (value rocket-id)))
@@ -48,7 +56,7 @@
   (let ((ordered-at-block
       (get ordered-at-block 
         (fetch-entry orderbook (tuple (buyer user))))))
-    (if (eq? ordered-at-block 'null) 'true 'false)))
+    (if (is-none? ordered-at-block) 'true 'false)))
 
 ;; Check if a given user can claim a rocket previously ordered
 ;; args:
@@ -56,8 +64,9 @@
 ;; returns: boolean
 (define (can-user-claim (user principal))
   (let ((ready-at-block
-      (get ready-at-block 
-        (fetch-entry orderbook (tuple (buyer user))))))
+      ;; shallow-return 'false if entry doesn't exist
+      (expects! (get ready-at-block 
+        (fetch-entry orderbook (tuple (buyer user)))) 'false)))
     (>= block-height ready-at-block)))
 
 ;; Order a rocket
@@ -67,47 +76,46 @@
 ;; Once the rocket is ready, users can get their rocket by calling the function "claim-rocket".
 ;; args:
 ;; @size (int) the size of the rocket (1 < size <= 20)
-;; returns: boolean
+;; returns: Response<int, int>
 (define-public (order-rocket (size int))
   (let ((down-payment (/ size 2)))
     (if (and 
           (> size 1)
           (<= size 20)
           (can-user-buy tx-sender))
-      (and
-        (contract-call! rocket-token transfer funds-address down-payment)
-        (insert-entry! orderbook
-          (tuple (buyer tx-sender))
-          (tuple 
-            (rocket-id (new-rocket-id))
-            (ordered-at-block block-height) 
-            (ready-at-block (+ block-height size)) 
-            (size size)
-            (balance (- size down-payment)))))
-      'false)))
+      (if (and
+           (is-ok? (contract-call! rocket-token transfer funds-address down-payment))
+           (insert-entry! orderbook
+             (tuple (buyer tx-sender))
+             (tuple 
+               (rocket-id (new-rocket-id))
+               (ordered-at-block block-height) 
+               (ready-at-block (+ block-height size)) 
+               (size size)
+               (balance (- size down-payment)))))
+          (ok (current-rocket-id))
+          not-enough-tokens-err)
+      invalid-or-duplicate-order-err)))
 
 ;; Claim a rocket
 ;; This function can only be executed when the rocket is ready.
 ;; By executing this function, the user will consent to pay the remaining balance.
 ;; In returns, a new rocket will receive a freshly minted rocket. 
-;; returns: boolean
+;; returns: Response<int, int>
 (define-public (claim-rocket)
-  (let ((buyer tx-sender)
-        (balance
-          (get balance 
-            (fetch-entry orderbook (tuple (buyer tx-sender)))))
-        (size
-          (get size 
-            (fetch-entry orderbook (tuple (buyer tx-sender)))))
-        (rocket-id
-          (get rocket-id 
-            (fetch-entry orderbook (tuple (buyer tx-sender))))))
-    (if (can-user-claim tx-sender)
-      (and
-        (contract-call! rocket-token transfer funds-address balance)
-        (as-contract (contract-call! rocket-market mint! buyer rocket-id size))
-        (delete-entry! orderbook (tuple (buyer tx-sender))))
-      'false)))
+  (let ((order-entry
+         (expects! (fetch-entry orderbook (tuple (buyer tx-sender)))
+                   no-order-on-books-err)))
+    (let ((buyer     tx-sender)
+          (balance   (get balance order-entry))
+          (size      (get size order-entry))
+          (rocket-id (get rocket-id order-entry))) 
+      (if (and (can-user-claim buyer)
+               (is-ok? (contract-call! rocket-token transfer funds-address balance))
+               (is-ok? (as-contract (contract-call! rocket-market mint! buyer rocket-id size)))
+               (delete-entry! orderbook (tuple (buyer buyer))))
+          (ok rocket-id)
+          order-fulfillment-err))))
 
 ;; Initialize the contract by
 ;; - initializing auto-increments
@@ -116,5 +124,4 @@
   (set-entry! auto-increments 
     (tuple (id 0))
     (tuple (value 0))) 
-  (as-contract (contract-call! rocket-market set-factory))
-  'null)
+  (as-contract (contract-call! rocket-market set-factory)))

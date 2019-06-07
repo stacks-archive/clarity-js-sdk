@@ -28,6 +28,13 @@
   ((id int))
   ((address principal)))
 
+;;; Constants
+
+(define no-such-rocket-err      (err 1))
+(define bad-rocket-transfer-err (err 2))
+(define unauthorized-mint-err   (err 3))
+(define factory-already-set-err (err 4))
+
 ;;; Internals
 
 ;; Gets the amount of rockets owned by the specified address
@@ -35,23 +42,23 @@
 ;; @account (principal) the principal of the user
 ;; returns: int
 (define (balance-of (account principal))
-  (let ((balance
-      (get count 
-        (fetch-entry rockets-count (tuple (owner account))))))
-    (if (eq? balance 'null) 0 balance)))
+  (default-to 0
+    (get count 
+         (fetch-entry rockets-count (tuple (owner account))))))
 
 ;; Check if the transaction has been sent by the factory-address
 ;; returns: boolean
 (define (is-tx-from-factory)
   (let ((address
-    (get address 
-        (fetch-entry factory-address (tuple (id 0))))))
+         (get address 
+              (expects! (fetch-entry factory-address (tuple (id 0)))
+                        'false))))
     (eq? tx-sender address)))
 
 ;; Gets the owner of the specified rocket ID
 ;; args:
 ;; @rocket-id (int) the id of the rocket to identify
-;; returns: principal
+;; returns: option<principal>
 (define (owner-of (rocket-id int)) 
   (get owner 
     (fetch-entry rockets-info (tuple (rocket-id rocket-id)))))
@@ -63,26 +70,27 @@
 ;; args:
 ;; @recipient (principal) the principal of the new owner of the rocket
 ;; @rocket-id (int) the id of the rocket to trade
-;; returns: boolean
+;; returns: Response<int,int>
 (define-public (transfer (recipient principal) (rocket-id int))
   (let ((balance-sender (balance-of tx-sender))
-    (balance-recipient (balance-of recipient)))
-      (if (and 
-            (eq? (owner-of rocket-id) tx-sender)
-            (> balance-sender 0)
-            (not (eq? recipient tx-sender)))
+        (balance-recipient (balance-of recipient)))
+    (if (and 
+         (eq? (expects! (owner-of rocket-id) no-such-rocket-err)
+              tx-sender)
+         (> balance-sender 0)
+         (not (eq? recipient tx-sender)))
         (begin
           (set-entry! rockets-info 
-            (tuple (rocket-id rocket-id))
-            (tuple (owner recipient))) 
+                      (tuple (rocket-id rocket-id))
+                      (tuple (owner recipient)))
           (set-entry! rockets-count 
-            (tuple (owner recipient))
-            (tuple (count (+ balance-recipient 1)))) 
+                      (tuple (owner recipient))
+                      (tuple (count (+ balance-recipient 1))))
           (set-entry! rockets-count 
-            (tuple (owner tx-sender))
-            (tuple (count (- balance-sender 1))))
-          'true)
-        'false)))
+                      (tuple (owner tx-sender))
+                      (tuple (count (- balance-sender 1))))
+          (ok rocket-id))
+        bad-rocket-transfer-err)))
 
 ;; Mint new rockets
 ;; This function can only be called by the factory.
@@ -90,31 +98,30 @@
 ;; @owner (principal) the principal of the owner of the new rocket
 ;; @rocket-id (int) the id of the rocket to mint
 ;; @size (int) the size of the rocket to mint
-;; returns: boolean
+;; returns: Response<int, int>
 (define-public (mint! (owner principal) (rocket-id int) (size int))
   (if (is-tx-from-factory)
-    (let ((current-balance (balance-of owner)))
+      (let ((current-balance (balance-of owner)))
         (begin
-        (insert-entry! rockets-info 
-            (tuple (rocket-id rocket-id))
-            (tuple (owner owner))) 
-        (set-entry! rockets-count 
-            (tuple (owner owner))
-            (tuple (count (+ 1 current-balance)))) 
-        'true))
-    'false))
+          (insert-entry! rockets-info 
+                         (tuple (rocket-id rocket-id))
+                         (tuple (owner owner))) 
+          (set-entry! rockets-count 
+                      (tuple (owner owner))
+                      (tuple (count (+ 1 current-balance)))) 
+          (ok rocket-id)))
+      unauthorized-mint-err))
 
 ;; Set Factory
 ;; This function can only be called once.
 ;; args:
-;; returns: boolean
+;; returns: Response<Principal, int>
 (define-public (set-factory)
-  (let ((address
-      (get address 
-        (fetch-entry factory-address (tuple (id 0))))))
-    (if (eq? address 'null) 
-        (insert-entry! factory-address 
-          (tuple (id 0))
-          (tuple (address tx-sender)))
-        'false)))
-
+  (let ((factory-entry
+         (fetch-entry factory-address (tuple (id 0)))))
+    (if (and (is-none? factory-entry) 
+             (insert-entry! factory-address 
+                            (tuple (id 0))
+                            (tuple (address tx-sender))))
+        (ok tx-sender)
+        factory-already-set-err)))
