@@ -14,7 +14,7 @@
     "version-bump": "lerna version",
     "pub": "lerna publish from-package",
     "prepare": "lerna bootstrap",
-    "clean": "lerna clean --yes",
+    "clean": "lerna run clean && lerna clean --yes",
     "build": "lerna run build",
     "rebuild": "npm run clean && npm run prepare && npm run build",
     "test": "lerna run test",

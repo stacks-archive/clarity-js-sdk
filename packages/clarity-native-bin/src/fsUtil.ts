@@ -1,4 +1,4 @@
-import * as fs from "fs-extra";
+import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
 import { ILogger } from "./logger";
@@ -52,7 +52,7 @@ export async function verifyOutputFile(
       logger.log(`Overwriting existing file: ${fullFilePath}`);
       fs.unlinkSync(fullFilePath);
     } else {
-      fs.ensureDirSync(outputDirectory);
+      fs.mkdirSync(outputDirectory, { recursive: true });
     }
     return true;
   } catch (error) {
