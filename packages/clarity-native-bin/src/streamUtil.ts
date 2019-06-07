@@ -43,17 +43,6 @@ export async function readStream(
     const streamArr: (NodeJS.ReadableStream | NodeJS.WritableStream)[] = [stream];
     if (monitorCallback) {
       const passThrough = new PassThrough();
-      /*
-      passThrough.on("data", chunk => {
-        if (chunk instanceof Buffer) {
-          monitorCallback(chunk.toString("utf8"));
-        } else if (typeof chunk === "string") {
-          monitorCallback(chunk);
-        } else {
-          monitorCallback(chunk.toString());
-        }
-      });
-      */
       const readStreamLine = readline.createInterface({
         input: passThrough,
         crlfDelay: Infinity
@@ -61,14 +50,6 @@ export async function readStream(
       readStreamLine.on("line", lineData => {
         monitorCallback(lineData);
       });
-
-      /*const monitorStream = new Transform({
-        transform: (chunk, encoding, callback) => {
-          monitorCallback(chunk instanceof Buffer ? chunk : Buffer.from(chunk, encoding));
-          callback(undefined, chunk);
-        }
-      });
-      streamArr.push(monitorStream);*/
       streamArr.push(passThrough);
     }
     streamArr.push(memStream);
