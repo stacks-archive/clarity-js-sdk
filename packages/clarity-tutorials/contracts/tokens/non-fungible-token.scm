@@ -35,10 +35,9 @@
 
 ;; Gets the amount of tokens owned by the specified address.
 (define (balance-of (account principal))
-  (let ((balance
-      (get count 
-        (fetch-entry tokens-count (tuple (owner account))))))
-    (if (eq? balance 'null) 0 balance)))
+  (default-to 0
+    (get count 
+         (fetch-entry tokens-count (tuple (owner account))))))
 
 ;; Gets the owner of the specified token ID.
 (define (owner-of (token-id int)) 
@@ -47,26 +46,31 @@
 
 ;; Gets the approved address for a token ID, or zero if no address set (approved method in ERC721)
 (define (is-spender-approved (spender principal) (token-id int))
-  (let ((spender
-      (get spender 
-        (fetch-entry tokens-spender (tuple (token-id token-id))))))
-    (if (eq? spender 'null) 'false 'true)))
+  (let ((approved-spender
+         (expects! (get spender 
+                        (fetch-entry tokens-spender (tuple (token-id token-id))))
+                   'false))) ;; return false if no specified spender
+    (eq? spender approved-spender)))
 
 ;; Tells whether an operator is approved by a given owner (isApprovedForAll method in ERC721)
 (define (is-operator-approved (account principal) (operator principal))
-  (let ((is-approved
-      (get is-approved 
-        (fetch-entry accounts-operator (tuple (operator operator) (account account))))))
-    (if (eq? is-approved 'null) 'false is-approved)))
+  (default-to 'false
+    (get is-approved 
+         (fetch-entry accounts-operator (tuple (operator operator) (account account))))))
+
+(define (is-owner (actor principal) (token-id int))
+  (eq? actor 
+       ;; if no owner, return false
+       (expects! (owner-of token-id) 'false)))
 
 ;; Returns whether the given actor can transfer a given token ID.
 ;; To be optimized
 (define (can-transfer (actor principal) (token-id int)) 
-  (or 
-    (eq? actor (owner-of token-id)) 
-    (is-spender-approved actor token-id)
-    (is-operator-approved (owner-of token-id) actor)))
- 
+  (or
+   (is-owner actor token-id)
+   (is-spender-approved actor token-id)
+   (is-operator-approved (expects! (owner-of token-id) 'false) actor)))
+  
 ;; Internal - Register token
 (define (register-token! (new-owner principal) (token-id int))
   (let ((current-balance (balance-of new-owner)))
@@ -76,7 +80,7 @@
         (tuple (owner new-owner))) 
       (set-entry! tokens-count 
         (tuple (owner new-owner))
-        (tuple (count (+ 1 current-balance)))) 
+        (tuple (count (+ 1 current-balance))))
       'true)))
 
 ;; Internal - Release token
@@ -92,40 +96,50 @@
 
 ;; Public functions
 
+(define same-spender-err (err 1))
+(define not-approved-spender-err (err 2))
+(define failed-to-move-token-err (err 3))
+(define unauthorized-transfer-err (err 4))
+(define failed-to-mint-err (err 5))
+
 ;; Approves another address to transfer the given token ID (approve method in ERC721)
 ;; To be optimized
 (define-public (set-spender-approval (spender principal) (token-id int))
   (if (eq? spender tx-sender)
-    'false
-    (if (or (eq? tx-sender (owner-of token-id)) 
-            (is-operator-approved tx-sender (owner-of token-id)))
-      (begin
-        (set-entry! tokens-spender 
-          (tuple (token-id token-id))
-          (tuple (spender spender))) 
-      'true)
-      'false)))
+      same-spender-err
+      (if (or (is-owner tx-sender token-id) 
+              (is-operator-approved
+               (expects! (owner-of token-id) not-approved-spender-err)
+               tx-sender))
+          (begin
+            (set-entry! tokens-spender 
+                        (tuple (token-id token-id))
+                        (tuple (spender spender))) 
+            (ok token-id))
+          not-approved-spender-err)))
 
 ;; Sets or unsets the approval of a given operator (setApprovalForAll method in ERC721)
 (define-public (set-operator-approval (operator principal) (is-approved bool))
   (if (eq? operator tx-sender)
-    'false
-    (begin
-      (set-entry! accounts-operator 
-        (tuple (operator operator) (account tx-sender))
-        (tuple (is-approved is-approved))) 
-    'true)))
+      same-spender-err
+      (begin
+        (set-entry! accounts-operator 
+                    (tuple (operator operator) (account tx-sender))
+                    (tuple (is-approved is-approved))) 
+        (ok 'true))))
 
 ;; Transfers the ownership of a given token ID to another address.
 (define-public (transfer-from (owner principal) (recipient principal) (token-id int))
   (if (and 
         (can-transfer tx-sender token-id) 
-        (eq? (owner-of token-id) owner)
+        (is-owner owner token-id)
         (not (eq? recipient owner)))
-    (and
-      (release-token! owner token-id)
-      (register-token! recipient token-id))
-    'false))
+      (if
+       (and (release-token! owner token-id)
+            (register-token! recipient token-id))
+       (ok token-id)
+       failed-to-move-token-err)
+      unauthorized-transfer-err))
 
 ;; Transfers tokens to a specified principal.
 (define-public (transfer (recipient principal) (token-id int))
@@ -133,11 +147,12 @@
 
 ;; Mint new tokens.
 (define (mint! (owner principal) (token-id int))
-  (register-token! owner token-id))
+  (if (register-token! owner token-id)
+      (ok token-id)
+      failed-to-mint-err))
 
 ;; Initialize the contract
 (begin
   (mint! 'SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7 10001)
   (mint! 'SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7 10002)
-  (mint! 'S02J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKPVKG2CE 10003)
-  'null)
+  (mint! 'S02J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKPVKG2CE 10003))

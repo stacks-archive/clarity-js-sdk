@@ -34,18 +34,17 @@
 
 ;; Gets the amount of tokens owned by the specified address.
 (define (balance-of (account principal))
-  (let ((balance
-      (get balance 
-        (fetch-entry balances (tuple (owner account))))))
-    (if (eq? balance 'null) 0 balance)))
+  (default-to 0
+    (get balance 
+         (fetch-entry balances (tuple (owner account))))))
 
 ;; Gets the amount of tokens that an owner allowed to a spender.
 (define (allowance-of (spender principal) (owner principal))
-  (let ((allowance (get allowance 
-      (fetch-entry allowances (tuple 
-        (owner owner) 
-        (spender spender))))))
-    (if (eq? allowance 'null) 0 allowance)))
+  (default-to 0 
+    (get allowance
+         (fetch-entry allowances (tuple 
+                                  (owner owner) 
+                                  (spender spender))))))
 
 ;; Credits balance of a specified principal.
 (define (credit-balance! (account principal) (amount int))
@@ -104,43 +103,48 @@
 
 ;; Transfers tokens to a specified principal.
 (define-public (transfer (recipient principal) (amount int))
-  (transfer! tx-sender recipient amount))
+  (if (transfer! tx-sender recipient amount)
+      (ok amount)
+      (err 'false)))
 
 ;; Transfers tokens to a specified principal, performed by a spender
 (define-public (transfer-from (owner principal) (recipient principal) (amount int))
   (let ((allowance (allowance-of tx-sender owner)))
     (if (or (> amount allowance) (<= amount 0))
-      'false
-      (and
-        (transfer! owner recipient amount)
-        (decrease-allowance! tx-sender owner amount)))))
+      (err 'false)
+      (if (and
+           (transfer! owner recipient amount)
+           (decrease-allowance! tx-sender owner amount))
+       (ok amount)
+       (err 'false)))))
 
 ;; Update the allowance for a given spender
 (define-public (approve (spender principal) (amount int))
-  (if (<= amount 0)
-    'false
-    (increase-allowance! spender tx-sender amount)))
+  (if (and (> amount 0)
+           (increase-allowance! spender tx-sender amount))
+      (ok amount)
+      (err 'false)))
 
 ;; Revoke a given spender
 (define-public (revoke (spender principal))
   (let ((allowance (allowance-of spender tx-sender)))
-    (if (<= allowance 0)
-      'false
-      (decrease-allowance! spender tx-sender allowance))))
+    (if (and (> allowance 0)
+             (decrease-allowance! spender tx-sender allowance))
+        (ok 0)
+        (err 'false))))
 
 ;; Mint new tokens.
 (define (mint! (account principal) (amount int))
   (if (<= amount 0)
-    'false
-    (let ((balance (balance-of account)))
-      (begin 
-        (set-entry! balances
-          (tuple (owner account))
-          (tuple (balance (+ balance amount))))
-        'true))))
+      (err 'false)
+      (let ((balance (balance-of account)))
+        (begin 
+          (set-entry! balances
+                      (tuple (owner account))
+                      (tuple (balance (+ balance amount))))
+          (ok amount)))))
 
 ;; Initialize the contract
 (begin
   (mint! 'SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7 20)
-  (mint! 'S02J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKPVKG2CE 10)
-  'null)
+  (mint! 'S02J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKPVKG2CE 10))

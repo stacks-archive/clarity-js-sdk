@@ -16,7 +16,7 @@ git clone --branch $GIT_SDK_TAG --depth 1 https://github.com/blockstack/blocksta
 
 
 owner="blockstack"
-repo="smart-contract-sdk"
+repo="clarity-js-sdk"
 tag="$GIT_SDK_TAG"
 github_api_token="$API_TOKEN"
 

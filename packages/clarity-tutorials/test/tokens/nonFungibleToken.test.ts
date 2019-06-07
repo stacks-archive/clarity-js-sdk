@@ -47,17 +47,17 @@ describe("NonFungibleTokenClient Test Suite", () => {
 
     it("should make Alice owner of asset #10001", async () => {
       const owner10001 = await nftokenStockClient.ownerOf(10001);
-      expect(owner10001).to.equal(alice);
+      expect(owner10001).to.equal(`(some ${alice})`);
     });
 
     it("should make Alice owner of asset #10002", async () => {
       const owner10002 = await nftokenStockClient.ownerOf(10002);
-      expect(owner10002).to.equal(alice);
+      expect(owner10002).to.equal(`(some ${alice})`);
     });
 
     it("should make Bib owner of asset #10003", async () => {
       const owner10003 = await nftokenStockClient.ownerOf(10003);
-      expect(owner10003).to.equal(bob);
+      expect(owner10003).to.equal(`(some ${bob})`);
     });
   });
 
@@ -78,7 +78,7 @@ describe("NonFungibleTokenClient Test Suite", () => {
 
     it("should make Bob owner of asset #10001", async () => {
       const owner10001 = await nftokenStockClient.ownerOf(10001);
-      expect(owner10001).to.equal(bob);
+      expect(owner10001).to.equal(`(some ${bob})`);
     });
   });
 
@@ -202,7 +202,7 @@ describe("NonFungibleTokenClient Test Suite", () => {
 
       it("should make Alice owner of asset #10002", async () => {
         const owner10002 = await nftokenStockClient.ownerOf(10002);
-        expect(owner10002).to.equal(alice);
+        expect(owner10002).to.equal(`(some ${alice})`);
       });
 
       it("should revoke Zoe's ability to trade asset #10002", async () => {
@@ -227,7 +227,7 @@ describe("NonFungibleTokenClient Test Suite", () => {
       expect(allowanceYann).to.be.true;
     });
 
-    it("should make Zoe able to transfer asset #10003", async () => {
+    it("should make Yann able to transfer asset #10003", async () => {
       const allowanceYann = await nftokenStockClient.canTransfer(yann, 10003);
       expect(allowanceYann).to.be.true;
     });
@@ -283,7 +283,7 @@ describe("NonFungibleTokenClient Test Suite", () => {
         receipt = await nftokenStockClient.transferFrom(alice, bob, 10002, { sender: yann });
       });
 
-      it("should return an invalid receipt", async () => {
+      it("should return an valid receipt", async () => {
         expect(receipt.success).to.be.true;
       });
 
@@ -299,7 +299,7 @@ describe("NonFungibleTokenClient Test Suite", () => {
 
       it("should make Bob owner of asset #10002", async () => {
         const owner10002 = await nftokenStockClient.ownerOf(10002);
-        expect(owner10002).to.equal(bob);
+        expect(owner10002).to.equal(`(some ${bob})`);
       });
 
       it("should revoke Yann's ability to trade asset #10002", async () => {

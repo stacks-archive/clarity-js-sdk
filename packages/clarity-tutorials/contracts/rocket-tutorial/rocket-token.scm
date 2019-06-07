@@ -30,18 +30,18 @@
 ;; Gets the total number of tokens in existence
 ;; returns: int
 (define (get-total-supply)
-  (get value 
-    (fetch-entry total-supply (tuple (id 0)))))
+  (default-to 0
+   (get value 
+    (fetch-entry total-supply (tuple (id 0))))))
 
 ;; Gets the amount of tokens owned by the specified address
 ;; args:
 ;; @account (principal) the principal of the user
 ;; returns: int
 (define (balance-of (account principal))
-  (let ((balance
-      (get balance 
-        (fetch-entry balances (tuple (owner account))))))
-    (if (eq? balance 'null) 0 balance)))
+  (default-to 0
+    (get balance 
+         (fetch-entry balances (tuple (owner account))))))
 
 ;; Credits balance of a specified principal
 ;; args:
@@ -55,8 +55,9 @@
       (begin
         (set-entry! balances 
           (tuple (owner account))
-          (tuple (balance (+ amount current-balance)))) 
-        'true)))) ;; Overflow management?
+          ;; Overflows will cause exceptions
+          (tuple (balance (+ amount current-balance))))
+        'true))))
 
 ;; Debits balance of a specified principal
 ;; args:
@@ -93,9 +94,11 @@
 ;; args:
 ;; @recipient (principal) the principal of the account to credit
 ;; @amount (int) the amount of tokens to transfer
-;; returns: boolean
+;; returns: Response<int, bool>
 (define-public (transfer (recipient principal) (amount int))
-  (transfer! tx-sender recipient amount))
+  (if (transfer! tx-sender recipient amount)
+      (ok amount)
+      (err 'false)))
 
 ;; Mint new tokens
 ;; args:
@@ -121,6 +124,4 @@
     (tuple (id 0))
     (tuple (value 0))) 
   (mint! 'SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7 20) ;; Alice
-  (mint! 'S02J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKPVKG2CE 10) ;; Bob
-
-  'null)
+  (mint! 'S02J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKPVKG2CE 10)) ;; Bob

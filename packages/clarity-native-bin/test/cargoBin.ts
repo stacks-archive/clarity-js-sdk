@@ -3,7 +3,7 @@ import fs from "fs";
 import "mocha";
 import * as index from "../src";
 
-describe("install via dist", () => {
+describe("install via build from source", () => {
   it("clear default install", () => {
     const filePath = index.getDefaultBinaryFilePath({ checkExists: false });
     if (fs.existsSync(filePath)) {
