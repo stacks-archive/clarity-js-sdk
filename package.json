@@ -11,6 +11,8 @@
   },
   "license": "MIT",
   "scripts": {
+    "version-bump": "lerna version",
+    "pub": "lerna publish from-package",
     "prepare": "lerna bootstrap",
     "clean": "lerna clean --yes",
     "build": "lerna run build",

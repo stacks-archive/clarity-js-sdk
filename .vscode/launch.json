@@ -30,6 +30,16 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "clarity-cli: Help",
+      "program": "${workspaceFolder}/packages/clarity-cli/bin/run",
+      "args": [
+        "help"
+      ],
+      "console": "integratedTerminal",
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "clarity-cli: test",
       "program": "${workspaceFolder}/packages/clarity-cli/node_modules/mocha/bin/_mocha",
       "cwd": "${workspaceFolder}/packages/clarity-cli",
