@@ -8,13 +8,12 @@
   },
   "bugs": "https://github.com/blockstack/clarity-js-sdk/issues",
   "dependencies": {
+    "@blockstack/clarity": "^0.1.1-alpha.0",
+    "@blockstack/clarity-native-bin": "^0.1.1-alpha.0",
     "@oclif/command": "^1.5.13",
     "@oclif/config": "^1.13.0",
     "@oclif/plugin-help": "^2.1.6",
-    "detect-libc": "^1.0.3",
     "fs-extra": "^8.0.1",
-    "node-fetch": "^2.6.0",
-    "tar": "^4.4.8",
     "tslib": "^1.9.3"
   },
   "devDependencies": {
@@ -23,18 +22,16 @@
     "@oclif/tslint": "^3.1.1",
     "@types/chai": "^4.1.7",
     "@types/fs-extra": "^7.0.0",
-    "@types/mocha": "^5.2.6",
+    "@types/mocha": "^5.2.7",
     "@types/node": "^10",
-    "@types/node-fetch": "^2.3.4",
-    "@types/tar": "^4.0.0",
     "chai": "^4.2.0",
     "globby": "^9.2.0",
     "mocha": "^6.1.4",
-    "nyc": "^13.3.0",
+    "nyc": "^14.1.1",
     "shx": "^0.3.2",
     "ts-node": "^8.2.0",
-    "tslint": "^5.16.0",
-    "typescript": "^3.4.5"
+    "tslint": "^5.17.0",
+    "typescript": "^3.5.1"
   },
   "engines": {
     "node": ">=8.0.0"
@@ -62,8 +59,8 @@
   },
   "scripts": {
     "build": "npm run clean && npm run compile",
-    "clean": "shx rm -rf ./lib tsconfig.tsbuildinfo",
-    "compile": "tsc --build tsconfig.json",
+    "clean": "shx rm -rf ./lib tsconfig.build.tsbuildinfo",
+    "compile": "tsc --build tsconfig.build.json",
     "prepublishOnly": "npm run build && npm run build-oclif",
     "lint": "tslint -p tsconfig.json 'src/**/*.ts' 'test/**/*.ts'",
     "lint-fix": "tslint --fix -p tsconfig.json 'src/**/*.ts' 'test/**/*.ts'",
@@ -71,7 +68,7 @@
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "tslint -p test -t stylish",
     "build-oclif": "oclif-dev manifest && oclif-dev readme",
-    "test": "nyc --extension .ts mocha --forbid-only \"test/**/*.test.ts\""
+    "test": "npm run build && nyc mocha"
   },
   "types": "lib/index.d.ts"
 }

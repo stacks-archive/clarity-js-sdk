@@ -30,9 +30,25 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "clarity-cli: test",
+      "program": "${workspaceFolder}/packages/clarity-cli/node_modules/mocha/bin/_mocha",
+      "cwd": "${workspaceFolder}/packages/clarity-cli",
+      "console": "integratedTerminal"
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "clarity-tutorials: test",
       "program": "${workspaceFolder}/packages/clarity-tutorials/node_modules/mocha/bin/_mocha",
       "cwd": "${workspaceFolder}/packages/clarity-tutorials",
+      "console": "integratedTerminal"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "clarity-native-bin: test",
+      "program": "${workspaceFolder}/packages/clarity-native-bin/node_modules/mocha/bin/_mocha",
+      "cwd": "${workspaceFolder}/packages/clarity-native-bin",
       "console": "integratedTerminal"
     }
   ]

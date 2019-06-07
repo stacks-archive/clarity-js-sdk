@@ -1,12 +1,13 @@
+
 {
   "compilerOptions": {
     "module": "commonjs",
     "target": "es2017",
     "lib": ["es2017", "esnext.bigint"],
+    "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "strict": true,
     "strictNullChecks": false,
-    "declaration": true,
     "sourceMap": true
   },
   "exclude": [

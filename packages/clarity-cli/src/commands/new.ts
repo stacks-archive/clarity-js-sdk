@@ -13,5 +13,6 @@ export default class New extends Command {
 
   async run() {
     const { args, flags } = this.parse(New);
+    this.log("todo " + (args.project || ""));
   }
 }

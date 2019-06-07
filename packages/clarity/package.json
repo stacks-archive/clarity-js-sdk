@@ -7,12 +7,12 @@
   "main": "lib/index.js",
   "scripts": {
     "build": "npm run clean && npm run compile",
-    "clean": "shx rm -rf ./lib tsconfig.tsbuildinfo",
-    "compile": "tsc --build tsconfig.json",
+    "clean": "shx rm -rf ./lib tsconfig.build.tsbuildinfo",
+    "compile": "tsc --build tsconfig.build.json",
     "prepublishOnly": "npm run build",
     "lint": "tslint -p tsconfig.json 'src/**/*.ts' 'test/**/*.ts'",
     "lint-fix": "tslint --fix -p tsconfig.json 'src/**/*.ts' 'test/**/*.ts'",
-    "test": "nyc mocha",
+    "test": "npm run build && nyc mocha",
     "tdd": "nodemon -e ts -w ./src -x npm run test"
   },
   "repository": "blockstack/clarity-js-sdk",
@@ -22,15 +22,22 @@
   "engines": {
     "node": ">=10"
   },
+  "dependencies": {
+
+  },
+  "peerDependencies": {
+    "@blockstack/clarity-native-bin": "^0.1.1-alpha.0"
+  },
   "devDependencies": {
+    "@blockstack/clarity-native-bin": "^0.1.1-alpha.0",
     "@types/chai": "^4.1.7",
-    "@types/mocha": "^5.2.6",
+    "@types/mocha": "^5.2.7",
     "chai": "^4.2.0",
     "mocha": "^6.1.4",
     "nyc": "^14.1.1",
     "shx": "^0.3.2",
-    "ts-node": "^8.1.0",
-    "tslint": "^5.16.0",
-    "typescript": "^3.4.5"
+    "ts-node": "^8.2.0",
+    "tslint": "^5.17.0",
+    "typescript": "^3.5.1"
   }
 }

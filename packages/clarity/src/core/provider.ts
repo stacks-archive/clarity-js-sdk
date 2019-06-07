@@ -1,32 +1,30 @@
 import { Receipt } from ".";
 
-export abstract class Provider {
-  abstract initialize(): Promise<void>;
+export interface ProviderConstructor {
+  create(): Promise<Provider>;
+}
 
-  abstract checkContract(contractFilePath: string): Promise<Receipt>;
+export interface Provider {
+  initialize(): Promise<void>;
 
-  abstract launchContract(contractName: string, contractFilePath: string): Promise<Receipt>;
+  checkContract(contractFilePath: string): Promise<Receipt>;
 
-  abstract execute(
+  launchContract(contractName: string, contractFilePath: string): Promise<Receipt>;
+
+  execute(
     contractName: string,
     functionName: string,
     senderAddress: string,
     ...args: string[]
   ): Promise<Receipt>;
 
-  abstract eval(
-    contractName: string,
-    evalStatement: string,
-    includeDebugOutput?: boolean
-  ): Promise<Receipt>;
+  eval(contractName: string, evalStatement: string, includeDebugOutput?: boolean): Promise<Receipt>;
 
-  abstract evalRaw(evalStatement: string): Promise<Receipt>;
+  evalRaw(evalStatement: string): Promise<Receipt>;
 
-  abstract getBlockHeight(): Promise<bigint>;
+  getBlockHeight(): Promise<bigint>;
 
-  abstract mineBlock(time?: number | bigint): Promise<void>;
+  mineBlock(time?: number | bigint): Promise<void>;
 
-  abstract mineBlocks(count: number | bigint): Promise<void>;
-
-  abstract close(): Promise<void>;
+  close(): Promise<void>;
 }

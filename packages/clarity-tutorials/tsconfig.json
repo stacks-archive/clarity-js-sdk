@@ -1,16 +1,5 @@
 {
   "extends": "../../tsconfig.json",
-  "compilerOptions": {
-    "outDir": "./lib",
-    "rootDir": "./src",
-    "composite": true,
-    "declaration": true
-  },
-  "references": [
-    {
-      "path": "../clarity/tsconfig.json"
-    }
-  ],
   "include": [
     "src/**/*"
   ]

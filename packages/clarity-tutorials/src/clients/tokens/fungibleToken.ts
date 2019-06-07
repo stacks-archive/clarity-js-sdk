@@ -8,7 +8,7 @@ export class FungibleTokenClient extends Client {
     const tx = this.createTransaction({
       method: { name: "transfer", args: [`'${to}`, `${value}`] }
     });
-    tx.sign(params.sender);
+    await tx.sign(params.sender);
     const res = await this.submitTransaction(tx);
     return res;
   }
@@ -23,14 +23,14 @@ export class FungibleTokenClient extends Client {
     const tx = this.createTransaction({
       method: { name: "approve", args: [`'${spender}`, `${amount}`] }
     });
-    tx.sign(params.sender);
+    await tx.sign(params.sender);
     const res = await this.submitTransaction(tx);
     return res;
   }
 
   async revoke(spender: string, params: { sender: string }): Promise<Receipt> {
     const tx = this.createTransaction({ method: { name: "revoke", args: [`'${spender}`] } });
-    tx.sign(params.sender);
+    await tx.sign(params.sender);
     const res = await this.submitTransaction(tx);
     return res;
   }
@@ -52,7 +52,7 @@ export class FungibleTokenClient extends Client {
     const tx = this.createTransaction({
       method: { name: "transfer-from", args: [`'${from}`, `'${to}`, `${value}`] }
     });
-    tx.sign(params.sender);
+    await tx.sign(params.sender);
     const res = await this.submitTransaction(tx);
     return res;
   }

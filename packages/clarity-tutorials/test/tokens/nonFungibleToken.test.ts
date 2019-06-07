@@ -1,10 +1,11 @@
-import { it, before } from "mocha";
+import { Provider, ProviderRegistry, Receipt } from "@blockstack/clarity";
 import { expect } from "chai";
+import "mocha";
 import { NonFungibleTokenClient } from "../../src/clients/tokens/nonFungibleToken";
-import { CargoBuildProvider, Receipt } from "../../../clarity/src";
 
 describe("NonFungibleTokenClient Test Suite", () => {
   let nftokenStockClient: NonFungibleTokenClient;
+  let provider: Provider;
 
   const addresses = [
     "SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7",
@@ -19,7 +20,7 @@ describe("NonFungibleTokenClient Test Suite", () => {
   const yann = addresses[3];
 
   before(async () => {
-    const provider = await CargoBuildProvider.createEphemeral();
+    provider = await ProviderRegistry.createProvider();
     nftokenStockClient = new NonFungibleTokenClient();
     await nftokenStockClient.tearUp(provider);
   });
@@ -316,5 +317,9 @@ describe("NonFungibleTokenClient Test Suite", () => {
         expect(allowanceYann).to.be.false;
       });
     });
+  });
+
+  after(async () => {
+    await provider.close();
   });
 });

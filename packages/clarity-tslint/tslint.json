@@ -8,6 +8,8 @@
   ],
   "rules": {
     "prettier": true,
+    "await-promise": true,
+    "no-floating-promises": true,
     "no-unused-expression": {
       "severity": "warn"
     },

@@ -1,10 +1,9 @@
-import { it, before } from "mocha";
+import { Provider, ProviderRegistry, Receipt } from "@blockstack/clarity";
 import { expect } from "chai";
+import "mocha";
 import { RocketFactoryClient } from "../../src/clients/rocketTutorial/rocketFactory";
-import { RocketTokenClient } from "../../src/clients/rocketTutorial/rocketToken";
 import { RocketMarketClient } from "../../src/clients/rocketTutorial/rocketMarket";
-import { CargoBuildProvider, Receipt } from "../../../clarity/src";
-import { Provider } from "../../../clarity/src/core/provider";
+import { RocketTokenClient } from "../../src/clients/rocketTutorial/rocketToken";
 
 describe("RocketFactoryClient Test Suite", () => {
   let rocketFactoryClient: RocketFactoryClient;
@@ -22,7 +21,7 @@ describe("RocketFactoryClient Test Suite", () => {
   const factory = addresses[2];
 
   before(async () => {
-    provider = await CargoBuildProvider.createEphemeral();
+    provider = await ProviderRegistry.createProvider();
 
     rocketFactoryClient = new RocketFactoryClient();
     await rocketFactoryClient.tearUp(provider);
@@ -333,7 +332,7 @@ describe("RocketFactoryClient Test Suite", () => {
 
     describe("14 blocks after the transaction, Alice's rocket", () => {
       before(async () => {
-        for (var i = 0; i < 14; i++) {
+        for (let i = 0; i < 14; i++) {
           await provider.mineBlock();
         }
       });
@@ -355,5 +354,9 @@ describe("RocketFactoryClient Test Suite", () => {
         });
       });
     });
+  });
+
+  after(async () => {
+    await provider.close();
   });
 });

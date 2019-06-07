@@ -1,4 +1,5 @@
 {
+  "prettier.tslintIntegration": true,
   "[typescript]": {
     "editor.formatOnSave": true
   }

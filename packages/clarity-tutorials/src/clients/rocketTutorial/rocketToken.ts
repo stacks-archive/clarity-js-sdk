@@ -1,4 +1,4 @@
-import { Client, Receipt } from "../../../../clarity/src";
+import { Client, Receipt } from "@blockstack/clarity";
 
 export class RocketTokenClient extends Client {
   name = "rocket-token";
@@ -8,7 +8,7 @@ export class RocketTokenClient extends Client {
     const tx = this.createTransaction({
       method: { name: "transfer", args: [`'${to}`, `${value}`] }
     });
-    tx.sign(params.sender);
+    await tx.sign(params.sender);
     const res = await this.submitTransaction(tx);
     return res;
   }

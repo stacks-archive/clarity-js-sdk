@@ -1,4 +1,4 @@
-import { Client, Receipt } from "../../../../clarity/src";
+import { Client, Receipt } from "@blockstack/clarity";
 
 export class RocketFactoryClient extends Client {
   name = "rocket-factory";
@@ -26,7 +26,7 @@ export class RocketFactoryClient extends Client {
     const tx = this.createTransaction({
       method: { name: "order-rocket", args: [`${size}`] }
     });
-    tx.sign(params.sender);
+    await tx.sign(params.sender);
     const res = await this.submitTransaction(tx);
     return res;
   }
@@ -35,7 +35,7 @@ export class RocketFactoryClient extends Client {
     const tx = this.createTransaction({
       method: { name: "claim-rocket", args: [] }
     });
-    tx.sign(params.sender);
+    await tx.sign(params.sender);
     const res = await this.submitTransaction(tx);
     return res;
   }
