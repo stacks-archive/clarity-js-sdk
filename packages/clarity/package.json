@@ -39,5 +39,19 @@
     "ts-node": "^8.2.0",
     "tslint": "^5.17.0",
     "typescript": "^3.5.1"
+  },
+  "nyc": {
+    "all": true,
+    "cache": false,
+    "extension": [
+      ".ts"
+    ],
+    "include": [
+      "src"
+    ],
+    "reporter": [
+      "text",
+      "lcov"
+    ]
   }
 }

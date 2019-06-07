@@ -23,7 +23,7 @@
     "@types/chai": "^4.1.7",
     "@types/fs-extra": "^7.0.0",
     "@types/mocha": "^5.2.7",
-    "@types/node": "^10",
+    "@types/node": "^10.14.8",
     "chai": "^4.2.0",
     "globby": "^9.2.0",
     "mocha": "^6.1.4",
@@ -70,5 +70,19 @@
     "build-oclif": "oclif-dev manifest && oclif-dev readme",
     "test": "npm run build && nyc mocha"
   },
-  "types": "lib/index.d.ts"
+  "types": "lib/index.d.ts",
+  "nyc": {
+    "all": true,
+    "cache": false,
+    "extension": [
+      ".ts"
+    ],
+    "include": [
+      "src"
+    ],
+    "reporter": [
+      "text",
+      "lcov"
+    ]
+  }
 }
