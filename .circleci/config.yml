@@ -11,7 +11,10 @@ jobs:
             - v1-dependencies-{{ checksum "package.json" }}
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
-      - run: npm install
+      - run:
+          command: |
+            curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain 1.34.0
+            npm install
 
       - save_cache:
           paths:
@@ -21,7 +24,6 @@ jobs:
 
       - run:
           command: |
-            curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain 1.34.0
             source $HOME/.cargo/env
             npm run test
 
