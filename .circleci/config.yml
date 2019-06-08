@@ -16,6 +16,7 @@ jobs:
       - save_cache:
           paths:
             - node_modules
+            - "~/.cargo"
           key: v1-dependencies-{{ checksum "package.json" }}
 
       - run:
