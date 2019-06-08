@@ -18,7 +18,8 @@ describe("install via dist", () => {
   });
 
   it("default install from dist", async () => {
-    await index.installDefaultPath({ fromSource: false });
+    const success = await index.installDefaultPath({ fromSource: false });
+    assert.isTrue(success);
   });
 
   it("native binary exists after install to default path from dist download", async () => {

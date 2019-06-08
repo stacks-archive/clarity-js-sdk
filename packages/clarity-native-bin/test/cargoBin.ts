@@ -18,7 +18,8 @@ describe("install via build from source", () => {
   });
 
   it("default install from source", async () => {
-    await index.installDefaultPath({ fromSource: true });
+    const success = await index.installDefaultPath({ fromSource: true });
+    assert.isTrue(success);
   });
 
   it("native binary exists after install to default path from source", async () => {
