@@ -1,12 +1,50 @@
 {
   "name": "@blockstack/clarity-cli",
-  "description": "The Clarity CLI is used to manage Clarity smart contracts from the command line.",
   "version": "0.1.2-alpha.0",
+  "description": "The Clarity CLI is used to manage Clarity smart contracts from the command line.",
   "author": "Blockstack <engineering@blockstack.com> (https://blockstack.com/)",
+  "license": "MIT",
+  "repository": "blockstack/clarity-js-sdk",
+  "homepage": "https://github.com/blockstack/clarity-js-sdk/tree/master/packages/clarity-cli#readme",
+  "bugs": "https://github.com/blockstack/clarity-js-sdk/issues",
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "bin": {
     "clarity": "./bin/run"
   },
-  "bugs": "https://github.com/blockstack/clarity-js-sdk/issues",
+  "engines": {
+    "node": ">=10"
+  },
+  "files": [
+    "/bin",
+    "/lib",
+    "/npm-shrinkwrap.json",
+    "/oclif.manifest.json"
+  ],
+  "oclif": {
+    "commands": "./lib/commands",
+    "bin": "clarity",
+    "plugins": [
+      "@oclif/plugin-help"
+    ],
+    "repositoryPrefix": "https://github.com/blockstack/clarity-js-sdk/blob/master/packages/clarity-cli/<%- commandPath %>"
+  },
+  "scripts": {
+    "build": "npm run clean && npm run compile",
+    "clean": "shx rm -rf ./lib tsconfig.build.tsbuildinfo",
+    "compile": "tsc --build tsconfig.build.json",
+    "prepublishOnly": "npm run build && npm run build-oclif",
+    "lint": "tslint -p tsconfig.json 'src/**/*.ts' 'test/**/*.ts'",
+    "lint-fix": "tslint --fix -p tsconfig.json 'src/**/*.ts' 'test/**/*.ts'",
+    "dev": "bin/run",
+    "postpack": "rm -f oclif.manifest.json",
+    "posttest": "tslint -p test -t stylish",
+    "build-oclif": "oclif-dev manifest && oclif-dev readme",
+    "test": "npm run build && nyc mocha"
+  },
   "dependencies": {
     "@blockstack/clarity": "^0.1.2-alpha.0",
     "@blockstack/clarity-native-bin": "^0.1.2-alpha.0",
@@ -33,44 +71,6 @@
     "tslint": "^5.17.0",
     "typescript": "^3.5.1"
   },
-  "engines": {
-    "node": ">=8.0.0"
-  },
-  "files": [
-    "/bin",
-    "/lib",
-    "/npm-shrinkwrap.json",
-    "/oclif.manifest.json"
-  ],
-  "homepage": "https://github.com/blockstack/clarity-js-sdk/tree/master/packages/clarity-cli",
-  "license": "MIT",
-  "main": "lib/index.js",
-  "oclif": {
-    "commands": "./lib/commands",
-    "bin": "clarity",
-    "plugins": [
-      "@oclif/plugin-help"
-    ],
-    "repositoryPrefix": "https://github.com/blockstack/clarity-js-sdk/blob/master/packages/clarity-cli/<%- commandPath %>"
-  },
-  "repository": "blockstack/clarity-js-sdk",
-  "publishConfig": {
-    "access": "public"
-  },
-  "scripts": {
-    "build": "npm run clean && npm run compile",
-    "clean": "shx rm -rf ./lib tsconfig.build.tsbuildinfo",
-    "compile": "tsc --build tsconfig.build.json",
-    "prepublishOnly": "npm run build && npm run build-oclif",
-    "lint": "tslint -p tsconfig.json 'src/**/*.ts' 'test/**/*.ts'",
-    "lint-fix": "tslint --fix -p tsconfig.json 'src/**/*.ts' 'test/**/*.ts'",
-    "dev": "bin/run",
-    "postpack": "rm -f oclif.manifest.json",
-    "posttest": "tslint -p test -t stylish",
-    "build-oclif": "oclif-dev manifest && oclif-dev readme",
-    "test": "npm run build && nyc mocha"
-  },
-  "types": "lib/index.d.ts",
   "nyc": {
     "all": true,
     "cache": false,

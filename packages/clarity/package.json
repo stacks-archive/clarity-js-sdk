@@ -4,7 +4,20 @@
   "description": "Clarity JS SDK - Core library",
   "author": "Blockstack <engineering@blockstack.com> (https://blockstack.com/)",
   "license": "MIT",
+  "repository": "blockstack/clarity-js-sdk",
+  "homepage": "https://github.com/blockstack/clarity-js-sdk/tree/master/packages/clarity#readme",
+  "bugs": "https://github.com/blockstack/clarity-js-sdk/issues",
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "engines": {
+    "node": ">=10"
+  },
+  "files": [
+    "/lib"
+  ],
   "scripts": {
     "build": "npm run clean && npm run compile",
     "clean": "shx rm -rf ./lib tsconfig.build.tsbuildinfo",
@@ -12,19 +25,8 @@
     "prepublishOnly": "npm run build",
     "lint": "tslint -p tsconfig.json 'src/**/*.ts' 'test/**/*.ts'",
     "lint-fix": "tslint --fix -p tsconfig.json 'src/**/*.ts' 'test/**/*.ts'",
-    "test": "npm run build && nyc mocha",
-    "tdd": "nodemon -e ts -w ./src -x npm run test"
+    "test": "npm run build && nyc mocha"
   },
-  "repository": "blockstack/clarity-js-sdk",
-  "publishConfig": {
-    "access": "public"
-  },
-  "engines": {
-    "node": ">=10"
-  },
-  "files": [
-    "/lib"
-  ],
   "peerDependencies": {
     "@blockstack/clarity-native-bin": "^0.1.2-alpha.0"
   },
