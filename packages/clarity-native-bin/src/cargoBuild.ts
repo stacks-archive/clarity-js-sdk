@@ -26,10 +26,29 @@ export async function cargoInstall(opts: {
   logger: ILogger;
   overwriteExisting: boolean;
   outputFilePath: string;
-  versionTag: string;
+  gitBranch?: string;
+  gitTag?: string;
+  gitCommitHash?: string;
 }): Promise<boolean> {
   if (!(await checkCargoStatus(opts.logger))) {
     return false;
+  }
+
+  const gitSpecifierOpts: string[] = [];
+  if (opts.gitBranch) {
+    gitSpecifierOpts.push("--branch", opts.gitBranch);
+  }
+  if (opts.gitTag) {
+    gitSpecifierOpts.push("--tag", opts.gitTag);
+  }
+  if (opts.gitCommitHash) {
+    gitSpecifierOpts.push("--rev", opts.gitCommitHash);
+  }
+
+  if (gitSpecifierOpts.length === 0) {
+    throw new Error("Must provide a git branch, tag, or commit hash.");
+  } else if (gitSpecifierOpts.length > 2) {
+    throw new Error("Only one git branch, tag, or commit hash can be specified.");
   }
 
   const tempCompileDir = makeUniqueTempDir();
@@ -39,8 +58,7 @@ export async function cargoInstall(opts: {
     "install",
     "--git",
     CORE_GIT_REPO,
-    "--tag",
-    opts.versionTag,
+    ...gitSpecifierOpts,
     "--bin=clarity-cli",
     "--root",
     tempCompileDir

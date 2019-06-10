@@ -60,7 +60,8 @@ Repo structure and project build instructions for contributors.
   -- distributes are automatically installed on MacOS, Windows (64-bit), and Linux (64-bit). 
   > _It will be compiled from source if using an OS or architecture not listed. 
   > This requires the Rust toolchain -- [rustup](https://rustup.rs/) is the recommended installer. 
-  > A C compiler must also be available (gcc, clang, and msvc are supported)._
+  > A C compiler must also be available (gcc, clang, and msvc are supported). 
+  > See [clarity-native-bin](packages/clarity-native-bin/README.md) for more details._
 
 ### Build Instructions
 
