@@ -21,6 +21,12 @@
   "engines": {
     "node": ">=10"
   },
+  "files": [
+    "/src",
+    "/test",
+    "/lib",
+    "/contracts"
+  ],
   "dependencies": {
     "@blockstack/clarity": "^0.1.1-alpha.0",
     "@blockstack/clarity-native-bin": "^0.1.1-alpha.0"

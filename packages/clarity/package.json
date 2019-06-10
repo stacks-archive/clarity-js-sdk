@@ -22,6 +22,9 @@
   "engines": {
     "node": ">=10"
   },
+  "files": [
+    "/lib"
+  ],
   "dependencies": {
 
   },
