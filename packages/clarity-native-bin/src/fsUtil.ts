@@ -29,11 +29,11 @@ export function getExecutableFileName(file: string) {
  * Ensures the provided output directory exists and is writable.
  * Deletes the provided output file if it already exists and overwrite has been specified.
  */
-export async function verifyOutputFile(
+export function verifyOutputFile(
   logger: ILogger,
   overwriteExisting: boolean,
   outputFilePath: string
-): Promise<boolean> {
+): boolean {
   const fullFilePath = path.resolve(outputFilePath);
   const outputDirectory = path.dirname(fullFilePath);
 
