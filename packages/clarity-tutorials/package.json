@@ -16,12 +16,17 @@
     "prepublishOnly": "npm run build",
     "lint": "tslint -p tsconfig.json 'src/**/*.ts' 'test/**/*.ts'",
     "lint-fix": "tslint --fix -p tsconfig.json 'src/**/*.ts' 'test/**/*.ts'",
-    "test": "npm run build && nyc mocha",
-    "tdd": "nodemon -e ts -w ./src -w ./test -x npm run test"
+    "test": "npm run build && nyc mocha"
   },
   "engines": {
     "node": ">=10"
   },
+  "files": [
+    "/src",
+    "/test",
+    "/lib",
+    "/contracts"
+  ],
   "dependencies": {
     "@blockstack/clarity": "^0.1.2-alpha.0",
     "@blockstack/clarity-native-bin": "^0.1.2-alpha.0"
@@ -36,5 +41,19 @@
     "ts-node": "^8.2.0",
     "tslint": "^5.17.0",
     "typescript": "^3.5.1"
+  },
+  "nyc": {
+    "all": true,
+    "cache": false,
+    "extension": [
+      ".ts"
+    ],
+    "include": [
+      "src"
+    ],
+    "reporter": [
+      "text",
+      "lcov"
+    ]
   }
 }

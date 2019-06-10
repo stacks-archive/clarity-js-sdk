@@ -3,9 +3,22 @@
   "version": "0.1.2-alpha.0",
   "description": "Library for providing the native Clarity CLI binary",
   "author": "Blockstack <engineering@blockstack.com> (https://blockstack.com/)",
-  "repository": "blockstack/clarity-js-sdk",
   "license": "MIT",
+  "repository": "blockstack/clarity-js-sdk",
+  "homepage": "https://github.com/blockstack/clarity-js-sdk/tree/master/packages/clarity-native-bin#readme",
+  "bugs": "https://github.com/blockstack/clarity-js-sdk/issues",
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "engines": {
+    "node": ">=10"
+  },
+  "files": [
+    "/lib",
+    "postInstallScript.js"
+  ],
   "scripts": {
     "build": "npm run clean && npm run compile",
     "clean": "shx rm -rf ./lib tsconfig.build.tsbuildinfo",
@@ -16,17 +29,14 @@
     "test": "npm run build && nyc mocha",
     "postinstall": "node postInstallScript.js"
   },
-  "publishConfig": {
-    "access": "public"
-  },
-  "engines": {
-    "node": ">=10"
+  "dependencies": {
+    "node-fetch": "^2.6.0",
+    "tar": "^4.4.8"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
-    "@types/fs-extra": "^7.0.0",
     "@types/mocha": "^5.2.7",
-    "@types/node": "^10",
+    "@types/node": "^10.14.8",
     "@types/node-fetch": "^2.3.4",
     "@types/tar": "^4.0.0",
     "chai": "^4.2.0",
@@ -37,11 +47,6 @@
     "ts-node": "^8.2.0",
     "tslint": "^5.17.0",
     "typescript": "^3.5.1"
-  },
-  "dependencies": {
-    "fs-extra": "^8.0.1",
-    "node-fetch": "^2.6.0",
-    "tar": "^4.4.8"
   },
   "nyc": {
     "all": true,

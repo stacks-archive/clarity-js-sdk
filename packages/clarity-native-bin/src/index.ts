@@ -80,11 +80,7 @@ export async function install(opts: {
   outputFilePath: string;
   versionTag: string;
 }): Promise<boolean> {
-  const outputIsValid = await verifyOutputFile(
-    opts.logger,
-    opts.overwriteExisting,
-    opts.outputFilePath
-  );
+  const outputIsValid = verifyOutputFile(opts.logger, opts.overwriteExisting, opts.outputFilePath);
   if (!outputIsValid) {
     return false;
   }

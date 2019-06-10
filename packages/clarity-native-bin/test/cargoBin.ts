@@ -11,17 +11,18 @@ describe("install via build from source", () => {
     }
   });
 
-  it("get binary throws if not exists", async () => {
+  it("get binary throws if not exists after source install", async () => {
     assert.throws(() => {
       index.getDefaultBinaryFilePath({ checkExists: true });
     });
   });
 
   it("default install from source", async () => {
-    await index.installDefaultPath({ fromSource: true });
+    const success = await index.installDefaultPath({ fromSource: true });
+    assert.isTrue(success);
   });
 
-  it("native binary exists after default install", async () => {
+  it("native binary exists after install to default path from source", async () => {
     index.getDefaultBinaryFilePath({ checkExists: true });
   });
 });

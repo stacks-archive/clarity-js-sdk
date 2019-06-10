@@ -1,4 +1,4 @@
-import * as fs from "fs-extra";
+import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
 import { ILogger } from "./logger";
@@ -29,11 +29,11 @@ export function getExecutableFileName(file: string) {
  * Ensures the provided output directory exists and is writable.
  * Deletes the provided output file if it already exists and overwrite has been specified.
  */
-export async function verifyOutputFile(
+export function verifyOutputFile(
   logger: ILogger,
   overwriteExisting: boolean,
   outputFilePath: string
-): Promise<boolean> {
+): boolean {
   const fullFilePath = path.resolve(outputFilePath);
   const outputDirectory = path.dirname(fullFilePath);
 
@@ -52,7 +52,7 @@ export async function verifyOutputFile(
       logger.log(`Overwriting existing file: ${fullFilePath}`);
       fs.unlinkSync(fullFilePath);
     } else {
-      fs.ensureDirSync(outputDirectory);
+      fs.mkdirSync(outputDirectory, { recursive: true });
     }
     return true;
   } catch (error) {
