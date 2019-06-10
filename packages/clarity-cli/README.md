@@ -10,7 +10,7 @@ $ npm install -g @blockstack/clarity-cli
 $ clarity COMMAND
 running command...
 $ clarity (-v|--version|version)
-@blockstack/clarity-cli/0.1.1-alpha.0 darwin-x64 node-v10.15.3
+@blockstack/clarity-cli/0.1.2-alpha.0 darwin-x64 node-v10.15.3
 $ clarity --help [COMMAND]
 USAGE
   $ clarity COMMAND
@@ -38,7 +38,7 @@ OPTIONS
   --all  see all commands in CLI
 ```
 
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v2.1.6/src/commands/help.ts)_
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v2.2.0/src/commands/help.ts)_
 
 ## `clarity new [PROJECT]`
 

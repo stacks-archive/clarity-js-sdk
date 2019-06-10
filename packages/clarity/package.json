@@ -1,6 +1,6 @@
 {
   "name": "@blockstack/clarity",
-  "version": "0.1.1-alpha.0",
+  "version": "0.1.2-alpha.0",
   "description": "Clarity JS SDK - Core library",
   "author": "Blockstack <engineering@blockstack.com> (https://blockstack.com/)",
   "license": "MIT",
@@ -25,14 +25,11 @@
   "files": [
     "/lib"
   ],
-  "dependencies": {
-
-  },
   "peerDependencies": {
-    "@blockstack/clarity-native-bin": "^0.1.1-alpha.0"
+    "@blockstack/clarity-native-bin": "^0.1.2-alpha.0"
   },
   "devDependencies": {
-    "@blockstack/clarity-native-bin": "^0.1.1-alpha.0",
+    "@blockstack/clarity-native-bin": "^0.1.2-alpha.0",
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.7",
     "chai": "^4.2.0",
