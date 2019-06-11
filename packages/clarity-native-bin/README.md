@@ -13,12 +13,27 @@ An installation script runs automatically when this package is installed via `np
 
 Force install via source compilation by specifying either the `BLOCKSTACK_CORE_SOURCE_TAG` or `BLOCKSTACK_CORE_SOURCE_BRANCH` 
 environment variables. The variable must be available during the npm install script. If found then the script will not attempt to download 
-a pre-compiled distributable. The value must be set to a git tag or branch on the `https://github.com/blockstack/blockstack-core.git` 
+a pre-compiled distributable. The value must be set to a git tag or branch on the `https://github.com/blockstack/blockstack-core` 
 repo. 
 
-For example, to specify a feature branch for use during local development in this SDK monorepo:
+For example, the following commands test a blockstack-core repo feature branch using the `clarity-tutorials` package:
 ```
-BLOCKSTACK_CORE_SOURCE_BRANCH="feature/new-thingy" npm run rebuild
+git clone git@github.com:blockstack/clarity-js-sdk.git
+cd clarity-js-sdk
+BLOCKSTACK_CORE_SOURCE_BRANCH="feature/new-thing" npm install
+cd packages/clarity-tutorials
+npm test
+```
+
+Or, for an already setup local SDK dev environment, trigger an `npm install` of this package. Examples:
+```
+cd clarity-js-sdk
+BLOCKSTACK_CORE_SOURCE_BRANCH="feature/new-thing" npm run rebuild
+```
+_Or_
+```
+cd clarity-js-sdk/packages/clarity-native-bin
+BLOCKSTACK_CORE_SOURCE_BRANCH="feature/new-thing" npm install
 ```
 
 
