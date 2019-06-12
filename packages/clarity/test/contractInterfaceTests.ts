@@ -30,22 +30,6 @@ describe("contract interface type checking", () => {
     nonFungibleToken = loadSampleContract("non-fungible-token.json");
   });
 
-  it("null const variable", () => {
-    // const exNullConst = typeTestContract.variable_types["example-null-const"];
-    // assert.equal(exNullConst.atomic_type, "VoidType");
-  });
-
-  it("null check function", () => {
-    // const getNullVarFn = typeTestContract.private_function_types["get-null-var"].Fixed;
-    // assert.equal(getNullVarFn[FunctionReturnType].atomic_type, "VoidType");
-  });
-
-  it("null arg input function", () => {
-    // const echoNullVarFn = typeTestContract.private_function_types["echo-null-var"].Fixed;
-    // assert.equal(echoNullVarFn[FunctionArgTypes][0].atomic_type, "VoidType");
-    // assert.equal(echoNullVarFn[FunctionReturnType].atomic_type, "VoidType");
-  });
-
   it("check private function types", () => {
     const priceFuncSig = namesContract.private_function_types["price-function"];
     assert.isOk(priceFuncSig.Fixed);
