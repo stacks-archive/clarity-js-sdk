@@ -107,7 +107,6 @@ This is a multi-package monorepo.
     │   │   └── index.ts
     │   └── test/
     │       ├── **/*.ts [test source files]
-    │       ├── tsconfig.json
     │       └── mocha.opts
     └── lib-a/
         ├── package.json
@@ -117,7 +116,6 @@ This is a multi-package monorepo.
         │   └── index.ts
         └── test/
             ├── **/*.ts [test source files]
-            ├── tsconfig.json
             └── mocha.opts
 ```
 
