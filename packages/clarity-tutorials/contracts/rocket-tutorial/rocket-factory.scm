@@ -36,16 +36,16 @@
 
 (define (current-rocket-id)
   (default-to 0
-    (get value (fetch-entry auto-increments (tuple (id 0))))))
+    (get value (fetch-entry auto-increments ((id 0))))))
 
-;; Fetch, increment, update and return new rocket-id 
+;; Fetch, increment, update and return new rocket-id
 ;; returns: int
 (define (new-rocket-id)
   (let ((rocket-id
       (+ 1 (current-rocket-id))))
     (begin (set-entry! auto-increments
-      (tuple (id 0))
-      (tuple (value rocket-id)))
+      ((id 0))
+      ((value rocket-id)))
     rocket-id)))
 
 ;; Check if a given user can buy a new rocket
@@ -54,8 +54,8 @@
 ;; returns: boolean
 (define (can-user-buy (user principal))
   (let ((ordered-at-block
-      (get ordered-at-block 
-        (fetch-entry orderbook (tuple (buyer user))))))
+      (get ordered-at-block
+        (fetch-entry orderbook ((buyer user))))))
     (if (is-none? ordered-at-block) 'true 'false)))
 
 ;; Check if a given user can claim a rocket previously ordered
@@ -65,8 +65,8 @@
 (define (can-user-claim (user principal))
   (let ((ready-at-block
       ;; shallow-return 'false if entry doesn't exist
-      (expects! (get ready-at-block 
-        (fetch-entry orderbook (tuple (buyer user)))) 'false)))
+      (expects! (get ready-at-block
+        (fetch-entry orderbook ((buyer user)))) 'false)))
     (>= block-height ready-at-block)))
 
 ;; Order a rocket
@@ -79,18 +79,18 @@
 ;; returns: Response<int, int>
 (define-public (order-rocket (size int))
   (let ((down-payment (/ size 2)))
-    (if (and 
+    (if (and
           (> size 1)
           (<= size 20)
           (can-user-buy tx-sender))
       (if (and
            (is-ok? (contract-call! rocket-token transfer funds-address down-payment))
            (insert-entry! orderbook
-             (tuple (buyer tx-sender))
-             (tuple 
+             ((buyer tx-sender))
+             (
                (rocket-id (new-rocket-id))
-               (ordered-at-block block-height) 
-               (ready-at-block (+ block-height size)) 
+               (ordered-at-block block-height)
+               (ready-at-block (+ block-height size))
                (size size)
                (balance (- size down-payment)))))
           (ok (current-rocket-id))
@@ -100,20 +100,20 @@
 ;; Claim a rocket
 ;; This function can only be executed when the rocket is ready.
 ;; By executing this function, the user will consent to pay the remaining balance.
-;; In returns, a new rocket will receive a freshly minted rocket. 
+;; In returns, a new rocket will receive a freshly minted rocket.
 ;; returns: Response<int, int>
 (define-public (claim-rocket)
   (let ((order-entry
-         (expects! (fetch-entry orderbook (tuple (buyer tx-sender)))
+         (expects! (fetch-entry orderbook ((buyer tx-sender)))
                    no-order-on-books-err)))
     (let ((buyer     tx-sender)
           (balance   (get balance order-entry))
           (size      (get size order-entry))
-          (rocket-id (get rocket-id order-entry))) 
+          (rocket-id (get rocket-id order-entry)))
       (if (and (can-user-claim buyer)
                (is-ok? (contract-call! rocket-token transfer funds-address balance))
                (is-ok? (as-contract (contract-call! rocket-market mint! buyer rocket-id size)))
-               (delete-entry! orderbook (tuple (buyer buyer))))
+               (delete-entry! orderbook ((buyer buyer))))
           (ok rocket-id)
           order-fulfillment-err))))
 
@@ -121,7 +121,7 @@
 ;; - initializing auto-increments
 ;; - taking ownership of rocket-market's mint function
 (begin
-  (set-entry! auto-increments 
-    (tuple (id 0))
-    (tuple (value 0))) 
+  (set-entry! auto-increments
+    ((id 0))
+    ((value 0)))
   (as-contract (contract-call! rocket-market set-factory)))

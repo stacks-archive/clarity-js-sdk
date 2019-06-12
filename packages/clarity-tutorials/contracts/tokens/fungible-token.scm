@@ -18,11 +18,11 @@
 ;; Fungible Token, modeled after ERC-20
 
 ;; Storage
-(define-map balances 
-  ((owner principal)) 
+(define-map balances
+  ((owner principal))
   ((balance int)))
-(define-map allowances 
-  ((spender principal) (owner principal)) 
+(define-map allowances
+  ((spender principal) (owner principal))
   ((allowance int)))
 (define total-supply 0)
 
@@ -35,15 +35,15 @@
 ;; Gets the amount of tokens owned by the specified address.
 (define (balance-of (account principal))
   (default-to 0
-    (get balance 
-         (fetch-entry balances (tuple (owner account))))))
+    (get balance
+         (fetch-entry balances ((owner account))))))
 
 ;; Gets the amount of tokens that an owner allowed to a spender.
 (define (allowance-of (spender principal) (owner principal))
-  (default-to 0 
+  (default-to 0
     (get allowance
-         (fetch-entry allowances (tuple 
-                                  (owner owner) 
+         (fetch-entry allowances (
+                                  (owner owner)
                                   (spender spender))))))
 
 ;; Credits balance of a specified principal.
@@ -52,9 +52,9 @@
     'false
     (let ((current-balance (balance-of account)))
       (begin
-        (set-entry! balances 
-          (tuple (owner account))
-          (tuple (balance (+ amount current-balance)))) 
+        (set-entry! balances
+          ((owner account))
+          ((balance (+ amount current-balance))))
         'true)))) ;; Overflow management?
 
 ;; Debits balance of a specified principal.
@@ -64,16 +64,16 @@
       'false
       (begin
         (set-entry! balances
-          (tuple (owner account))
-          (tuple (balance (- balance amount))))
+          ((owner account))
+          ((balance (- balance amount))))
         'true))))
 
 ;; Transfers tokens to a specified principal.
 (define (transfer! (sender principal) (recipient principal) (amount int))
-  (if (and  
-        (not (eq? sender recipient)) 
-        (debit-balance! sender amount) 
-        (credit-balance! recipient amount)) 
+  (if (and
+        (not (eq? sender recipient))
+        (debit-balance! sender amount)
+        (credit-balance! recipient amount))
     'true
     'false))
 
@@ -84,8 +84,8 @@
       'true
       (begin
         (set-entry! allowances
-          (tuple (spender spender) (owner owner))
-          (tuple (allowance (- allowance amount))))
+          ((spender spender) (owner owner))
+          ((allowance (- allowance amount))))
         'true))))
 
 ;; Internal - Increase allowance of a specified spender.
@@ -94,10 +94,10 @@
     (if (<= amount 0)
       'false
       (begin
-        (set-entry! allowances 
-          (tuple (spender spender) (owner owner))
-          (tuple (allowance (+ allowance amount))))
-        'true)))) 
+        (set-entry! allowances
+          ((spender spender) (owner owner))
+          ((allowance (+ allowance amount))))
+        'true))))
 
 ;; Public functions
 
@@ -138,10 +138,10 @@
   (if (<= amount 0)
       (err 'false)
       (let ((balance (balance-of account)))
-        (begin 
+        (begin
           (set-entry! balances
-                      (tuple (owner account))
-                      (tuple (balance (+ balance amount))))
+                      ((owner account))
+                      ((balance (+ balance amount))))
           (ok amount)))))
 
 ;; Initialize the contract
