@@ -1,0 +1,517 @@
+{
+  "private_function_types": {
+    "balance-of": {
+      "Fixed": [
+        [
+          {
+            "atomic_type": "PrincipalType",
+            "list_dimensions": null,
+            "name": "account"
+          }
+        ],
+        {
+          "atomic_type": "IntType",
+          "list_dimensions": null
+        }
+      ]
+    },
+    "can-transfer": {
+      "Fixed": [
+        [
+          {
+            "atomic_type": "PrincipalType",
+            "list_dimensions": null,
+            "name": "actor"
+          },
+          {
+            "atomic_type": "IntType",
+            "list_dimensions": null,
+            "name": "token-id"
+          }
+        ],
+        {
+          "atomic_type": "BoolType",
+          "list_dimensions": null
+        }
+      ]
+    },
+    "is-operator-approved": {
+      "Fixed": [
+        [
+          {
+            "atomic_type": "PrincipalType",
+            "list_dimensions": null,
+            "name": "account"
+          },
+          {
+            "atomic_type": "PrincipalType",
+            "list_dimensions": null,
+            "name": "operator"
+          }
+        ],
+        {
+          "atomic_type": "BoolType",
+          "list_dimensions": null
+        }
+      ]
+    },
+    "is-owner": {
+      "Fixed": [
+        [
+          {
+            "atomic_type": "PrincipalType",
+            "list_dimensions": null,
+            "name": "actor"
+          },
+          {
+            "atomic_type": "IntType",
+            "list_dimensions": null,
+            "name": "token-id"
+          }
+        ],
+        {
+          "atomic_type": "BoolType",
+          "list_dimensions": null
+        }
+      ]
+    },
+    "is-spender-approved": {
+      "Fixed": [
+        [
+          {
+            "atomic_type": "PrincipalType",
+            "list_dimensions": null,
+            "name": "spender"
+          },
+          {
+            "atomic_type": "IntType",
+            "list_dimensions": null,
+            "name": "token-id"
+          }
+        ],
+        {
+          "atomic_type": "BoolType",
+          "list_dimensions": null
+        }
+      ]
+    },
+    "mint!": {
+      "Fixed": [
+        [
+          {
+            "atomic_type": "PrincipalType",
+            "list_dimensions": null,
+            "name": "owner"
+          },
+          {
+            "atomic_type": "IntType",
+            "list_dimensions": null,
+            "name": "token-id"
+          }
+        ],
+        {
+          "atomic_type": {
+            "ResponseType": [
+              {
+                "atomic_type": "IntType",
+                "list_dimensions": null
+              },
+              {
+                "atomic_type": "IntType",
+                "list_dimensions": null
+              }
+            ]
+          },
+          "list_dimensions": null
+        }
+      ]
+    },
+    "owner-of": {
+      "Fixed": [
+        [
+          {
+            "atomic_type": "IntType",
+            "list_dimensions": null,
+            "name": "token-id"
+          }
+        ],
+        {
+          "atomic_type": {
+            "OptionalType": {
+              "atomic_type": "PrincipalType",
+              "list_dimensions": null
+            }
+          },
+          "list_dimensions": null
+        }
+      ]
+    },
+    "register-token!": {
+      "Fixed": [
+        [
+          {
+            "atomic_type": "PrincipalType",
+            "list_dimensions": null,
+            "name": "new-owner"
+          },
+          {
+            "atomic_type": "IntType",
+            "list_dimensions": null,
+            "name": "token-id"
+          }
+        ],
+        {
+          "atomic_type": "BoolType",
+          "list_dimensions": null
+        }
+      ]
+    },
+    "release-token!": {
+      "Fixed": [
+        [
+          {
+            "atomic_type": "PrincipalType",
+            "list_dimensions": null,
+            "name": "owner"
+          },
+          {
+            "atomic_type": "IntType",
+            "list_dimensions": null,
+            "name": "token-id"
+          }
+        ],
+        {
+          "atomic_type": "BoolType",
+          "list_dimensions": null
+        }
+      ]
+    }
+  },
+  "variable_types": {
+    "failed-to-mint-err": {
+      "atomic_type": {
+        "ResponseType": [
+          {
+            "atomic_type": "NoType",
+            "list_dimensions": null
+          },
+          {
+            "atomic_type": "IntType",
+            "list_dimensions": null
+          }
+        ]
+      },
+      "list_dimensions": null
+    },
+    "failed-to-move-token-err": {
+      "atomic_type": {
+        "ResponseType": [
+          {
+            "atomic_type": "NoType",
+            "list_dimensions": null
+          },
+          {
+            "atomic_type": "IntType",
+            "list_dimensions": null
+          }
+        ]
+      },
+      "list_dimensions": null
+    },
+    "not-approved-spender-err": {
+      "atomic_type": {
+        "ResponseType": [
+          {
+            "atomic_type": "NoType",
+            "list_dimensions": null
+          },
+          {
+            "atomic_type": "IntType",
+            "list_dimensions": null
+          }
+        ]
+      },
+      "list_dimensions": null
+    },
+    "same-spender-err": {
+      "atomic_type": {
+        "ResponseType": [
+          {
+            "atomic_type": "NoType",
+            "list_dimensions": null
+          },
+          {
+            "atomic_type": "IntType",
+            "list_dimensions": null
+          }
+        ]
+      },
+      "list_dimensions": null
+    },
+    "unauthorized-transfer-err": {
+      "atomic_type": {
+        "ResponseType": [
+          {
+            "atomic_type": "NoType",
+            "list_dimensions": null
+          },
+          {
+            "atomic_type": "IntType",
+            "list_dimensions": null
+          }
+        ]
+      },
+      "list_dimensions": null
+    }
+  },
+  "public_function_types": {
+    "set-operator-approval": {
+      "Fixed": [
+        [
+          {
+            "atomic_type": "PrincipalType",
+            "list_dimensions": null,
+            "name": "operator"
+          },
+          {
+            "atomic_type": "BoolType",
+            "list_dimensions": null,
+            "name": "is-approved"
+          }
+        ],
+        {
+          "atomic_type": {
+            "ResponseType": [
+              {
+                "atomic_type": "BoolType",
+                "list_dimensions": null
+              },
+              {
+                "atomic_type": "IntType",
+                "list_dimensions": null
+              }
+            ]
+          },
+          "list_dimensions": null
+        }
+      ]
+    },
+    "set-spender-approval": {
+      "Fixed": [
+        [
+          {
+            "atomic_type": "PrincipalType",
+            "list_dimensions": null,
+            "name": "spender"
+          },
+          {
+            "atomic_type": "IntType",
+            "list_dimensions": null,
+            "name": "token-id"
+          }
+        ],
+        {
+          "atomic_type": {
+            "ResponseType": [
+              {
+                "atomic_type": "IntType",
+                "list_dimensions": null
+              },
+              {
+                "atomic_type": "IntType",
+                "list_dimensions": null
+              }
+            ]
+          },
+          "list_dimensions": null
+        }
+      ]
+    },
+    "transfer": {
+      "Fixed": [
+        [
+          {
+            "atomic_type": "PrincipalType",
+            "list_dimensions": null,
+            "name": "recipient"
+          },
+          {
+            "atomic_type": "IntType",
+            "list_dimensions": null,
+            "name": "token-id"
+          }
+        ],
+        {
+          "atomic_type": {
+            "ResponseType": [
+              {
+                "atomic_type": "IntType",
+                "list_dimensions": null
+              },
+              {
+                "atomic_type": "IntType",
+                "list_dimensions": null
+              }
+            ]
+          },
+          "list_dimensions": null
+        }
+      ]
+    },
+    "transfer-from": {
+      "Fixed": [
+        [
+          {
+            "atomic_type": "PrincipalType",
+            "list_dimensions": null,
+            "name": "owner"
+          },
+          {
+            "atomic_type": "PrincipalType",
+            "list_dimensions": null,
+            "name": "recipient"
+          },
+          {
+            "atomic_type": "IntType",
+            "list_dimensions": null,
+            "name": "token-id"
+          }
+        ],
+        {
+          "atomic_type": {
+            "ResponseType": [
+              {
+                "atomic_type": "IntType",
+                "list_dimensions": null
+              },
+              {
+                "atomic_type": "IntType",
+                "list_dimensions": null
+              }
+            ]
+          },
+          "list_dimensions": null
+        }
+      ]
+    }
+  },
+  "read_only_function_types": {},
+  "map_types": {
+    "accounts-operator": [
+      {
+        "atomic_type": {
+          "TupleType": {
+            "type_map": {
+              "account": {
+                "atomic_type": "PrincipalType",
+                "list_dimensions": null
+              },
+              "operator": {
+                "atomic_type": "PrincipalType",
+                "list_dimensions": null
+              }
+            }
+          }
+        },
+        "list_dimensions": null
+      },
+      {
+        "atomic_type": {
+          "TupleType": {
+            "type_map": {
+              "is-approved": {
+                "atomic_type": "BoolType",
+                "list_dimensions": null
+              }
+            }
+          }
+        },
+        "list_dimensions": null
+      }
+    ],
+    "tokens-count": [
+      {
+        "atomic_type": {
+          "TupleType": {
+            "type_map": {
+              "owner": {
+                "atomic_type": "PrincipalType",
+                "list_dimensions": null
+              }
+            }
+          }
+        },
+        "list_dimensions": null
+      },
+      {
+        "atomic_type": {
+          "TupleType": {
+            "type_map": {
+              "count": {
+                "atomic_type": "IntType",
+                "list_dimensions": null
+              }
+            }
+          }
+        },
+        "list_dimensions": null
+      }
+    ],
+    "tokens-owner": [
+      {
+        "atomic_type": {
+          "TupleType": {
+            "type_map": {
+              "token-id": {
+                "atomic_type": "IntType",
+                "list_dimensions": null
+              }
+            }
+          }
+        },
+        "list_dimensions": null
+      },
+      {
+        "atomic_type": {
+          "TupleType": {
+            "type_map": {
+              "owner": {
+                "atomic_type": "PrincipalType",
+                "list_dimensions": null
+              }
+            }
+          }
+        },
+        "list_dimensions": null
+      }
+    ],
+    "tokens-spender": [
+      {
+        "atomic_type": {
+          "TupleType": {
+            "type_map": {
+              "token-id": {
+                "atomic_type": "IntType",
+                "list_dimensions": null
+              }
+            }
+          }
+        },
+        "list_dimensions": null
+      },
+      {
+        "atomic_type": {
+          "TupleType": {
+            "type_map": {
+              "spender": {
+                "atomic_type": "PrincipalType",
+                "list_dimensions": null
+              }
+            }
+          }
+        },
+        "list_dimensions": null
+      }
+    ]
+  }
+}

@@ -1,0 +1,165 @@
+{
+  "private_function_types": {
+    "price-function": {
+      "Fixed": [
+        [
+          {
+            "atomic_type": "IntType",
+            "list_dimensions": null,
+            "name": "name"
+          }
+        ],
+        {
+          "atomic_type": "IntType",
+          "list_dimensions": null
+        }
+      ]
+    }
+  },
+  "variable_types": {
+    "burn-address": {
+      "atomic_type": "PrincipalType",
+      "list_dimensions": null
+    }
+  },
+  "public_function_types": {
+    "preorder": {
+      "Fixed": [
+        [
+          {
+            "atomic_type": {
+              "BufferType": 20
+            },
+            "list_dimensions": null,
+            "name": "name-hash"
+          },
+          {
+            "atomic_type": "IntType",
+            "list_dimensions": null,
+            "name": "name-price"
+          }
+        ],
+        {
+          "atomic_type": {
+            "ResponseType": [
+              {
+                "atomic_type": "IntType",
+                "list_dimensions": null
+              },
+              {
+                "atomic_type": {
+                  "BufferType": 21
+                },
+                "list_dimensions": null
+              }
+            ]
+          },
+          "list_dimensions": null
+        }
+      ]
+    },
+    "register": {
+      "Fixed": [
+        [
+          {
+            "atomic_type": "PrincipalType",
+            "list_dimensions": null,
+            "name": "recipient-principal"
+          },
+          {
+            "atomic_type": "IntType",
+            "list_dimensions": null,
+            "name": "name"
+          },
+          {
+            "atomic_type": "IntType",
+            "list_dimensions": null,
+            "name": "salt"
+          }
+        ],
+        {
+          "atomic_type": {
+            "ResponseType": [
+              {
+                "atomic_type": "IntType",
+                "list_dimensions": null
+              },
+              {
+                "atomic_type": {
+                  "BufferType": 31
+                },
+                "list_dimensions": null
+              }
+            ]
+          },
+          "list_dimensions": null
+        }
+      ]
+    }
+  },
+  "read_only_function_types": {},
+  "map_types": {
+    "name-map": [
+      {
+        "atomic_type": {
+          "TupleType": {
+            "type_map": {
+              "name": {
+                "atomic_type": "IntType",
+                "list_dimensions": null
+              }
+            }
+          }
+        },
+        "list_dimensions": null
+      },
+      {
+        "atomic_type": {
+          "TupleType": {
+            "type_map": {
+              "owner": {
+                "atomic_type": "PrincipalType",
+                "list_dimensions": null
+              }
+            }
+          }
+        },
+        "list_dimensions": null
+      }
+    ],
+    "preorder-map": [
+      {
+        "atomic_type": {
+          "TupleType": {
+            "type_map": {
+              "name-hash": {
+                "atomic_type": {
+                  "BufferType": 20
+                },
+                "list_dimensions": null
+              }
+            }
+          }
+        },
+        "list_dimensions": null
+      },
+      {
+        "atomic_type": {
+          "TupleType": {
+            "type_map": {
+              "buyer": {
+                "atomic_type": "PrincipalType",
+                "list_dimensions": null
+              },
+              "paid": {
+                "atomic_type": "IntType",
+                "list_dimensions": null
+              }
+            }
+          }
+        },
+        "list_dimensions": null
+      }
+    ]
+  }
+}
