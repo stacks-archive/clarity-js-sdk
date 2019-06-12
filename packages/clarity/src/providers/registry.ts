@@ -5,7 +5,7 @@ export class ProviderRegistry {
   static availableProviders: ProviderConstructor[] = [];
 
   // Cached the loading promise to avoid race conditions during repeated invocations.
-  static defaultLoadCachedPromise: Promise<false | ProviderConstructor>;
+  static defaultLoadCachedPromise: Promise<false | ProviderConstructor> | undefined;
 
   static registerProvider(providerConstructor: ProviderConstructor, clearExisting = false) {
     if (clearExisting) {

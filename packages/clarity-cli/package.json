@@ -41,7 +41,6 @@
     "lint-fix": "tslint --fix -p tsconfig.json 'src/**/*.ts' 'test/**/*.ts'",
     "dev": "bin/run",
     "postpack": "rm -f oclif.manifest.json",
-    "posttest": "tslint -p test -t stylish",
     "build-oclif": "oclif-dev manifest && oclif-dev readme",
     "test": "npm run build && nyc mocha"
   },
@@ -67,6 +66,7 @@
     "mocha": "^6.1.4",
     "nyc": "^14.1.1",
     "shx": "^0.3.2",
+    "source-map-support": "^0.5.12",
     "ts-node": "^8.2.0",
     "tslint": "^5.17.0",
     "typescript": "^3.5.1"

@@ -22,12 +22,18 @@ export class Client {
     return receipt;
   };
 
-  createTransaction = (params?: { method: Method }): Transaction => {
-    const tx = new Transaction(params.method);
+  createTransaction = (params?: { method?: Method }): Transaction => {
+    const tx = new Transaction(params && params.method);
     return tx;
   };
 
   submitTransaction = async (tx: Transaction): Promise<Receipt> => {
+    if (!tx.sender) {
+      throw new Error("Transaction should have `sender` property");
+    }
+    if (!tx.method) {
+      throw new Error("Transaction should have `method` property");
+    }
     let receipt: Receipt;
     try {
       receipt = await this.provider.execute(
@@ -53,6 +59,10 @@ export class Client {
     //     query.method.name,
     //     "SZ2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKQ9H6DPR",
     //     ...query.method.args)
+
+    if (!query.method) {
+      throw new Error("Query should target a method");
+    }
     const res = await this.provider.eval(
       this.name,
       `(${query.method.name} ${query.method.args.join(" ")})`,

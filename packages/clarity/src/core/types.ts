@@ -1,14 +1,17 @@
+import { ResultInterface } from "./result";
+
 export interface Var {
   name: string;
 }
 
 export interface Method {
   name: string;
-  args?: string[];
+  args: string[];
 }
 
-export interface Receipt {
-  success: boolean;
-  error?: string;
-  data?: any;
+export interface Receipt extends ResultInterface<string, string> {
+  debugOutput?: string;
 }
+
+// tslint:disable-next-line: ban-types
+export interface CheckResult extends ResultInterface<Object, string> {}

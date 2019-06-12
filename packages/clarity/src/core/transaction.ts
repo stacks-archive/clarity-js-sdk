@@ -5,7 +5,7 @@ export class Transaction {
   receipt?: Receipt;
   method?: Method;
 
-  constructor(method: Method) {
+  constructor(method?: Method) {
     this.method = method;
   }
 

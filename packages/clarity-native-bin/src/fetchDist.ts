@@ -24,18 +24,22 @@ const enum SupportedDistArch {
 }
 
 /**
- * Gets a download url for a dist archive containing a binary that
- * can run in the currently executing system OS and architecture.
- * Returns false if system is incompatible with known available distributables.
+ * Checks if the currently executing platform and architecture has an distributable available
+ * for download.
+ * @param logger Optionally log error message for unsupported platform or arch.
  */
-export function getDownloadUrl(logger: ILogger, versionTag: string): string | false {
+export function isDistAvailable(
+  logger?: ILogger
+): { platform: SupportedDistPlatform; arch: SupportedDistArch } | false {
   let arch: SupportedDistArch;
   switch (os.arch()) {
     case "x64":
       arch = SupportedDistArch.x64;
       break;
     default:
-      logger.error(`System arch "${os.arch()}" not supported. Must build from source.`);
+      if (logger) {
+        logger.error(`System arch "${os.arch()}" not supported. Must build from source.`);
+      }
       return false;
   }
 
@@ -56,13 +60,30 @@ export function getDownloadUrl(logger: ILogger, versionTag: string): string | fa
       }
       break;
     default:
-      logger.error(`System platform "${os.platform()}" not supported. Must build from source.`);
+      if (logger) {
+        logger.error(`System platform "${os.platform()}" not supported. Must build from source.`);
+      }
       return false;
   }
+  return {
+    platform,
+    arch
+  };
+}
 
+/**
+ * Gets a download url for a dist archive containing a binary that
+ * can run in the currently executing system OS and architecture.
+ * Returns false if system is incompatible with known available distributables.
+ */
+export function getDownloadUrl(logger: ILogger, versionTag: string): string | false {
+  const distInfo = isDistAvailable(logger);
+  if (!distInfo) {
+    return false;
+  }
   const downloadUrl = DIST_DOWNLOAD_URL_TEMPLATE.replace("{tag}", versionTag)
-    .replace("{platform}", platform)
-    .replace("{arch}", arch);
+    .replace("{platform}", distInfo.platform)
+    .replace("{arch}", distInfo.arch);
   return downloadUrl;
 }
 

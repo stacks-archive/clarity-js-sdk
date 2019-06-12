@@ -1,10 +1,10 @@
-import { Receipt } from "../../core";
+import { CheckResult, Receipt } from "../../core";
 import { Provider } from "../../core/provider";
 
 export class JsonRpcProvider implements Provider {
   async initialize(): Promise<void> {}
 
-  async checkContract(contractFilePath: string): Promise<Receipt> {
+  async checkContract(contractFilePath: string): Promise<CheckResult> {
     return {
       success: false
     };

@@ -7,7 +7,7 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "strict": true,
-    "strictNullChecks": false,
+    "strictNullChecks": true,
     "sourceMap": true
   },
   "exclude": [

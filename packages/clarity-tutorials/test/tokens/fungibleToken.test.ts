@@ -162,6 +162,7 @@ describe("FungibleTokenClient Test Suite", () => {
     });
   });
 
+  // tslint:disable-next-line: max-line-length
   describe("Alice approving Zoe to spend 10 STX on her behalf, with allowance >= balance, allowance > 0", () => {
     before(async () => {
       await stacksTokenClient.approve(zoe, 10, { sender: alice });
