@@ -19,7 +19,7 @@
 
 ;;; Storage
 (define-map rockets-info
-  ((rocket-id int)) 
+  ((rocket-id int))
   ((owner principal)))
 (define-map rockets-count
   ((owner principal))
@@ -43,15 +43,15 @@
 ;; returns: int
 (define (balance-of (account principal))
   (default-to 0
-    (get count 
-         (fetch-entry rockets-count (tuple (owner account))))))
+    (get count
+         (fetch-entry rockets-count ((owner account))))))
 
 ;; Check if the transaction has been sent by the factory-address
 ;; returns: boolean
 (define (is-tx-from-factory)
   (let ((address
-         (get address 
-              (expects! (fetch-entry factory-address (tuple (id 0)))
+         (get address
+              (expects! (fetch-entry factory-address ((id 0)))
                         'false))))
     (eq? tx-sender address)))
 
@@ -59,9 +59,9 @@
 ;; args:
 ;; @rocket-id (int) the id of the rocket to identify
 ;; returns: option<principal>
-(define (owner-of (rocket-id int)) 
-  (get owner 
-    (fetch-entry rockets-info (tuple (rocket-id rocket-id)))))
+(define (owner-of (rocket-id int))
+  (get owner
+    (fetch-entry rockets-info ((rocket-id rocket-id)))))
 
 ;;; Public functions
 
@@ -74,21 +74,21 @@
 (define-public (transfer (recipient principal) (rocket-id int))
   (let ((balance-sender (balance-of tx-sender))
         (balance-recipient (balance-of recipient)))
-    (if (and 
+    (if (and
          (eq? (expects! (owner-of rocket-id) no-such-rocket-err)
               tx-sender)
          (> balance-sender 0)
          (not (eq? recipient tx-sender)))
         (begin
-          (set-entry! rockets-info 
-                      (tuple (rocket-id rocket-id))
-                      (tuple (owner recipient)))
-          (set-entry! rockets-count 
-                      (tuple (owner recipient))
-                      (tuple (count (+ balance-recipient 1))))
-          (set-entry! rockets-count 
-                      (tuple (owner tx-sender))
-                      (tuple (count (- balance-sender 1))))
+          (set-entry! rockets-info
+                      ((rocket-id rocket-id))
+                      ((owner recipient)))
+          (set-entry! rockets-count
+                      ((owner recipient))
+                      ((count (+ balance-recipient 1))))
+          (set-entry! rockets-count
+                      ((owner tx-sender))
+                      ((count (- balance-sender 1))))
           (ok rocket-id))
         bad-rocket-transfer-err)))
 
@@ -103,12 +103,12 @@
   (if (is-tx-from-factory)
       (let ((current-balance (balance-of owner)))
         (begin
-          (insert-entry! rockets-info 
-                         (tuple (rocket-id rocket-id))
-                         (tuple (owner owner))) 
-          (set-entry! rockets-count 
-                      (tuple (owner owner))
-                      (tuple (count (+ 1 current-balance)))) 
+          (insert-entry! rockets-info
+                         ((rocket-id rocket-id))
+                         ((owner owner)))
+          (set-entry! rockets-count
+                      ((owner owner))
+                      ((count (+ 1 current-balance))))
           (ok rocket-id)))
       unauthorized-mint-err))
 
@@ -118,10 +118,10 @@
 ;; returns: Response<Principal, int>
 (define-public (set-factory)
   (let ((factory-entry
-         (fetch-entry factory-address (tuple (id 0)))))
-    (if (and (is-none? factory-entry) 
-             (insert-entry! factory-address 
-                            (tuple (id 0))
-                            (tuple (address tx-sender))))
+         (fetch-entry factory-address ((id 0)))))
+    (if (and (is-none? factory-entry)
+             (insert-entry! factory-address
+                            ((id 0))
+                            ((address tx-sender))))
         (ok tx-sender)
         factory-already-set-err)))
