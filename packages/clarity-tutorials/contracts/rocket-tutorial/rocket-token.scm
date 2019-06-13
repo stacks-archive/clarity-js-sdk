@@ -18,8 +18,8 @@
 ;;;; Rocket-Token
 
 ;;; Storage
-(define-map balances 
-  ((owner principal)) 
+(define-map balances
+  ((owner principal))
   ((balance int)))
 (define-map total-supply
   ((id int))
@@ -31,8 +31,8 @@
 ;; returns: int
 (define (get-total-supply)
   (default-to 0
-   (get value 
-    (fetch-entry total-supply (tuple (id 0))))))
+   (get value
+    (fetch-entry total-supply ((id 0))))))
 
 ;; Gets the amount of tokens owned by the specified address
 ;; args:
@@ -40,8 +40,8 @@
 ;; returns: int
 (define (balance-of (account principal))
   (default-to 0
-    (get balance 
-         (fetch-entry balances (tuple (owner account))))))
+    (get balance
+         (fetch-entry balances ((owner account))))))
 
 ;; Credits balance of a specified principal
 ;; args:
@@ -53,10 +53,10 @@
     'false
     (let ((current-balance (balance-of account)))
       (begin
-        (set-entry! balances 
-          (tuple (owner account))
+        (set-entry! balances
+          ((owner account))
           ;; Overflows will cause exceptions
-          (tuple (balance (+ amount current-balance))))
+          ((balance (+ amount current-balance))))
         'true))))
 
 ;; Debits balance of a specified principal
@@ -70,8 +70,8 @@
       'false
       (begin
         (set-entry! balances
-          (tuple (owner account))
-          (tuple (balance (- balance amount))))
+          ((owner account))
+          ((balance (- balance amount))))
         'true))))
 
 ;; Transfers tokens to a specified principal
@@ -81,10 +81,10 @@
 ;; @amount (int) the amount of tokens to transfer
 ;; returns: boolean
 (define (transfer! (sender principal) (recipient principal) (amount int))
-  (if (and  
-        (not (eq? sender recipient)) 
-        (debit-balance! sender amount) 
-        (credit-balance! recipient amount)) 
+  (if (and
+        (not (eq? sender recipient))
+        (debit-balance! sender amount)
+        (credit-balance! recipient amount))
     'true
     'false))
 
@@ -109,19 +109,19 @@
   (if (<= amount 0)
     'false
     (let ((balance (balance-of account)))
-      (begin 
+      (begin
         (set-entry! balances
-          (tuple (owner account))
-          (tuple (balance (+ balance amount))))
-        (set-entry! total-supply 
-          (tuple (id 0))
-          (tuple (value (+ (get-total-supply) amount)))) 
+          ((owner account))
+          ((balance (+ balance amount))))
+        (set-entry! total-supply
+          ((id 0))
+          ((value (+ (get-total-supply) amount))))
         'true))))
 
 ;; Initialize the contract
 (begin
-  (set-entry! total-supply 
-    (tuple (id 0))
-    (tuple (value 0))) 
+  (set-entry! total-supply
+    ((id 0))
+    ((value 0)))
   (mint! 'SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7 20) ;; Alice
   (mint! 'S02J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKPVKG2CE 10)) ;; Bob

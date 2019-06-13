@@ -17,7 +17,7 @@
     "clean": "lerna run clean && lerna clean --yes",
     "build": "lerna run build",
     "rebuild": "npm run clean && npm run prepare && npm run build",
-    "test": "lerna run test",
+    "test": "lerna run test --stream",
     "lint": "lerna run lint",
     "lint-fix": "lerna run lint-fix",
     "codecov-upload": "codecov"
