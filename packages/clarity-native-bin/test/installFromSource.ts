@@ -10,7 +10,11 @@ describe("install via build from source", () => {
   let tempDir: string;
   let filePath: string;
 
-  before(() => {
+  before(function() {
+    if (process.env.SKIP_SLOW_TESTS) {
+      this.skip();
+      return;
+    }
     tempDir = makeUniqueTempDir();
     filePath = path.join(tempDir, "clarity-bin");
   });

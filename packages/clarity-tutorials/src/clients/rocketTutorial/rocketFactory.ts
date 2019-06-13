@@ -2,7 +2,7 @@ import { Client, Receipt } from "@blockstack/clarity";
 
 export class RocketFactoryClient extends Client {
   name = "rocket-factory";
-  filePath = "contracts/rocket-tutorial/rocket-factory.scm";
+  filePath = "rocket-tutorial/rocket-factory";
 
   async canUserBuy(user: string): Promise<boolean> {
     const query = this.createQuery({ method: { name: "can-user-buy", args: [`'${user}`] } });
