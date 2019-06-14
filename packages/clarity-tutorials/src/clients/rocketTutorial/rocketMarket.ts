@@ -1,4 +1,4 @@
-import { Client, Receipt } from "@blockstack/clarity";
+import { Client, Receipt, Result } from "@blockstack/clarity";
 
 export class RocketMarketClient extends Client {
   name = "rocket-market";
@@ -7,13 +7,13 @@ export class RocketMarketClient extends Client {
   async balanceOf(owner: string): Promise<number> {
     const query = this.createQuery({ method: { name: "balance-of", args: [`'${owner}`] } });
     const res = await this.submitQuery(query);
-    return parseInt(res.data.result);
+    return parseInt(Result.get(res));
   }
 
-  async ownerOf(tokenId: number): Promise<number> {
+  async ownerOf(tokenId: number): Promise<string> {
     const query = this.createQuery({ method: { name: "owner-of", args: [`${tokenId}`] } });
     const res = await this.submitQuery(query);
-    return res.data.result.replace(/'/g, "");
+    return Result.get(res).replace(/'/g, "");
   }
 
   async transfer(to: string, tokenId: number, params: { sender: string }): Promise<Receipt> {

@@ -1,5 +1,5 @@
 import fs from "fs";
-import { Receipt } from "../../core";
+import { CheckResult, Receipt } from "../../core";
 import { Provider } from "../../core/provider";
 import { getContractFilePath } from "../../utils/contractSourceDir";
 import { getTempFilePath } from "../../utils/fsUtil";
@@ -95,31 +95,26 @@ export class NativeClarityBinProvider implements Provider {
     }
   }
 
-  async checkContract(contractFilePath: string): Promise<Receipt> {
+  async checkContract(contractFilePath: string): Promise<CheckResult> {
     const filePath = getContractFilePath(contractFilePath);
     const result = await this.runCommand(["check", filePath, this.dbFilePath, "--output_analysis"]);
     if (result.exitCode !== 0) {
       return {
         success: false,
-        error: result.stderr,
-        data: {
-          code: result.exitCode
-        }
+        error: result.stderr
       };
     } else {
       const contractInterface = JSON.parse(result.stdout);
       return {
         success: true,
-        data: {
-          ...result,
-          contractInterface: contractInterface
-        }
+        result: contractInterface
       };
     }
   }
 
   async launchContract(contractName: string, contractFilePath: string): Promise<Receipt> {
     const filePath = getContractFilePath(contractFilePath);
+
     const result = await this.runCommand(["launch", contractName, filePath, this.dbFilePath]);
     if (result.exitCode !== 0) {
       throw new ExecutionError(
@@ -176,9 +171,8 @@ export class NativeClarityBinProvider implements Provider {
     }
     return {
       success: true,
-      data: {
-        debugOutput: result.stderr
-      }
+      result: result.stdout,
+      debugOutput: result.stderr
     };
   }
 
@@ -210,7 +204,8 @@ export class NativeClarityBinProvider implements Provider {
     const outputResult = result.stdout.substr(successPrefix[0].length);
     return {
       success: true,
-      data: { result: outputResult, debugOutput: result.stderr }
+      result: outputResult,
+      debugOutput: result.stderr
     };
   }
 
@@ -249,17 +244,13 @@ export class NativeClarityBinProvider implements Provider {
     if (includeDebugOutput) {
       return {
         success: true,
-        data: {
-          result: outputResult,
-          debugOutput: result.stderr
-        }
+        result: outputResult,
+        debugOutput: result.stderr
       };
     } else {
       return {
         success: true,
-        data: {
-          result: outputResult
-        }
+        result: outputResult
       };
     }
   }

@@ -1,4 +1,4 @@
-import { Client, Receipt } from "@blockstack/clarity";
+import { Client, Receipt, Result } from "@blockstack/clarity";
 
 export class RocketFactoryClient extends Client {
   name = "rocket-factory";
@@ -7,19 +7,19 @@ export class RocketFactoryClient extends Client {
   async canUserBuy(user: string): Promise<boolean> {
     const query = this.createQuery({ method: { name: "can-user-buy", args: [`'${user}`] } });
     const res = await this.submitQuery(query);
-    return res.data.result === "true";
+    return res.result === "true";
   }
 
   async canUserClaim(user: string): Promise<boolean> {
     const query = this.createQuery({ method: { name: "can-user-claim", args: [`'${user}`] } });
     const res = await this.submitQuery(query);
-    return res.data.result === "true";
+    return res.result === "true";
   }
 
   async rocketClaimableAt(user: string): Promise<number> {
     const query = this.createQuery({ method: { name: "rocket-claimable-at", args: [`'${user}`] } });
     const res = await this.submitQuery(query);
-    return parseInt(res.data.result);
+    return parseInt(Result.get(res));
   }
 
   async orderRocket(size: number, params: { sender: string }): Promise<Receipt> {

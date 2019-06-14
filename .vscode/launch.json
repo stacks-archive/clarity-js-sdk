@@ -7,6 +7,14 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "clarity-core: test",
+      "program": "${workspaceFolder}/packages/clarity/node_modules/mocha/bin/_mocha",
+      "cwd": "${workspaceFolder}/packages/clarity",
+      "console": "integratedTerminal"
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "clarity-cli: Setup from_dist",
       "program": "${workspaceFolder}/packages/clarity-cli/bin/run",
       "args": [

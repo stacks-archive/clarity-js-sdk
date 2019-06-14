@@ -3,7 +3,7 @@ import * as path from "path";
 import { cargoInstall } from "./cargoBuild";
 import { fetchDistributable, getDownloadUrl } from "./fetchDist";
 import { getExecutableFileName, verifyOutputFile } from "./fsUtil";
-import { ILogger } from "./logger";
+import { ConsoleLogger, ILogger } from "./logger";
 
 /**
  * Should correspond to both a git tag on the blockstack-core repo and a
@@ -22,6 +22,9 @@ export const BLOCKSTACK_CORE_SOURCE_BRANCH_ENV_VAR = "BLOCKSTACK_CORE_SOURCE_BRA
  */
 function getOverriddenCoreSource(): false | { specifier: "branch" | "tag"; value: string } {
   for (const [key, val] of Object.entries(process.env)) {
+    if (val === undefined) {
+      continue;
+    }
     const keyStr = key.toLocaleUpperCase();
     if (keyStr === BLOCKSTACK_CORE_SOURCE_TAG_ENV_VAR) {
       return { specifier: "tag", value: val };
@@ -45,59 +48,49 @@ function getThisPackageDir(): string {
  * Returns the full file path of the native clarity-cli executable.
  * Throws an error if it does not exist.
  * @param checkExists [Default = true] If true then an error is thrown if the file does not exist.
+ * @param versionTag Defaults to the current `CORE_SDK_TAG`.
  */
 export function getDefaultBinaryFilePath({
-  checkExists = true
-}: { checkExists?: boolean } = {}): string {
+  checkExists = true,
+  versionTag
+}: { checkExists?: boolean; versionTag?: string } = {}): string {
+  if (!versionTag) {
+    versionTag = CORE_SDK_TAG;
+  }
   const thisPkgDir = path.resolve(getThisPackageDir());
   const binFileName = getExecutableFileName("clarity-cli");
-  const binFilePath = path.join(thisPkgDir, ".native-bin", CORE_SDK_TAG, binFileName);
+  const binFilePath = path.join(thisPkgDir, ".native-bin", versionTag, binFileName);
   if (checkExists && !fs.existsSync(binFilePath)) {
     throw new Error(`Native binary does not appear to be installed at ${binFilePath}`);
   }
   return binFilePath;
 }
 
-export async function installDefaultPath({
-  checkExists = false,
-  fromSource = null
-}: { checkExists?: boolean; fromSource?: boolean } = {}): Promise<boolean> {
-  const installPath = getDefaultBinaryFilePath({ checkExists: checkExists });
-  const logger: ILogger = {
-    error: (input: string | Error): void => {
-      console.error(input);
-    },
-    log: (message?: string): void => {
-      console.log(message);
-    }
-  };
+export async function installDefaultPath(): Promise<boolean> {
+  const installPath = getDefaultBinaryFilePath({ checkExists: false });
+  const logger = ConsoleLogger;
 
-  let versionTag = CORE_SDK_TAG;
-  let versionBranch: string;
+  let versionTag: string | undefined = CORE_SDK_TAG;
+  let versionBranch: string | undefined;
+  let fromSource = false;
+
+  // Check if source git tag/branch was specified using env var
+  const sourceOverride = getOverriddenCoreSource();
+  if (sourceOverride !== false) {
+    logger.log(`Found git source env var ${sourceOverride.specifier}=${sourceOverride.value}`);
+    fromSource = true;
+    if (sourceOverride.specifier === "branch") {
+      versionTag = undefined;
+      versionBranch = sourceOverride.value;
+    } else {
+      versionTag = sourceOverride.value;
+    }
+  }
 
   if (!fromSource) {
-    // Check if source git tag/branch was specified using env var
-    const sourceOverride = getOverriddenCoreSource();
-    if (sourceOverride !== false) {
-      logger.log(`Found git source env var ${sourceOverride.specifier}=${sourceOverride.value}`);
+    const distFileAvailable = getDownloadUrl(logger, CORE_SDK_TAG);
+    if (!distFileAvailable) {
       fromSource = true;
-      if (sourceOverride.specifier === "branch") {
-        versionTag = undefined;
-        versionBranch = sourceOverride.value;
-      } else {
-        versionTag = sourceOverride.value;
-      }
-    } else {
-      const distFileAvailable = getDownloadUrl(logger, CORE_SDK_TAG);
-      // If the distFile is not available, and `fromSource` is explicitly disabled
-      // then return false (failure).
-      if (!distFileAvailable && fromSource === false) {
-        logger.error("Dist files are not available and `fromSource` is explicitly disabled.");
-        return false;
-      } else if (!distFileAvailable) {
-        // Otherwise, if `fromSource` was left undefined/null then enable it.
-        fromSource = true;
-      }
     }
   }
 
@@ -120,7 +113,7 @@ export async function installDefaultPath({
       logger: logger,
       overwriteExisting: true,
       outputFilePath: installPath,
-      versionTag: versionTag
+      versionTag: versionTag!
     });
   }
 
@@ -138,7 +131,6 @@ export async function install(opts: {
   if (!outputIsValid) {
     return false;
   }
-
   if (opts.fromSource) {
     return cargoInstall({ ...opts, gitTag: opts.versionTag });
   } else {
