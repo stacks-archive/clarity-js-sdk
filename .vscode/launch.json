@@ -68,6 +68,14 @@
       "program": "${workspaceFolder}/packages/clarity-native-bin/node_modules/mocha/bin/_mocha",
       "cwd": "${workspaceFolder}/packages/clarity-native-bin",
       "console": "integratedTerminal"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "generator-clarity-dev: test",
+      "program": "${workspaceFolder}/packages/generator-clarity-dev/node_modules/mocha/bin/_mocha",
+      "cwd": "${workspaceFolder}/packages/generator-clarity-dev",
+      "console": "integratedTerminal"
     }
   ]
 }

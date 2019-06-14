@@ -1,6 +1,5 @@
 import { Provider, ProviderRegistry, Receipt } from "@blockstack/clarity";
 import { expect } from "chai";
-import "mocha";
 import { RocketFactoryClient } from "../../src/clients/rocketTutorial/rocketFactory";
 import { RocketMarketClient } from "../../src/clients/rocketTutorial/rocketMarket";
 import { RocketTokenClient } from "../../src/clients/rocketTutorial/rocketToken";
@@ -23,14 +22,11 @@ describe("RocketFactoryClient Test Suite", () => {
   before(async () => {
     provider = await ProviderRegistry.createProvider();
 
-    rocketFactoryClient = new RocketFactoryClient();
-    await rocketFactoryClient.tearUp(provider);
+    rocketFactoryClient = new RocketFactoryClient(provider);
 
-    rocketTokenClient = new RocketTokenClient();
-    await rocketTokenClient.tearUp(provider);
+    rocketTokenClient = new RocketTokenClient(provider);
 
-    rocketMarketClient = new RocketMarketClient();
-    await rocketMarketClient.tearUp(provider);
+    rocketMarketClient = new RocketMarketClient(provider);
   });
 
   it("should have a valid syntax", async () => {

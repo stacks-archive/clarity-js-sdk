@@ -1,5 +1,4 @@
 import { assert, expect, should } from "chai";
-import "mocha";
 import { Result, ResultInterface } from "../src";
 import { CheckResult, Receipt } from "../src/core/types";
 

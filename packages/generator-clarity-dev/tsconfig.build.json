@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "declaration": true,
+    "outDir": "./generators",
+    "rootDir": "./src",
+    "esModuleInterop": false
+  },
+  "references": [
+    {
+      "path": "../clarity/tsconfig.build.json"
+    },
+    {
+      "path": "../clarity-native-bin/tsconfig.build.json"
+    }
+  ],
+  "include": [
+    "src/**/*"
+  ]
+}

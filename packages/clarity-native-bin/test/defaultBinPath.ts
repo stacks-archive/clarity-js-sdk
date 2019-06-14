@@ -1,5 +1,4 @@
 import { assert } from "chai";
-import "mocha";
 import path from "path";
 import { getDefaultBinaryFilePath } from "../src";
 

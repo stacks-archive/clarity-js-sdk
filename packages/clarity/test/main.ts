@@ -1,5 +1,4 @@
 import { assert, expect, should } from "chai";
-import "mocha";
 import * as path from "path";
 import * as index from "../src";
 import { fileExists, getTempFilePath } from "../src/utils/fsUtil";

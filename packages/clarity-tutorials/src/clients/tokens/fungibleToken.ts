@@ -1,8 +1,9 @@
-import { Client, Receipt, Result } from "@blockstack/clarity";
+import { Client, Provider, Receipt, Result } from "@blockstack/clarity";
 
 export class FungibleTokenClient extends Client {
-  name = "fungible-token";
-  filePath = "tokens/fungible-token";
+  constructor(provider: Provider) {
+    super("fungible-token", "tokens/fungible-token", provider);
+  }
 
   async transfer(to: string, value: number, params: { sender: string }): Promise<Receipt> {
     const tx = this.createTransaction({

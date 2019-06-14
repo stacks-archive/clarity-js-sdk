@@ -1,8 +1,9 @@
-import { Client, Receipt, Result } from "@blockstack/clarity";
+import { Client, Provider, Receipt, Result } from "@blockstack/clarity";
 
 export class NonFungibleTokenClient extends Client {
-  name = "non-fungible-stock";
-  filePath = "tokens/non-fungible-token";
+  constructor(provider: Provider) {
+    super("non-fungible-stock", "tokens/non-fungible-token", provider);
+  }
 
   async balanceOf(owner: string): Promise<number> {
     const query = this.createQuery({ method: { name: "balance-of", args: [`'${owner}`] } });

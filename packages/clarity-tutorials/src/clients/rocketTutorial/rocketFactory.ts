@@ -1,8 +1,9 @@
-import { Client, Receipt, Result } from "@blockstack/clarity";
+import { Client, Provider, Receipt, Result } from "@blockstack/clarity";
 
 export class RocketFactoryClient extends Client {
-  name = "rocket-factory";
-  filePath = "rocket-tutorial/rocket-factory";
+  constructor(provider: Provider) {
+    super("rocket-factory", "rocket-tutorial/rocket-factory", provider);
+  }
 
   async canUserBuy(user: string): Promise<boolean> {
     const query = this.createQuery({ method: { name: "can-user-buy", args: [`'${user}`] } });

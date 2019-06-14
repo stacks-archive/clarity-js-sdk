@@ -1,6 +1,5 @@
 import { Provider, ProviderRegistry, Receipt } from "@blockstack/clarity";
 import { expect } from "chai";
-import "mocha";
 import { RocketTokenClient } from "../../src/clients/rocketTutorial/rocketToken";
 
 describe("RocketTokenClient Test Suite", () => {
@@ -18,13 +17,11 @@ describe("RocketTokenClient Test Suite", () => {
 
   before(async () => {
     provider = await ProviderRegistry.createProvider();
-    rocketTokenClient = new RocketTokenClient();
-    await rocketTokenClient.tearUp(provider);
+    rocketTokenClient = new RocketTokenClient(provider);
   });
 
   it("should have a valid syntax", async () => {
-    const res = await rocketTokenClient.checkContract();
-    expect(res).to.be.true;
+    await rocketTokenClient.checkContract();
   });
 
   describe("Deploying an instance of the contract", () => {

@@ -1,20 +1,21 @@
 import { Method, Query, Receipt, Transaction } from ".";
 import { Provider } from "./provider";
+import { Result } from "./result";
 
 export class Client {
-  name!: string;
-  filePath!: string;
-  provider!: Provider;
+  name: string;
+  filePath: string;
+  provider: Provider;
 
-  constructor() {}
-
-  tearUp = async (provider: Provider) => {
+  constructor(name: string, filePath: string, provider: Provider) {
+    this.name = name;
+    this.filePath = filePath;
     this.provider = provider;
-  };
+  }
 
-  checkContract = async (): Promise<boolean> => {
+  checkContract = async (): Promise<void> => {
     const res = await this.provider.checkContract(this.filePath);
-    return res.success;
+    Result.unwrap(res);
   };
 
   deployContract = async (): Promise<any> => {

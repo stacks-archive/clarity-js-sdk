@@ -43,13 +43,13 @@ export class NativeClarityBinProvider implements Provider {
   static async createEphemeral(clarityBinPath: string): Promise<Provider> {
     const tempDbPath = getTempFilePath("blockstack-local-{uniqueID}.db");
     const instance = await this.create(tempDbPath, clarityBinPath);
-    instance.closeActions.push(() => fs.promises.unlink(instance.dbFilePath));
+    instance.closeActions.push(() => fs.unlinkSync(instance.dbFilePath));
     return instance;
   }
 
   public readonly dbFilePath: string;
   readonly clarityBinPath: string;
-  private closeActions: (() => Promise<any>)[] = [];
+  private closeActions: ((() => Promise<any>) | (() => any))[] = [];
 
   constructor(dbFilePath: string, clarityBinPath: string) {
     this.dbFilePath = dbFilePath;
@@ -334,7 +334,7 @@ export class NativeClarityBinProvider implements Provider {
 
   async close(): Promise<void> {
     for (const closeAction of this.closeActions) {
-      await closeAction();
+      await Promise.resolve(closeAction());
     }
   }
 }
