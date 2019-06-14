@@ -7,13 +7,13 @@ export class RocketMarketClient extends Client {
   async balanceOf(owner: string): Promise<number> {
     const query = this.createQuery({ method: { name: "balance-of", args: [`'${owner}`] } });
     const res = await this.submitQuery(query);
-    return parseInt(Result.get(res));
+    return parseInt(Result.unwrap(res));
   }
 
   async ownerOf(tokenId: number): Promise<string> {
     const query = this.createQuery({ method: { name: "owner-of", args: [`${tokenId}`] } });
     const res = await this.submitQuery(query);
-    return Result.get(res).replace(/'/g, "");
+    return Result.unwrap(res).replace(/'/g, "");
   }
 
   async transfer(to: string, tokenId: number, params: { sender: string }): Promise<Receipt> {

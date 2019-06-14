@@ -7,13 +7,13 @@ export class NonFungibleTokenClient extends Client {
   async balanceOf(owner: string): Promise<number> {
     const query = this.createQuery({ method: { name: "balance-of", args: [`'${owner}`] } });
     const res = await this.submitQuery(query);
-    return parseInt(Result.get(res));
+    return parseInt(Result.unwrap(res));
   }
 
   async ownerOf(tokenId: number): Promise<string> {
     const query = this.createQuery({ method: { name: "owner-of", args: [`${tokenId}`] } });
     const res = await this.submitQuery(query);
-    return Result.get(res).replace(/'/g, "");
+    return Result.unwrap(res).replace(/'/g, "");
   }
 
   async canTransfer(actor: string, tokenId: number): Promise<boolean> {
@@ -21,7 +21,7 @@ export class NonFungibleTokenClient extends Client {
       method: { name: "can-transfer", args: [`'${actor}`, `${tokenId}`] }
     });
     const res = await this.submitQuery(query);
-    return Result.get(res).replace(/'/g, "") === "true";
+    return Result.unwrap(res).replace(/'/g, "") === "true";
   }
 
   async isSpenderApproved(spender: string, tokenId: number): Promise<number> {
@@ -29,7 +29,7 @@ export class NonFungibleTokenClient extends Client {
       method: { name: "is-spender-approved", args: [`'${spender}`, `${tokenId}`] }
     });
     const res = await this.submitQuery(query);
-    return parseInt(Result.get(res));
+    return parseInt(Result.unwrap(res));
   }
 
   async isOperatorApproved(owner: string, operator: string): Promise<number> {
@@ -37,7 +37,7 @@ export class NonFungibleTokenClient extends Client {
       method: { name: "is-operator-approved", args: [`'${owner}`, `'${operator}`] }
     });
     const res = await this.submitQuery(query);
-    return parseInt(Result.get(res));
+    return parseInt(Result.unwrap(res));
   }
 
   async setSpenderApproval(

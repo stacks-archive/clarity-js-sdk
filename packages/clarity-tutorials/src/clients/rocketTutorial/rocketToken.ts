@@ -16,12 +16,12 @@ export class RocketTokenClient extends Client {
   async balanceOf(owner: string): Promise<number> {
     const query = this.createQuery({ method: { name: "balance-of", args: [`'${owner}`] } });
     const res = await this.submitQuery(query);
-    return parseInt(Result.get(res));
+    return parseInt(Result.unwrap(res));
   }
 
   async totalSupply(): Promise<number> {
     const query = this.createQuery({ method: { name: "get-total-supply", args: [] } });
     const res = await this.submitQuery(query);
-    return parseInt(Result.get(res));
+    return parseInt(Result.unwrap(res));
   }
 }
