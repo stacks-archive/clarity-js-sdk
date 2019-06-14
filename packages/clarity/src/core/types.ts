@@ -1,3 +1,4 @@
+import { ContractInterface } from "./contractInterface";
 import { ResultInterface } from "./result";
 
 export interface Var {
@@ -13,5 +14,4 @@ export interface Receipt extends ResultInterface<string, string> {
   debugOutput?: string;
 }
 
-// tslint:disable-next-line: ban-types
-export interface CheckResult extends ResultInterface<Object, string> {}
+export interface CheckResult extends ResultInterface<ContractInterface, string> {}
