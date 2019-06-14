@@ -1,7 +1,7 @@
 import * as path from "path";
 import { fileExists } from "./fsUtil";
 
-export const CONTRACT_FILE_EXT = ".scm";
+export const CONTRACT_FILE_EXT = ".clar";
 
 export function getContractFilePath(contractFile: string): string {
   function* getLocations(file: string): IterableIterator<string> {

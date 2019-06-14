@@ -2,7 +2,7 @@ import { Client, Receipt, Result } from "@blockstack/clarity";
 
 export class NonFungibleTokenClient extends Client {
   name = "non-fungible-stock";
-  filePath = "contracts/tokens/non-fungible-token.scm";
+  filePath = "tokens/non-fungible-token";
 
   async balanceOf(owner: string): Promise<number> {
     const query = this.createQuery({ method: { name: "balance-of", args: [`'${owner}`] } });

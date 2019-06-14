@@ -2,7 +2,7 @@ import { Client, Receipt, Result } from "@blockstack/clarity";
 
 export class RocketTokenClient extends Client {
   name = "rocket-token";
-  filePath = "contracts/rocket-tutorial/rocket-token.scm";
+  filePath = "rocket-tutorial/rocket-token";
 
   async transfer(to: string, value: number, params: { sender: string }): Promise<Receipt> {
     const tx = this.createTransaction({

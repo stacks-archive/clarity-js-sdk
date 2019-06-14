@@ -2,7 +2,7 @@ import { Client, Receipt, Result } from "@blockstack/clarity";
 
 export class FungibleTokenClient extends Client {
   name = "fungible-token";
-  filePath = "contracts/tokens/fungible-token.scm";
+  filePath = "tokens/fungible-token";
 
   async transfer(to: string, value: number, params: { sender: string }): Promise<Receipt> {
     const tx = this.createTransaction({
