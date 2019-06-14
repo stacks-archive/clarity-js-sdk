@@ -1,7 +1,7 @@
 import { Client, Provider, ProviderRegistry, Result } from "@blockstack/clarity";
 import { assert } from "chai";
 
-describe.only("hello world contract test suite", () => {
+describe("hello world contract test suite", () => {
   let helloWorldClient: Client;
   let provider: Provider;
 
