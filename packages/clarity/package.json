@@ -1,6 +1,6 @@
 {
   "name": "@blockstack/clarity",
-  "version": "0.1.4-alpha.0",
+  "version": "0.1.5-alpha.0",
   "description": "Clarity JS SDK - Core library",
   "author": "Blockstack <engineering@blockstack.com> (https://blockstack.com/)",
   "license": "MIT",
