@@ -70,3 +70,4 @@ package.json.lerna_backup
 *.native-bin
 packages/generator-clarity-dev/generators/app/index.*
 .yo-test*
+.blockstack-core-src
