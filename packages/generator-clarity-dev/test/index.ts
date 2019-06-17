@@ -28,6 +28,7 @@ describe("generator tests", () => {
 
   it("generated files", () => {
     assert.file([
+      ".gitignore",
       "package.json",
       "tsconfig.json",
       "contracts/sample/hello-world.clar",

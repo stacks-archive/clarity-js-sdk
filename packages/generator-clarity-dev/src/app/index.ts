@@ -53,7 +53,7 @@ module.exports = class extends Generator {
       }
     };
 
-    copyFiles([".vscode/", "contracts/", "test/", "tsconfig.json"]);
+    copyFiles([".vscode/", "contracts/", "test/", "tsconfig.json", ".gitignore"]);
 
     this.fs.move(
       this.destinationPath("test/hello-world.ts_template"),
