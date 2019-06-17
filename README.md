@@ -15,21 +15,22 @@ A development environment, testing framework, and deployment tool for Clarity sm
 
 ## Smart Contract Development
 
-> _Note: This initialization package is not yet ready, the following steps will not yet work._
-
 #### TypeScript
 
-Initialize project:
+Quick Start:
 ```
-npm init @blockstack/clarity-dev -- ts
+npm init yo clarity-dev
+npm test
 ```
 
+_See [`generator-clarity-dev`](packages/generator-clarity-dev/README.md) for more details._
 
 #### JavaScript
-Initialize project:
-```
-npm init @blockstack/clarity-dev -- js
-```
+
+Quick Start:
+
+> _Not yet available_
+
 
 ## clarity-cli
 
