@@ -1,29 +1,40 @@
 import fs from "fs";
 import path from "path";
 import assert = require("yeoman-assert");
+import yo_env = require("yeoman-environment");
+import Generator = require("yeoman-generator");
 import helpers = require("yeoman-test");
 
 describe("generator tests", () => {
   let testingDir: string;
+  let generator: Generator;
 
-  before(() => {
-    // testingDir = fs.mkdtempSync(path.join(__dirname, ".tmp-yo-test"));
-    // console.log(`__TEMP DIR: ${testingDir}`);
-    // helpers.setUpTestDirectory(testingDir);
+  before(async () => {
+    testingDir = path.join(__dirname, "../.yo-test");
+    await new Promise((resolve, reject) => {
+      helpers.testDirectory(testingDir, err => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
   });
 
   it("generate a project", async () => {
     const appPath = path.join(__dirname, "../generators/app");
-    testingDir = await Promise.resolve(
-      helpers
-        .run(appPath)
-        // .inDir(testingDir)
-        .withOptions({
-          skipInstall: false
-        })
-        .withLocalConfig({ lang: "en" })
-    );
-    console.log(`__RESULT DIR: ${testingDir}`);
+    generator = helpers.createGenerator("clarity-dev", [appPath], undefined, {
+      skipInstall: false
+    });
+
+    // Setup local dependencies.
+    const moduleClarityCore = path.join(__dirname, "../../clarity");
+    const moduleClarityNativeBin = path.join(__dirname, "../../clarity-native-bin");
+    generator.npmInstall([moduleClarityCore, moduleClarityNativeBin]);
+
+    // Run yo-generator to output project.
+    await Promise.resolve(generator.run());
   });
 
   it("generated files", () => {
@@ -37,5 +48,23 @@ describe("generator tests", () => {
       ".vscode/extensions.json",
       ".vscode/launch.json"
     ]);
+  });
+
+  it("run npm test", () => {
+    // Ensure `npm test` succeeds in generated project.
+    generator.spawnCommandSync("npm", ["test"]);
+  });
+
+  after(async () => {
+    // Clean temp output dir.
+    await new Promise((resolve, reject) => {
+      helpers.testDirectory(testingDir, err => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
   });
 });
