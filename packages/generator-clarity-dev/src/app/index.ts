@@ -53,13 +53,14 @@ module.exports = class extends Generator {
       }
     };
 
-    copyFiles([".vscode/", "contracts/", "test/", "tsconfig.json", ".gitignore"]);
+    copyFiles([".vscode/", "contracts/", "test/", "tsconfig.json"]);
 
     this.fs.move(
       this.destinationPath("test/hello-world.ts_template"),
       this.destinationPath("test/hello-world.ts")
     );
 
+    this.fs.copy(this.templatePath("_.gitignore"), this.destinationPath(".gitignore"));
     this.fs.copy(this.templatePath("_package.json"), this.destinationPath("package.json"));
 
     const generatorGeneratorPkg: PackageJson = require("../../package.json");
