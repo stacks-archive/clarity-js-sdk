@@ -16,7 +16,7 @@ export class FungibleTokenClient extends Client {
   async balanceOf(owner: string): Promise<number> {
     const query = this.createQuery({ method: { name: "balance-of", args: [`'${owner}`] } });
     const res = await this.submitQuery(query);
-    return parseInt(Result.get(res));
+    return parseInt(Result.unwrap(res));
   }
 
   async approve(spender: string, amount: number, params: { sender: string }): Promise<Receipt> {
@@ -40,7 +40,7 @@ export class FungibleTokenClient extends Client {
       method: { name: "allowance-of", args: [`'${spender}`, `'${owner}`] }
     });
     const res = await this.submitQuery(query);
-    return parseInt(Result.get(res));
+    return parseInt(Result.unwrap(res));
   }
 
   async transferFrom(

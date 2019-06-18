@@ -23,28 +23,52 @@ type ExtractErr<T extends ResultInterface<unknown, unknown>> = T extends ResultI
  * If `success` is true then the `result` property is marked as defined,
  * otherwise, the `error` property is marked as defined.
  */
-function extract<T extends ResultInterface<unknown, unknown>>(
-  input: T
-): { success: true; value: ExtractOk<T> } | { success: false; value: ExtractErr<T> } {
-  if (input.success) {
-    return { success: true, value: input.result as ExtractOk<T> };
+export function matchResult<TReturn, T extends ResultInterface<unknown, unknown>>(
+  input: T,
+  ok: (val: ExtractOk<T>) => TReturn,
+  error: (err: ExtractErr<T>) => TReturn
+): TReturn {
+  const extracted = extractResult(input);
+  if (extracted.success) {
+    return ok(extracted.result);
   } else {
-    return { success: false, value: input.error as ExtractErr<T> };
+    return error(extracted.error);
+  }
+}
+
+/**
+ * Type guard for objects that define `ResultInterface`.
+ * If `success` is true then the `result` property is marked as defined,
+ * otherwise, the `error` property is marked as defined.
+ */
+export function extractResult<T extends ResultInterface<unknown, unknown>>(
+  input: T
+): { success: true; result: ExtractOk<T> } | { success: false; error: ExtractErr<T> } {
+  if (input.success) {
+    return { success: true, result: input.result as ExtractOk<T> };
+  } else {
+    return { success: false, error: input.error as ExtractErr<T> };
   }
 }
 
 /**
  * Unwraps an object that defines `ResultInterface`.
- * If `success` is false then an error is thrown with the given object's `error` value.
- * Otherwise, returns the object's `result` value.
+ * If `success` is true then the object's `result` value is returned.
+ * Otherwise, an error is thrown with the given object's `error` value.
+ * The type of the `error` value determines what gets thrown:
+ * * If `error` is an instance of an `Error` object then it is directly thrown.
+ * * If `error` is a string then an `Error` will be constructed with the string and thrown.
+ * * If `error` is of neither type then the object is thrown directly (not generally recommended).
  */
-function get<T extends ResultInterface<unknown, unknown>>(input: T): ExtractOk<T> {
+export function unwrapResult<T extends ResultInterface<unknown, unknown>>(input: T): ExtractOk<T> {
   if (!input.success) {
     if (input.error) {
       if (input.error instanceof Error) {
         throw input.error;
       } else if (typeof input.error === "string") {
         throw new Error(input.error);
+      } else {
+        throw input.error;
       }
     } else {
       throw new Error("Result not successful and did not include an error message.");
@@ -54,6 +78,7 @@ function get<T extends ResultInterface<unknown, unknown>>(input: T): ExtractOk<T
 }
 
 export const Result = {
-  get,
-  extract
+  unwrap: unwrapResult,
+  extract: extractResult,
+  match: matchResult
 };

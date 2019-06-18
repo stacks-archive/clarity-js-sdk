@@ -19,7 +19,7 @@ export class RocketFactoryClient extends Client {
   async rocketClaimableAt(user: string): Promise<number> {
     const query = this.createQuery({ method: { name: "rocket-claimable-at", args: [`'${user}`] } });
     const res = await this.submitQuery(query);
-    return parseInt(Result.get(res));
+    return parseInt(Result.unwrap(res));
   }
 
   async orderRocket(size: number, params: { sender: string }): Promise<Receipt> {
