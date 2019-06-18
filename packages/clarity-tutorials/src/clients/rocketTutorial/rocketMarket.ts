@@ -1,8 +1,9 @@
-import { Client, Receipt, Result } from "@blockstack/clarity";
+import { Client, Provider, Receipt, Result } from "@blockstack/clarity";
 
 export class RocketMarketClient extends Client {
-  name = "rocket-market";
-  filePath = "rocket-tutorial/rocket-market";
+  constructor(provider: Provider) {
+    super("rocket-market", "rocket-tutorial/rocket-market", provider);
+  }
 
   async balanceOf(owner: string): Promise<number> {
     const query = this.createQuery({ method: { name: "balance-of", args: [`'${owner}`] } });

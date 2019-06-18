@@ -1,6 +1,5 @@
 import { assert } from "chai";
 import fs from "fs";
-import "mocha";
 import path from "path";
 import { CORE_SDK_TAG, install } from "../src";
 import { makeUniqueTempDir } from "../src/fsUtil";

@@ -1,6 +1,5 @@
 import { Provider, ProviderRegistry, Receipt } from "@blockstack/clarity";
 import { expect } from "chai";
-import "mocha";
 import { NonFungibleTokenClient } from "../../src/clients/tokens/nonFungibleToken";
 
 describe("NonFungibleTokenClient Test Suite", () => {
@@ -21,13 +20,11 @@ describe("NonFungibleTokenClient Test Suite", () => {
 
   before(async () => {
     provider = await ProviderRegistry.createProvider();
-    nftokenStockClient = new NonFungibleTokenClient();
-    await nftokenStockClient.tearUp(provider);
+    nftokenStockClient = new NonFungibleTokenClient(provider);
   });
 
   it("should have a valid syntax", async () => {
-    const res = await nftokenStockClient.checkContract();
-    expect(res).to.be.true;
+    await nftokenStockClient.checkContract();
   });
 
   describe("Deploying an instance of the contract", () => {

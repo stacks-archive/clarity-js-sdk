@@ -1,6 +1,5 @@
 import { Provider, ProviderRegistry, Receipt } from "@blockstack/clarity";
 import { expect } from "chai";
-import "mocha";
 import { FungibleTokenClient } from "../../src/clients/tokens/fungibleToken";
 
 describe("FungibleTokenClient Test Suite", () => {
@@ -18,13 +17,11 @@ describe("FungibleTokenClient Test Suite", () => {
 
   before(async () => {
     provider = await ProviderRegistry.createProvider();
-    stacksTokenClient = new FungibleTokenClient();
-    await stacksTokenClient.tearUp(provider);
+    stacksTokenClient = new FungibleTokenClient(provider);
   });
 
   it("should have a valid syntax", async () => {
-    const res = await stacksTokenClient.checkContract();
-    expect(res).to.be.true;
+    await stacksTokenClient.checkContract();
   });
 
   describe("Deploying an instance of the contract", () => {

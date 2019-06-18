@@ -1,8 +1,9 @@
-import { Client, Receipt, Result } from "@blockstack/clarity";
+import { Client, Provider, Receipt, Result } from "@blockstack/clarity";
 
 export class RocketTokenClient extends Client {
-  name = "rocket-token";
-  filePath = "rocket-tutorial/rocket-token";
+  constructor(provider: Provider) {
+    super("rocket-token", "rocket-tutorial/rocket-token", provider);
+  }
 
   async transfer(to: string, value: number, params: { sender: string }): Promise<Receipt> {
     const tx = this.createTransaction({
