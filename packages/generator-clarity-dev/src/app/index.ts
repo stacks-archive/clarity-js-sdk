@@ -1,8 +1,20 @@
+import semver = require("semver");
 import Generator = require("yeoman-generator");
 
-type Mutable<T> = { -readonly [P in keyof T]: Mutable<T[P]> };
+const generatorPackage: PackageJson = require("../../package.json");
 
+type Mutable<T> = { -readonly [P in keyof T]: Mutable<T[P]> };
 type PackageJson = Mutable<Required<import("package-json").FullVersion>>;
+
+const version = generatorPackage.engines.node;
+if (!semver.satisfies(process.version, version)) {
+  console.error(
+    `Node.js version ${version} is required. Installed version ${
+      process.version
+    } is not compatible.`
+  );
+  process.exit(1);
+}
 
 function inheritDependencies(src: PackageJson, target: PackageJson, names: string[]) {
   for (const name of names) {
@@ -63,7 +75,6 @@ module.exports = class extends Generator {
     this.fs.copy(this.templatePath("_.gitignore"), this.destinationPath(".gitignore"));
     this.fs.copy(this.templatePath("_package.json"), this.destinationPath("package.json"));
 
-    const generatorGeneratorPkg: PackageJson = require("../../package.json");
     const pkgJson: PackageJson = {
       dependencies: {},
       devDependencies: {},
@@ -72,11 +83,11 @@ module.exports = class extends Generator {
       }
     } as any;
 
-    inheritDependencies(generatorGeneratorPkg, pkgJson, [
+    inheritDependencies(generatorPackage, pkgJson, [
       "@blockstack/clarity",
       "@blockstack/clarity-native-bin"
     ]);
-    inheritDevDependencies(generatorGeneratorPkg, pkgJson, [
+    inheritDevDependencies(generatorPackage, pkgJson, [
       "typescript",
       "ts-node",
       "chai",
