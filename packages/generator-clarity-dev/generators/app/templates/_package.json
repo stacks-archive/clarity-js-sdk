@@ -1,7 +1,17 @@
 {
+  "name": "<%= name %>",
+  "version": "0.0.0",
+  "author": {
+    "name": "<%= authorName %>",
+    "email": "<%= authorEmail %>"
+  },
+  "repository": "<%= repository %>",
   "private": true,
   "engines": {
     "node": ">=10"
+  },
+  "scripts": {
+    "test": "mocha"
   },
   "devDependencies": {
     "@types/node": "^10"

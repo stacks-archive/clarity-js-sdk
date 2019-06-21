@@ -1,3 +1,5 @@
+import fs = require("fs");
+import path = require("path");
 import semver = require("semver");
 import Generator = require("yeoman-generator");
 
@@ -28,34 +30,68 @@ function inheritDevDependencies(src: PackageJson, target: PackageJson, names: st
   }
 }
 
+const PROJECT_NAME_ARG = "project_name";
+
 module.exports = class extends Generator {
+  packageJsonTemplateData: any;
+
   constructor(args: string | string[], options: any) {
     super(args, options);
-
-    // const sampleConfig: Generator.OptionConfig = {};
-    // This method adds support for a `--sample` flag
-    // this.option("sample", sampleConfig);
+    this.argument(PROJECT_NAME_ARG, { type: String, required: false });
   }
 
   async prompting() {
-    /*
-    const answers = await this.prompt([
-      {
-        type: "input",
-        name: "name",
-        message: "Your project name",
-        default: this.appname // Default to current folder name
-      },
-      {
-        type: "confirm",
-        name: "cool",
-        message: "Would you like to enable the Cool feature?"
-      }
-    ]);
+    const isDirEmpty = (dir: string) => {
+      const dirEntries = fs.readdirSync(dir);
+      return dirEntries.length === 0;
+    };
 
-    this.log("app name", answers.name);
-    this.log("cool feature", answers.cool);
-    */
+    let projNameArg: string | undefined = this.options[PROJECT_NAME_ARG];
+
+    const getGithubUsername = async () => {
+      if (this.options.githubUsername) {
+        return (this.options.githubUsername as string) || "";
+      } else {
+        try {
+          return await this.user.github.username();
+        } catch (error) {
+          return "";
+        }
+      }
+    };
+
+    let destRoot: string | undefined;
+    if (projNameArg) {
+      destRoot = this.destinationRoot(projNameArg);
+    } else {
+      destRoot = this.destinationRoot();
+      projNameArg = path.basename(destRoot);
+
+      if (!isDirEmpty(destRoot)) {
+        const answers = await this.prompt([
+          {
+            name: PROJECT_NAME_ARG,
+            message: "Project name",
+            default: "clarity-dev-project"
+          }
+        ]);
+        projNameArg = answers[PROJECT_NAME_ARG];
+        destRoot = this.destinationRoot(projNameArg);
+      }
+    }
+
+    const githubUsername = await getGithubUsername();
+    const authorName = this.user.git.name();
+    const authorEmail = this.user.git.email();
+    const repo = githubUsername ? `https://github.com/${githubUsername}/${projNameArg}` : "";
+
+    this.packageJsonTemplateData = {
+      name: projNameArg,
+      authorName: authorName,
+      authorEmail: authorEmail,
+      authorUsername: githubUsername,
+      repository: repo
+    };
   }
 
   writing() {
@@ -73,14 +109,19 @@ module.exports = class extends Generator {
     );
 
     this.fs.copy(this.templatePath("_.gitignore"), this.destinationPath(".gitignore"));
-    this.fs.copy(this.templatePath("_package.json"), this.destinationPath("package.json"));
+    try {
+      this.fs.copyTpl(
+        this.templatePath("_package.json"),
+        this.destinationPath("package.json"),
+        this.packageJsonTemplateData
+      );
+    } catch (error) {
+      this.log(`Error generating package.json: ${error}`);
+    }
 
     const pkgJson: PackageJson = {
       dependencies: {},
-      devDependencies: {},
-      scripts: {
-        test: "mocha"
-      }
+      devDependencies: {}
     } as any;
 
     inheritDependencies(generatorPackage, pkgJson, [
@@ -100,8 +141,10 @@ module.exports = class extends Generator {
   }
 
   install() {
-    this.installDependencies({
-      bower: false
-    });
+    if (!this.options["skip-install"]) {
+      this.installDependencies({
+        bower: false
+      });
+    }
   }
 };

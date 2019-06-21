@@ -24,7 +24,7 @@ describe("generator tests", () => {
 
   it("generate a project", async () => {
     const appPath = path.join(__dirname, "../generators/app");
-    generator = helpers.createGenerator("clarity-dev", [appPath], undefined, {
+    generator = helpers.createGenerator("clarity-dev", [appPath], ["example-proj"], {
       skipInstall: false
     });
 
@@ -35,6 +35,9 @@ describe("generator tests", () => {
 
     // Run yo-generator to output project.
     await Promise.resolve(generator.run());
+
+    const outputDir = generator.destinationRoot();
+    assert.strictEqual(path.basename(outputDir), "example-proj");
   });
 
   it("generated files", () => {
