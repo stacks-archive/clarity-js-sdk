@@ -1,5 +1,6 @@
 import filenamify = require("filenamify");
 import fs = require("fs");
+import githubUsername = require("github-username");
 import path = require("path");
 import semver = require("semver");
 import Generator = require("yeoman-generator");
@@ -19,6 +20,28 @@ if (!semver.satisfies(process.version, version)) {
   process.exit(1);
 }
 
+async function getGithubUsername(generator: Generator): Promise<string | undefined> {
+  let result: string | undefined;
+  if (generator.options.githubUsername) {
+    result = generator.options.githubUsername as string;
+  }
+  if (!result) {
+    try {
+      result = await generator.user.github.username();
+    } catch (error) {
+      // ignore
+    }
+  }
+  if (!result) {
+    try {
+      result = await githubUsername(generator.user.git.email());
+    } catch (error) {
+      // ignore
+    }
+  }
+  return result;
+}
+
 function inheritDependencies(src: PackageJson, target: PackageJson, names: string[]) {
   for (const name of names) {
     target.dependencies[name] = src.dependencies[name];
@@ -31,14 +54,14 @@ function inheritDevDependencies(src: PackageJson, target: PackageJson, names: st
   }
 }
 
-const PROJECT_NAME_ARG = "project_name";
+const PROJECT_DIR = "project_name";
 
 module.exports = class extends Generator {
   packageJsonTemplateData: any;
 
   constructor(args: string | string[], options: any) {
     super(args, options);
-    this.argument(PROJECT_NAME_ARG, { type: String, required: false });
+    this.argument(PROJECT_DIR, { type: String, required: false });
   }
 
   async prompting() {
@@ -47,45 +70,33 @@ module.exports = class extends Generator {
       return dirEntries.length === 0;
     };
 
-    let projNameArg: string | undefined = this.options[PROJECT_NAME_ARG];
-
-    const getGithubUsername = async () => {
-      if (this.options.githubUsername) {
-        return (this.options.githubUsername as string) || "";
-      } else {
-        try {
-          return await this.user.github.username();
-        } catch (error) {
-          return "";
-        }
-      }
-    };
+    let projDirArg: string | undefined = this.options[PROJECT_DIR];
 
     let destRoot: string | undefined;
-    if (projNameArg) {
+    if (projDirArg) {
       // Normalize file path.
-      let pathParts = projNameArg.split(/\/|\\/g);
+      let pathParts = projDirArg.split(/\/|\\/g);
       pathParts = pathParts.map((part: string) => filenamify(part, { replacement: "-" }));
-      projNameArg = path.join(...pathParts);
-      destRoot = this.destinationRoot(projNameArg);
+      projDirArg = path.join(...pathParts);
+      destRoot = this.destinationRoot(projDirArg);
     } else {
       destRoot = this.destinationRoot();
-      projNameArg = path.basename(destRoot);
+      projDirArg = path.basename(destRoot);
 
       if (!isDirEmpty(destRoot)) {
         const answers = await this.prompt([
           {
-            name: PROJECT_NAME_ARG,
+            name: PROJECT_DIR,
             message: "Project name",
             default: "clarity-dev-project"
           }
         ]);
-        projNameArg = answers[PROJECT_NAME_ARG];
-        destRoot = this.destinationRoot(projNameArg);
+        projDirArg = answers[PROJECT_DIR];
+        destRoot = this.destinationRoot(projDirArg);
       }
     }
 
-    if (!projNameArg) {
+    if (!projDirArg) {
       this.log("Missing project name!");
       process.exit(1);
       return;
@@ -100,11 +111,11 @@ module.exports = class extends Generator {
       return result;
     };
 
-    const packageName = normalizePackageName(projNameArg);
-    const githubUsername = await getGithubUsername();
+    const packageName = normalizePackageName(projDirArg);
+    const githubUsername = await getGithubUsername(this).catch(_ => undefined);
     const authorName = this.user.git.name();
     const authorEmail = this.user.git.email();
-    const repo = githubUsername ? `https://github.com/${githubUsername}/${projNameArg}` : "";
+    const repo = githubUsername ? `https://github.com/${githubUsername}/${packageName}.git` : "";
 
     this.packageJsonTemplateData = {
       name: packageName,
