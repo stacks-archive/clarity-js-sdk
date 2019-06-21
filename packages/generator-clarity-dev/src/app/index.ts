@@ -1,3 +1,4 @@
+import filenamify = require("filenamify");
 import fs = require("fs");
 import path = require("path");
 import semver = require("semver");
@@ -62,6 +63,10 @@ module.exports = class extends Generator {
 
     let destRoot: string | undefined;
     if (projNameArg) {
+      // Normalize file path.
+      let pathParts = projNameArg.split(/\/|\\/g);
+      pathParts = pathParts.map((part: string) => filenamify(part, { replacement: "-" }));
+      projNameArg = path.join(...pathParts);
       destRoot = this.destinationRoot(projNameArg);
     } else {
       destRoot = this.destinationRoot();
@@ -80,13 +85,29 @@ module.exports = class extends Generator {
       }
     }
 
+    if (!projNameArg) {
+      this.log("Missing project name!");
+      process.exit(1);
+      return;
+    }
+
+    // Make the project name a save npm package name.
+    const normalizePackageName = (name: string) => {
+      let result = path.basename(name);
+      result = result.toLowerCase();
+      result = result.replace(/[^a-zA-Z0-9_-]/g, "");
+      result = result.replace(/^[_-]+|[_-]+$/g, "");
+      return result;
+    };
+
+    const packageName = normalizePackageName(projNameArg);
     const githubUsername = await getGithubUsername();
     const authorName = this.user.git.name();
     const authorEmail = this.user.git.email();
     const repo = githubUsername ? `https://github.com/${githubUsername}/${projNameArg}` : "";
 
     this.packageJsonTemplateData = {
-      name: projNameArg,
+      name: packageName,
       authorName: authorName,
       authorEmail: authorEmail,
       authorUsername: githubUsername,
@@ -146,5 +167,10 @@ module.exports = class extends Generator {
         bower: false
       });
     }
+  }
+
+  end() {
+    const outputPath = this.destinationRoot();
+    this.log(`Project created at ${outputPath}`);
   }
 };

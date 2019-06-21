@@ -4,8 +4,9 @@ import assert = require("yeoman-assert");
 import yo_env = require("yeoman-environment");
 import Generator = require("yeoman-generator");
 import helpers = require("yeoman-test");
+import utils = require("./util");
 
-describe("generator tests", () => {
+describe("generator tests [in non-empty dir]", () => {
   let testingDir: string;
   let generator: Generator;
 
@@ -22,12 +23,16 @@ describe("generator tests", () => {
     });
   });
 
+  it("add existing files to output dir", async () => {
+    fs.writeFileSync(path.join(testingDir, "something.txt"), "x");
+  });
+
   it("generate a project", async () => {
     const appPath = path.join(__dirname, "../generators/app");
-    generator = helpers.createGenerator("clarity-dev", [appPath], ["example-proj"], {
+    generator = helpers.createGenerator("clarity-dev", [appPath], [], {
       skipInstall: false
     });
-
+    helpers.mockPrompt(generator, { project_name: "tmp-example" });
     // Setup local dependencies.
     const moduleClarityCore = path.join(__dirname, "../../clarity");
     const moduleClarityNativeBin = path.join(__dirname, "../../clarity-native-bin");
@@ -36,21 +41,13 @@ describe("generator tests", () => {
     // Run yo-generator to output project.
     await Promise.resolve(generator.run());
 
+    // Validate output directory.
     const outputDir = generator.destinationRoot();
-    assert.strictEqual(path.basename(outputDir), "example-proj");
+    assert.strictEqual(path.basename(outputDir), "tmp-example");
   });
 
   it("generated files", () => {
-    assert.file([
-      ".gitignore",
-      "package.json",
-      "tsconfig.json",
-      "contracts/sample/hello-world.clar",
-      "test/hello-world.ts",
-      "test/mocha.opts",
-      ".vscode/extensions.json",
-      ".vscode/launch.json"
-    ]);
+    assert.file(utils.EXPECTED_OUTPUT_FILES);
   });
 
   it("run npm test", () => {
