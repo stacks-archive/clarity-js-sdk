@@ -1,17 +1,20 @@
 import { expect, test } from "@oclif/test";
+import fs from "fs-extra";
+import os from "os";
+import path from "path";
 
 describe("new project", () => {
+  const testingDir = path.resolve(path.join(path.dirname(__dirname), ".yo-test"));
+  fs.mkdirSync(testingDir, { recursive: true });
+  const outputDir = fs.mkdtempSync(`${testingDir}${path.sep}`);
   test
     .stdout()
-    .command(["new"])
-    .it("runs new", ctx => {
-      expect(ctx.stdout).to.contain("todo");
-    });
-
-  test
-    .stdout()
-    .command(["new", "example_proj"])
-    .it("runs new example_proj", ctx => {
-      expect(ctx.stdout).to.contain("todo example_proj");
+    .command(["new", outputDir, "--skip_install"])
+    .finally(ctx => {
+      fs.removeSync(testingDir);
+    })
+    .it("runs new project", ctx => {
+      // tslint:disable-next-line: no-unused-expression
+      expect(ctx.error).to.be.undefined;
     });
 });

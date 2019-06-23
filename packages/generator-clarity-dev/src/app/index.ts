@@ -1,4 +1,3 @@
-import filenamify = require("filenamify");
 import fs = require("fs");
 import githubUsername = require("github-username");
 import path = require("path");
@@ -74,10 +73,8 @@ class ClarityDevGenerator extends Generator {
 
     let destRoot: string | undefined;
     if (projDirArg) {
-      // Normalize file path.
-      let pathParts = projDirArg.split(/\/|\\/g);
-      pathParts = pathParts.map((part: string) => filenamify(part, { replacement: "-" }));
-      projDirArg = path.join(...pathParts);
+      const normalizedPath = projDirArg.replace(/\/|\\/g, path.sep);
+      projDirArg = normalizedPath;
       destRoot = this.destinationRoot(projDirArg);
     } else {
       destRoot = this.destinationRoot();

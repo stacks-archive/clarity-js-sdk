@@ -47,6 +47,7 @@
   "dependencies": {
     "@blockstack/clarity": "^0.1.5-alpha.0",
     "@blockstack/clarity-native-bin": "^0.1.4-alpha.0",
+    "generator-clarity-dev": "^0.1.5-alpha.0",
     "@oclif/command": "^1.5.13",
     "@oclif/config": "^1.13.0",
     "@oclif/plugin-help": "^2.1.6",

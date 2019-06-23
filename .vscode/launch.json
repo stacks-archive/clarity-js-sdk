@@ -51,7 +51,8 @@
       "name": "clarity-cli: test",
       "program": "${workspaceFolder}/packages/clarity-cli/node_modules/mocha/bin/_mocha",
       "cwd": "${workspaceFolder}/packages/clarity-cli",
-      "console": "integratedTerminal"
+      "console": "integratedTerminal",
+      "preLaunchTask": "npm: build"
     },
     {
       "type": "node",
