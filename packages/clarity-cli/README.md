@@ -10,7 +10,7 @@ $ npm install -g @blockstack/clarity-cli
 $ clarity COMMAND
 running command...
 $ clarity (-v|--version|version)
-@blockstack/clarity-cli/0.1.5-alpha.0 darwin-x64 node-v10.15.3
+@blockstack/clarity-cli/0.1.6-alpha.0 darwin-x64 node-v10.15.3
 $ clarity --help [COMMAND]
 USAGE
   $ clarity COMMAND
@@ -20,7 +20,7 @@ USAGE
 # Commands
 <!-- commands -->
 * [`clarity help [COMMAND]`](#clarity-help-command)
-* [`clarity new [PROJECT]`](#clarity-new-project)
+* [`clarity new PROJECT`](#clarity-new-project)
 * [`clarity setup`](#clarity-setup)
 
 ## `clarity help [COMMAND]`
@@ -40,16 +40,17 @@ OPTIONS
 
 _See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v2.2.0/src/commands/help.ts)_
 
-## `clarity new [PROJECT]`
+## `clarity new PROJECT`
 
 Generate new project
 
 ```
 USAGE
-  $ clarity new [PROJECT]
+  $ clarity new PROJECT
 
 OPTIONS
-  -h, --help  show CLI help
+  -h, --help      show CLI help
+  --skip_install  Skip running `npm install` after project generation.
 
 EXAMPLE
   $ clarity new <PROJECT_NAME>
