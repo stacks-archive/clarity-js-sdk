@@ -1,5 +1,4 @@
-import fs from "fs";
-import path from "path";
+import path = require("path");
 import assert = require("yeoman-assert");
 import yo_env = require("yeoman-environment");
 import Generator = require("yeoman-generator");
@@ -25,7 +24,7 @@ describe("generator tests", () => {
 
   it("generate a project", async () => {
     const appPath = path.join(__dirname, "../generators/app");
-    const projectName = path.join("example-proj");
+    const projectName = "example-proj";
     generator = helpers.createGenerator("clarity-dev", [appPath], [projectName], {
       skipInstall: false
     });

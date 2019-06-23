@@ -1,5 +1,4 @@
-import fs from "fs";
-import path from "path";
+import path = require("path");
 import assert = require("yeoman-assert");
 import yo_env = require("yeoman-environment");
 import Generator = require("yeoman-generator");

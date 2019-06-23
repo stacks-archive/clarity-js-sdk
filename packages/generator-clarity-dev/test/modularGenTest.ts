@@ -1,14 +1,17 @@
 import fs = require("fs");
 import path = require("path");
 import assert = require("yeoman-assert");
-import yo_env = require("yeoman-environment");
-import Generator = require("yeoman-generator");
+import YeoEnv = require("yeoman-environment");
 import helpers = require("yeoman-test");
+import * as modularGen from "../src/modularGen";
 import utils = require("./util");
 
-describe("generator tests [in non-empty dir]", () => {
+describe("generator tests [modular usage]", () => {
+  const projectName = "example-mod-output";
   let testingDir: string;
-  let generator: Generator;
+  let generator: import("yeoman-generator");
+  let env: YeoEnv<YeoEnv.Options>;
+  let runGen: () => Promise<unknown>;
 
   before(async () => {
     testingDir = path.join(__dirname, "../.yo-test");
@@ -23,27 +26,24 @@ describe("generator tests [in non-empty dir]", () => {
     });
   });
 
-  it("add existing files to output dir", async () => {
-    fs.writeFileSync(path.join(testingDir, "something.txt"), "x");
+  it("create app generator", async () => {
+    const result = modularGen.createAppGen({
+      args: [projectName],
+      options: { "skip-install": false }
+    });
+    generator = result.generator;
+    env = result.env;
+    runGen = result.run;
   });
 
   it("generate a project", async () => {
-    const appPath = path.join(__dirname, "../generators/app");
-    generator = helpers.createGenerator("clarity-dev", [appPath], [], {
-      skipInstall: false
-    });
-    helpers.mockPrompt(generator, { project_name: "tmp-example" });
-    // Setup local dependencies.
-    const moduleClarityCore = path.join(__dirname, "../../clarity");
-    const moduleClarityNativeBin = path.join(__dirname, "../../clarity-native-bin");
-    generator.npmInstall([moduleClarityCore, moduleClarityNativeBin]);
+    await runGen();
+  });
 
-    // Run yo-generator to output project.
-    await Promise.resolve(generator.run());
-
-    // Validate output directory.
-    const outputDir = generator.destinationRoot();
-    assert.strictEqual(path.basename(outputDir), "tmp-example");
+  it("validate output directory", () => {
+    const outputDir = path.resolve(generator.destinationRoot());
+    const expectedOutDir = path.resolve(path.join(testingDir, projectName));
+    assert.strictEqual(outputDir, expectedOutDir);
   });
 
   it("generated files", () => {
