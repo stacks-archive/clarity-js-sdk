@@ -1,5 +1,17 @@
 const fs = require("fs");
 const path = require("path");
+const semver = require("semver");
+const generatorPackage = require(path.join(__dirname, "package.json"));
+
+const version = generatorPackage.engines.node;
+if (!semver.satisfies(process.version, version)) {
+  console.error(
+    `Node.js version ${version} is required. Installed version ${
+      process.version
+    } is not compatible.`
+  );
+  process.exit(1);
+}
 
 // Detect if running in dev environment.
 const tsConfigBuildFile = path.join(__dirname, "tsconfig.build.json");

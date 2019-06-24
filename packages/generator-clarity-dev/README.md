@@ -42,13 +42,23 @@ _Expected output:_
 
 #### Project Generator
 
-The above `npm init ...` command uses the [`create-yo`](https://github.com/boneskull/create-yo) utility to avoid global package installs.
+* Ensure all checks pass when running `npx yo doctor`.
+  > ```
+  > Yeoman Doctor - Running sanity checks on your system
+  > ✔ Global configuration file is valid
+  > ✔ NODE_PATH matches the npm root
+  > ✔ Node.js version
+  > ✔ No .bowerrc file in home directory
+  > ✔ No .yo-rc.json file in home directory
+  > ✔ npm version
+  > ✔ yo version
 
-If running into problems then try with regular `yo` installation:
-```
-npm install -g yo generator-clarity-dev
-yo clarity-dev
-```
+* Alternate install commands
+  > The above `npm init ...` command uses the [`create-yo`](https://github.com/boneskull/create-yo) utility to avoid global package installs. If running into problems then try with regular `yo` installation:
+  > ```
+  > npm install -g yo generator-clarity-dev
+  > yo clarity-dev
+  > ```
 
 #### clarity-native-bin
 

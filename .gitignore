@@ -68,6 +68,9 @@ tsconfig.tsbuildinfo
 oclif.manifest.json
 package.json.lerna_backup
 *.native-bin
+packages/generator-clarity-dev/generators/index.*
 packages/generator-clarity-dev/generators/app/index.*
+packages/generator-clarity-dev/generators/modularGen.*
 .yo-test*
 .blockstack-core-src
+

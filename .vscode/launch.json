@@ -51,7 +51,8 @@
       "name": "clarity-cli: test",
       "program": "${workspaceFolder}/packages/clarity-cli/node_modules/mocha/bin/_mocha",
       "cwd": "${workspaceFolder}/packages/clarity-cli",
-      "console": "integratedTerminal"
+      "console": "integratedTerminal",
+      "preLaunchTask": "npm: build"
     },
     {
       "type": "node",
@@ -75,7 +76,8 @@
       "name": "generator-clarity-dev: test",
       "program": "${workspaceFolder}/packages/generator-clarity-dev/node_modules/mocha/bin/_mocha",
       "cwd": "${workspaceFolder}/packages/generator-clarity-dev",
-      "console": "integratedTerminal"
+      "console": "integratedTerminal",
+      "preLaunchTask": "npm: build"
     }
   ]
 }

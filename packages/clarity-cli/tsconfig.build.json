@@ -12,6 +12,9 @@
     },
     {
       "path": "../clarity-native-bin/tsconfig.build.json"
+    },
+    {
+      "path": "../generator-clarity-dev/tsconfig.build.json"
     }
   ],
   "include": [

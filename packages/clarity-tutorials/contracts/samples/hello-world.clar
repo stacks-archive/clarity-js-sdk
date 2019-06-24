@@ -1,5 +1,5 @@
 (define (hello-world)
-   (begin "hello world"))
+   "hello world")
 
 (define (echo-number (val int))
-   (begin val))
+   val)
