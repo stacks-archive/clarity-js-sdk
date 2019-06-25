@@ -10,8 +10,8 @@
   "publishConfig": {
     "access": "public"
   },
-  "main": "generators/index.js",
-  "types": "generators/index.d.ts",
+  "main": "generators/modularGen.js",
+  "types": "generators/modularGen.d.ts",
   "engines": {
     "node": ">=10"
   },
@@ -19,7 +19,6 @@
     "yeoman-generator"
   ],
   "files": [
-    "/lib",
     "/generators"
   ],
   "scripts": {
