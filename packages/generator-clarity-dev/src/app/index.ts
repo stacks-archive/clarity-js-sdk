@@ -55,7 +55,7 @@ function inheritDevDependencies(src: PackageJson, target: PackageJson, names: st
 
 const PROJECT_DIR = "project_name";
 
-class ClarityDevGenerator extends Generator {
+module.exports = class extends Generator {
   packageJsonTemplateData: any;
 
   constructor(args: string | string[], options: any) {
@@ -181,6 +181,4 @@ class ClarityDevGenerator extends Generator {
     const outputPath = this.destinationRoot();
     this.log(`Project created at ${outputPath}`);
   }
-}
-
-export default ClarityDevGenerator;
+};
