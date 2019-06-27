@@ -19,8 +19,8 @@ describe("hello world contract test suite", () => {
       await helloWorldClient.deployContract();
     });
 
-    it("should print hello world message", async () => {
-      const query = helloWorldClient.createQuery({ method: { name: "hello-world", args: [] } });
+    it("should return 'hello world'", async () => {
+      const query = helloWorldClient.createQuery({ method: { name: "say-hi", args: [] } });
       const receipt = await helloWorldClient.submitQuery(query);
       const result = Result.unwrap(receipt);
       const parsedResult = Buffer.from(result.replace("0x", ""), "hex").toString();

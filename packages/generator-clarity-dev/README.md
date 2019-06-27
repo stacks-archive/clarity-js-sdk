@@ -29,7 +29,7 @@ _Expected output:_
   hello world contract test suite
     ✓ should have a valid syntax
     deploying an instance of the contract
-      ✓ should print hello world message
+      ✓ should return 'hello world'
       ✓ should echo number
 
   3 passing

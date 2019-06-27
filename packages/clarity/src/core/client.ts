@@ -1,6 +1,7 @@
 import { Method, Query, Receipt, Transaction } from ".";
 import { Provider } from "./provider";
 import { Result } from "./result";
+import { CheckResult } from "./types";
 
 export class Client {
   name: string;
@@ -18,7 +19,7 @@ export class Client {
     Result.unwrap(res);
   };
 
-  deployContract = async (): Promise<any> => {
+  deployContract = async (): Promise<Receipt> => {
     const receipt = await this.provider.launchContract(this.name, this.filePath);
     return receipt;
   };
