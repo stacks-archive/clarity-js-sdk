@@ -25,7 +25,7 @@ describe("generator tests", () => {
   it("generate a project", async () => {
     const appPath = path.join(__dirname, "../generators/app");
     const projectName = "example-proj";
-    generator = helpers.createGenerator("clarity-dev", [appPath], [projectName], {
+    generator = helpers.createGenerator(appPath, [], [projectName], {
       skipInstall: false
     });
 

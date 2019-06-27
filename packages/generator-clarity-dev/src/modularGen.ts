@@ -17,7 +17,7 @@ export function createAppGen({
   env.register(appPath, generatorName);
 
   const genOpts = { arguments: args, options: options };
-  const instance = (env.create("clarity:dev", genOpts) as unknown) as Generator;
+  const instance = (env.create(generatorName, genOpts) as unknown) as Generator;
 
   const runFn = () => {
     return Promise.resolve(instance.run()) as Promise<unknown>;
