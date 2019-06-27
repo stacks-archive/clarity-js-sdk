@@ -60,7 +60,8 @@
       "name": "clarity-tutorials: test",
       "program": "${workspaceFolder}/packages/clarity-tutorials/node_modules/mocha/bin/_mocha",
       "cwd": "${workspaceFolder}/packages/clarity-tutorials",
-      "console": "integratedTerminal"
+      "console": "integratedTerminal",
+      "preLaunchTask": "npm: build"
     },
     {
       "type": "node",

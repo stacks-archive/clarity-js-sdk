@@ -133,7 +133,8 @@ export class NativeClarityBinProvider implements Provider {
       );
     }
     return {
-      success: true
+      success: true,
+      debugOutput: result.stderr
     };
   }
 
