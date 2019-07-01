@@ -14,6 +14,8 @@ install:
   - npm --version
   - npm install
 
+build: false
+
 test_script:
   - npm run lint
   - npm run test
