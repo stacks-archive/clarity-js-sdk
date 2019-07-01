@@ -3,6 +3,7 @@ import fetch from "node-fetch";
 import * as os from "os";
 import * as path from "path";
 import * as tar from "tar";
+import { detectArch } from "./detectArch";
 import { detectLibc } from "./detectLibc";
 import { getExecutableFileName, makeUniqueTempDir } from "./fsUtil";
 import { ILogger } from "./logger";
@@ -32,13 +33,14 @@ export function isDistAvailable(
   logger?: ILogger
 ): { platform: SupportedDistPlatform; arch: SupportedDistArch } | false {
   let arch: SupportedDistArch;
-  switch (os.arch()) {
+  const detectedArch = detectArch();
+  switch (detectedArch) {
     case "x64":
       arch = SupportedDistArch.x64;
       break;
     default:
       if (logger) {
-        logger.error(`System arch "${os.arch()}" not supported. Must build from source.`);
+        logger.error(`System arch "${detectedArch}" not supported. Must build from source.`);
       }
       return false;
   }
