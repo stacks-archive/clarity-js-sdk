@@ -54,5 +54,5 @@ function tsNodeInstall() {
   const directInstallTsFile = path.join(__dirname, "src", "directInstall.ts");
   const tsNodeExecArgs = [tsNodePkg, "--project", tsConfigBuildFile, directInstallTsFile];
   console.log(`Running: npx ${tsNodeExecArgs.join(" ")}`);
-  childProcess.execFileSync("npx", tsNodeExecArgs, { stdio: ['pipe', process.stdout, process.stderr] });
+  childProcess.execFileSync("npx", tsNodeExecArgs, { stdio: ['pipe', process.stdout, process.stderr], shell: process.platform=="win32" });
 }
