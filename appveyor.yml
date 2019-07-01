@@ -9,7 +9,7 @@ install:
   - rustc -V
   - cargo -V
   # Get the latest stable version of Node.js or io.js
-  - ps: Install-Product node $env:nodejs_version
+  - ps: Install-Product node $env:nodejs_version x64
   - node --version
   - npm --version
   - npm install
