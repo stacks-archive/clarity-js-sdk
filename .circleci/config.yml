@@ -22,6 +22,8 @@ jobs:
             - "~/.cargo"
           key: v1-dependencies-{{ checksum "package.json" }}
 
+      - run: npm run lint
+
       - run:
           command: |
             source $HOME/.cargo/env

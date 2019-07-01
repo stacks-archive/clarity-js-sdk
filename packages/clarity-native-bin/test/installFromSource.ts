@@ -9,7 +9,7 @@ describe("install via build from source", () => {
   let tempDir: string;
   let filePath: string;
 
-  before(function () {
+  before(function() {
     if (process.env.SKIP_SLOW_TESTS) {
       this.skip();
       return;
