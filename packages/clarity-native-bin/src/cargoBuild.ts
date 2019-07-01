@@ -1,4 +1,4 @@
-import * as fs from "fs";
+import * as fs from "fs-extra";
 import * as path from "path";
 import { executeCommand } from "./execUtil";
 import { getExecutableFileName, makeUniqueTempDir } from "./fsUtil";
@@ -88,7 +88,7 @@ export async function cargoInstall(opts: {
   const tempBinFilePath = path.join(tempCompileBinDir, binFileName);
 
   opts.logger.log(`Moving ${tempBinFilePath} to ${opts.outputFilePath}`);
-  fs.renameSync(tempBinFilePath, opts.outputFilePath);
+  fs.moveSync(tempBinFilePath, opts.outputFilePath);
 
   return true;
 }
