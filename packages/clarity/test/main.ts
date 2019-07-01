@@ -6,8 +6,8 @@ import { executeCommand } from "../src/utils/processUtil";
 
 describe("process exec", () => {
   it("reads stdout", async () => {
-    const result = await executeCommand("echo", ["hello world"]);
-    assert.equal(result.stdout.trim(), "hello world");
+    const result = await executeCommand(process.execPath, ["-v"]);
+    assert.isTrue(result.stdout.trim().startsWith("v"));
   });
 });
 
