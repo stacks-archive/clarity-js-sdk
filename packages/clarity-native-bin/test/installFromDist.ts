@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import fs from "fs";
+import fs from "fs-extra";
 import path from "path";
 import { CORE_SDK_TAG, install } from "../src";
 import { makeUniqueTempDir } from "../src/fsUtil";
@@ -35,7 +35,7 @@ describe("install via dist", () => {
       fs.unlinkSync(filePath);
     }
     if (fs.existsSync(tempDir)) {
-      fs.rmdirSync(tempDir);
+      fs.removeSync(tempDir);
     }
   });
 });

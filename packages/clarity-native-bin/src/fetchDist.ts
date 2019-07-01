@@ -1,4 +1,4 @@
-import * as fs from "fs";
+import * as fs from "fs-extra";
 import fetch from "node-fetch";
 import * as os from "os";
 import * as path from "path";
@@ -119,8 +119,8 @@ export async function fetchDistributable(opts: {
   const tempBinFilePath = path.join(tempExtractDir, binFileName);
 
   opts.logger.log(`Moving ${tempBinFilePath} to ${opts.outputFilePath}`);
-  fs.renameSync(tempBinFilePath, opts.outputFilePath);
-  fs.rmdirSync(tempExtractDir);
+  fs.moveSync(tempBinFilePath, opts.outputFilePath);
+  fs.removeSync(tempExtractDir);
 
   return true;
 }
