@@ -1,4 +1,4 @@
-import fs from "fs";
+import fs from "fs-extra";
 import { CheckResult, Receipt } from "../../core";
 import { Provider } from "../../core/provider";
 import { getContractFilePath } from "../../utils/contractSourceDir";
@@ -155,7 +155,7 @@ export class NativeClarityBinProvider implements Provider {
     if (result.exitCode !== 0) {
       throw new ExecutionError(
         `Execute expression on contract failed with bad exit code ${result.exitCode}: ${
-          result.stderr
+        result.stderr
         }`,
         result.exitCode,
         result.stdout,
@@ -221,7 +221,7 @@ export class NativeClarityBinProvider implements Provider {
     if (result.exitCode !== 0) {
       throw new ExecutionError(
         `Eval expression on contract failed with bad exit code ${result.exitCode}: ${
-          result.stderr
+        result.stderr
         }`,
         result.exitCode,
         result.stdout,

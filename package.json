@@ -24,9 +24,11 @@
     "codecov-upload": "codecov"
   },
   "devDependencies": {
+    "@types/fs-extra": "^8.0.0",
     "@types/node": "^10.14.8",
     "codecov": "^3.5.0",
     "cross-env": "^5.2.0",
+    "fs-extra": "^8.1.0",
     "lerna": "^3.14.1",
     "typescript": "^3.5.1"
   }
