@@ -10,9 +10,6 @@ describe("new project", () => {
   test
     .stdout()
     .command(["new", outputDir, "--skip_install"])
-    .finally(ctx => {
-      fs.removeSync(testingDir);
-    })
     .it("runs new project", ctx => {
       // tslint:disable-next-line: no-unused-expression
       expect(ctx.error).to.be.undefined;
