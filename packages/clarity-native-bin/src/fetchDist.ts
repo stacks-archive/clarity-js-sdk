@@ -33,7 +33,7 @@ export function isDistAvailable(
   logger?: ILogger
 ): { platform: SupportedDistPlatform; arch: SupportedDistArch } | false {
   let arch: SupportedDistArch;
-  const detectedArch = detectArch();
+  const detectedArch = detectArch(logger);
   switch (detectedArch) {
     case "x64":
       arch = SupportedDistArch.x64;

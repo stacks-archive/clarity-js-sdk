@@ -1,4 +1,7 @@
 // Gratefully borrowed from https://github.com/feross/arch/blob/master/index.js
+// Note: Modified to only return `x64` when detecting a 32-bit Node.js on 64-bit
+// platform, otherwise returns `os.arch()`.
+
 /*
  > In Node.js, the os.arch() method (and process.arch property) returns a string
  > identifying the operating system CPU architecture for which the Node.js binary
@@ -11,8 +14,9 @@ import cp from "child_process";
 import fs from "fs";
 import os from "os";
 import path from "path";
+import { ConsoleLogger, ILogger } from "./logger";
 
-export function detectArch(): string {
+export function detectArch(logger: ILogger = ConsoleLogger): string {
   try {
     /**
      * The running binary is 64-bit, so the OS is clearly 64-bit.
@@ -58,7 +62,7 @@ export function detectArch(): string {
       }
     }
   } catch (error) {
-    console.error(`Unexpected error trying to detect system architecture: ${error}`);
+    logger.error(`Unexpected error trying to detect system architecture: ${error}`);
   }
 
   /**
