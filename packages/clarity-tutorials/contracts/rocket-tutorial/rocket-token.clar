@@ -21,18 +21,14 @@
 (define-map balances
   ((owner principal))
   ((balance int)))
-(define-map total-supply
-  ((id int))
-  ((value int)))
+(define-data-var total-supply int 0)
 
 ;;; Internals
 
 ;; Gets the total number of tokens in existence
 ;; returns: int
 (define (get-total-supply)
-  (default-to 0
-   (get value
-    (fetch-entry total-supply ((id 0))))))
+  (fetch-var total-supply))
 
 ;; Gets the amount of tokens owned by the specified address
 ;; args:
@@ -113,15 +109,10 @@
         (set-entry! balances
           ((owner account))
           ((balance (+ balance amount))))
-        (set-entry! total-supply
-          ((id 0))
-          ((value (+ (get-total-supply) amount))))
+        (set-var! total-supply (+ (fetch-var total-supply) amount))
         'true))))
 
 ;; Initialize the contract
 (begin
-  (set-entry! total-supply
-    ((id 0))
-    ((value 0)))
   (mint! 'SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7 20) ;; Alice
   (mint! 'S02J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKPVKG2CE 10)) ;; Bob

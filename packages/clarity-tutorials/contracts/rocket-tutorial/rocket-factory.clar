@@ -21,9 +21,7 @@
 (define-map orderbook
   ((buyer principal))
   ((rocket-id int) (ordered-at-block int) (ready-at-block int) (balance int) (size int)))
-(define-map auto-increments
-  ((id int))
-  ((value int)))
+(define-data-var last-rocket-id int 0)
 
 ;;; Constants
 (define funds-address 'SZ2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKQ9H6DPR)
@@ -34,19 +32,13 @@
 
 ;;; Internals
 
-(define (current-rocket-id)
-  (default-to 0
-    (get value (fetch-entry auto-increments ((id 0))))))
-
 ;; Fetch, increment, update and return new rocket-id
 ;; returns: int
 (define (new-rocket-id)
   (let ((rocket-id
-      (+ 1 (current-rocket-id))))
-    (begin (set-entry! auto-increments
-      ((id 0))
-      ((value rocket-id)))
-    rocket-id)))
+      (+ 1 (fetch-var last-rocket-id))))
+    (begin (set-var! last-rocket-id rocket-id)
+      rocket-id)))
 
 ;; Check if a given user can buy a new rocket
 ;; args:
@@ -93,7 +85,7 @@
                (ready-at-block (+ block-height size))
                (size size)
                (balance (- size down-payment)))))
-          (ok (current-rocket-id))
+          (ok (fetch-var last-rocket-id))
           not-enough-tokens-err)
       invalid-or-duplicate-order-err)))
 
@@ -118,10 +110,6 @@
           order-fulfillment-err))))
 
 ;; Initialize the contract by
-;; - initializing auto-increments
 ;; - taking ownership of rocket-market's mint function
 (begin
-  (set-entry! auto-increments
-    ((id 0))
-    ((value 0)))
   (as-contract (contract-call! rocket-market set-factory)))
