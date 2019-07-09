@@ -24,13 +24,13 @@
 (define-map allowances
   ((spender principal) (owner principal))
   ((allowance int)))
-(define total-supply 0)
+(define-data-var total-supply int 0)
 
 ;; Internals
 
 ;; Total number of tokens in existence.
 (define (get-total-supply)
-  total-supply)
+  (fetch-var total-supply))
 
 ;; Gets the amount of tokens owned by the specified address.
 (define (balance-of (account principal))
@@ -139,6 +139,7 @@
       (err 'false)
       (let ((balance (balance-of account)))
         (begin
+          (set-var! total-supply (+ (fetch-var total-supply) amount))
           (set-entry! balances
                       ((owner account))
                       ((balance (+ balance amount))))
