@@ -52,7 +52,7 @@ export function verifyOutputFile(
       logger.log(`Overwriting existing file: ${fullFilePath}`);
       fs.unlinkSync(fullFilePath);
     } else {
-      fs.mkdirSync(outputDirectory, { recursive: true });
+      fs.mkdirpSync(outputDirectory);
     }
     return true;
   } catch (error) {
