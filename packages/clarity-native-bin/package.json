@@ -30,12 +30,14 @@
     "postinstall": "node postInstallScript.js"
   },
   "dependencies": {
+    "fs-extra": "^8.0.1",
     "node-fetch": "^2.6.0",
     "semver": "^6.1.1",
     "tar": "^4.4.8"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
+    "@types/fs-extra": "^8.0.0",
     "@types/mocha": "^5.2.7",
     "@types/node": "^10",
     "@types/node-fetch": "^2.3.4",
