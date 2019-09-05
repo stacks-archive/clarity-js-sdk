@@ -3,7 +3,7 @@
   "compilerOptions": {
     "module": "commonjs",
     "target": "es2017",
-    "lib": ["es2017", "esnext.bigint"],
+    "lib": ["es2017"],
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "strict": true,

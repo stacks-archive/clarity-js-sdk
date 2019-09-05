@@ -9,6 +9,9 @@
   "rules": {
     "prettier": true,
     "await-promise": true,
+    "type-literal-delimiter": true,
+    "no-angle-bracket-type-assertion": true,
+    "interface-over-type-literal": true,
     "no-floating-promises": true,
     "no-unused-expression": {
       "severity": "warn"

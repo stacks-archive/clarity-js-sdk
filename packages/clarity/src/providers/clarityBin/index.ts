@@ -1,5 +1,5 @@
 import fs from "fs";
-import { CheckResult, Receipt } from "../../core";
+import { CheckResult, LaunchContractResult, Receipt } from "../../core";
 import { Provider } from "../../core/provider";
 import { getContractFilePath } from "../../utils/contractSourceDir";
 import { getTempFilePath } from "../../utils/fsUtil";
@@ -105,6 +105,8 @@ export class NativeClarityBinProvider implements Provider {
       };
     } else {
       const contractInterface = JSON.parse(result.stdout);
+      console.log(`__${contractFilePath}`);
+      console.log(result.stdout);
       return {
         success: true,
         result: contractInterface
@@ -112,10 +114,19 @@ export class NativeClarityBinProvider implements Provider {
     }
   }
 
-  async launchContract(contractName: string, contractFilePath: string): Promise<Receipt> {
+  async launchContract(
+    contractName: string,
+    contractFilePath: string
+  ): Promise<LaunchContractResult> {
     const filePath = getContractFilePath(contractFilePath);
 
-    const result = await this.runCommand(["launch", contractName, filePath, this.dbFilePath]);
+    const result = await this.runCommand([
+      "launch",
+      contractName,
+      filePath,
+      this.dbFilePath,
+      "--output_analysis"
+    ]);
     if (result.exitCode !== 0) {
       throw new ExecutionError(
         `Launch contract failed with bad exit code ${result.exitCode}: ${result.stderr}`,
@@ -124,16 +135,10 @@ export class NativeClarityBinProvider implements Provider {
         result.stderr
       );
     }
-    if (result.stdout !== "Contract initialized!") {
-      throw new ExecutionError(
-        `Launch contract failed with bad output: ${result.stdout}`,
-        result.exitCode,
-        result.stdout,
-        result.stderr
-      );
-    }
     return {
-      success: true
+      success: true,
+      result: result.stdout,
+      contractInterfaceJson: result.stdout
     };
   }
 

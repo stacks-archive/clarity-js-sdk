@@ -1,11 +1,11 @@
-import path from 'path';
-import fs from 'fs';
-import os from 'os';
-import { executeCommand } from './processUtil';
-import './globalUtil';
-import { ContractInterface } from './ContractTypes';
+import path from "path";
+import fs from "fs";
+import os from "os";
+import { executeCommand } from "./processUtil";
+import "./globalUtil";
+import { ContractInterface } from "./ContractTypes";
 
-const CONTRACT_FILE_EXT = '.scm';
+const CONTRACT_FILE_EXT = ".scm";
 
 function fileExists(filePath: string): boolean {
   try {
@@ -23,8 +23,8 @@ function fileExists(filePath: string): boolean {
 export function getContractFilePath(contractFile: string): string {
   function* getLocations(file: string): IterableIterator<string> {
     yield path.resolve(file);
-    yield path.resolve('contracts', file);
-    yield path.resolve(__dirname, 'contracts', file);
+    yield path.resolve("contracts", file);
+    yield path.resolve(__dirname, "contracts", file);
     yield path.resolve(__dirname, file);
     if (!file.endsWith(CONTRACT_FILE_EXT)) {
       for (const f of getLocations(file + CONTRACT_FILE_EXT)) {
@@ -36,10 +36,7 @@ export function getContractFilePath(contractFile: string): string {
   // Normalize OS path separators.
   if (path.sep == path.posix.sep && contractFile.includes(path.win32.sep)) {
     contractFile = contractFile.replace(/\\/g, path.sep);
-  } else if (
-    path.sep == path.win32.sep &&
-    contractFile.includes(path.posix.sep)
-  ) {
+  } else if (path.sep == path.win32.sep && contractFile.includes(path.posix.sep)) {
     contractFile = contractFile.replace(/\//g, path.sep);
   }
 
@@ -56,12 +53,7 @@ export class LocalExecutionError extends Error {
   readonly code: number;
   readonly commandOutput: string;
   readonly errorOutput: string;
-  constructor(
-    message: string,
-    code: number,
-    commandOutput: string,
-    errorOutput: string
-  ) {
+  constructor(message: string, code: number, commandOutput: string, errorOutput: string) {
     super(message);
     this.message = message;
     this.name = this.constructor.name;
@@ -86,12 +78,7 @@ export class LaunchedContract {
     senderAddress: string,
     ...args: string[]
   ): Promise<{ debugOutput: string }> {
-    return this.localNodeExecutor.execute(
-      this.contractName,
-      functionName,
-      senderAddress,
-      ...args
-    );
+    return this.localNodeExecutor.execute(this.contractName, functionName, senderAddress, ...args);
   }
 
   eval(evalStatement: string): Promise<string>;
@@ -103,11 +90,7 @@ export class LaunchedContract {
     evalStatement: string,
     includeDebugOutput: boolean = false
   ): Promise<string | { result: string; debugOutput: string }> {
-    return this.localNodeExecutor.eval(
-      this.contractName,
-      evalStatement,
-      includeDebugOutput
-    );
+    return this.localNodeExecutor.eval(this.contractName, evalStatement, includeDebugOutput);
   }
 }
 
@@ -121,10 +104,7 @@ export interface CheckContractResult {
 export interface LocalNodeExecutor {
   initialize(): Promise<void>;
   checkContract(contractFilePath: string): Promise<CheckContractResult>;
-  launchContract(
-    contractName: string,
-    contractFilePath: string
-  ): Promise<LaunchedContract>;
+  launchContract(contractName: string, contractFilePath: string): Promise<LaunchedContract>;
   execute(
     contractName: string,
     functionName: string,
@@ -142,9 +122,7 @@ export interface LocalNodeExecutor {
     evalStatement: string,
     includeDebugOutput?: boolean
   ): Promise<string | { result: string; debugOutput: string }>;
-  evalRaw(
-    evalStatement: string
-  ): Promise<{ result: string; debugOutput: string }>;
+  evalRaw(evalStatement: string): Promise<{ result: string; debugOutput: string }>;
   getBlockHeight(): Promise<bigint>;
   mineBlock(time?: number | bigint): Promise<void>;
   close(): Promise<void>;
@@ -164,7 +142,7 @@ export class CargoLocalNodeExecutor implements LocalNodeExecutor {
   private closeActions: (() => Promise<any>)[] = [];
 
   static getCoreSrcDir() {
-    const dir = path.resolve(path.dirname(__dirname), 'blockstack-core');
+    const dir = path.resolve(path.dirname(__dirname), "blockstack-core");
     return dir;
   }
 
@@ -173,10 +151,7 @@ export class CargoLocalNodeExecutor implements LocalNodeExecutor {
    * Before returning, ensures cargo is setup and working with `cargoBuild`,
    * and node is ready with `initialize`.
    */
-  static async create(
-    dbFilePath: string,
-    coreSrcDir?: string
-  ): Promise<CargoLocalNodeExecutor> {
+  static async create(dbFilePath: string, coreSrcDir?: string): Promise<CargoLocalNodeExecutor> {
     const executor = new CargoLocalNodeExecutor(dbFilePath, coreSrcDir);
     await executor.cargoBuild();
     await executor.initialize();
@@ -189,18 +164,13 @@ export class CargoLocalNodeExecutor implements LocalNodeExecutor {
    * Before returning, ensures cargo is setup and working with `cargoBuild`,
    * and node is ready with `initialize`.
    */
-  static async createEphemeral(
-    coreSrcDir?: string
-  ): Promise<CargoLocalNodeExecutor> {
+  static async createEphemeral(coreSrcDir?: string): Promise<CargoLocalNodeExecutor> {
     const instance = await this.create(getTempDbPath(), coreSrcDir);
     instance.closeActions.push(() => fs.promises.unlink(instance.dbFilePath));
     return instance;
   }
 
-  constructor(
-    dbFilePath: string,
-    coreSrcDir = CargoLocalNodeExecutor.getCoreSrcDir()
-  ) {
+  constructor(dbFilePath: string, coreSrcDir = CargoLocalNodeExecutor.getCoreSrcDir()) {
     this.dbFilePath = dbFilePath;
     this.coreSrcDir = coreSrcDir;
   }
@@ -209,8 +179,8 @@ export class CargoLocalNodeExecutor implements LocalNodeExecutor {
    * Use cargo to build the Blockstack node rust src.
    */
   async cargoBuild() {
-    const args = ['build', '--bin=clarity'];
-    const result = await executeCommand('cargo', args, {
+    const args = ["build", "--bin=clarity"];
+    const result = await executeCommand("cargo", args, {
       cwd: this.coreSrcDir
     });
     if (result.exitCode !== 0) {
@@ -224,38 +194,32 @@ export class CargoLocalNodeExecutor implements LocalNodeExecutor {
    * @param localArgs Local test node commands.
    */
   async cargoRunLocal(localArgs: string[], opts?: { stdin: string }) {
-    const args = ['run', '--bin=clarity', '--quiet', '--', ...localArgs];
-    const result = await executeCommand('cargo', args, {
+    const args = ["run", "--bin=clarity", "--quiet", "--", ...localArgs];
+    const result = await executeCommand("cargo", args, {
       cwd: this.coreSrcDir,
       stdin: opts && opts.stdin
     });
 
     // Normalize first EOL, and trim the trailing EOL.
-    result.stdout = result.stdout
-      .replace(/\r\n|\r|\n/, '\n')
-      .replace(/\r\n|\r|\n$/, '');
+    result.stdout = result.stdout.replace(/\r\n|\r|\n/, "\n").replace(/\r\n|\r|\n$/, "");
 
     // Normalize all stderr EOLs, trim the trailing EOL.
-    result.stderr = result.stderr
-      .replace(/\r\n|\r|\n/g, '\n')
-      .replace(/\r\n|\r|\n$/, '');
+    result.stderr = result.stderr.replace(/\r\n|\r|\n/g, "\n").replace(/\r\n|\r|\n$/, "");
 
     return result;
   }
 
   async initialize(): Promise<void> {
-    const result = await this.cargoRunLocal(['initialize', this.dbFilePath]);
+    const result = await this.cargoRunLocal(["initialize", this.dbFilePath]);
     if (result.exitCode !== 0) {
       throw new LocalExecutionError(
-        `Initialize failed with bad exit code ${result.exitCode}: ${
-          result.stderr
-        }`,
+        `Initialize failed with bad exit code ${result.exitCode}: ${result.stderr}`,
         result.exitCode,
         result.stdout,
         result.stderr
       );
     }
-    if (result.stdout !== 'Database created.') {
+    if (result.stdout !== "Database created.") {
       throw new LocalExecutionError(
         `Initialize failed with bad output: ${result.stdout}`,
         result.exitCode,
@@ -268,10 +232,10 @@ export class CargoLocalNodeExecutor implements LocalNodeExecutor {
   async checkContract(contractFilePath: string): Promise<CheckContractResult> {
     const filePath = getContractFilePath(contractFilePath);
     const result = await this.cargoRunLocal([
-      'check',
+      "check",
       filePath,
       this.dbFilePath,
-      '--output_analysis'
+      "--output_analysis"
     ]);
     if (result.exitCode !== 0) {
       return {
@@ -290,28 +254,18 @@ export class CargoLocalNodeExecutor implements LocalNodeExecutor {
     }
   }
 
-  async launchContract(
-    contractName: string,
-    contractFilePath: string
-  ): Promise<LaunchedContract> {
+  async launchContract(contractName: string, contractFilePath: string): Promise<LaunchedContract> {
     const filePath = getContractFilePath(contractFilePath);
-    const result = await this.cargoRunLocal([
-      'launch',
-      contractName,
-      filePath,
-      this.dbFilePath
-    ]);
+    const result = await this.cargoRunLocal(["launch", contractName, filePath, this.dbFilePath]);
     if (result.exitCode !== 0) {
       throw new LocalExecutionError(
-        `Launch contract failed with bad exit code ${result.exitCode}: ${
-          result.stderr
-        }`,
+        `Launch contract failed with bad exit code ${result.exitCode}: ${result.stderr}`,
         result.exitCode,
         result.stdout,
         result.stderr
       );
     }
-    if (result.stdout !== 'Contract initialized!') {
+    if (result.stdout !== "Contract initialized!") {
       throw new LocalExecutionError(
         `Launch contract failed with bad output: ${result.stdout}`,
         result.exitCode,
@@ -329,7 +283,7 @@ export class CargoLocalNodeExecutor implements LocalNodeExecutor {
     ...args: string[]
   ): Promise<{ debugOutput: string }> {
     const result = await this.cargoRunLocal([
-      'execute',
+      "execute",
       this.dbFilePath,
       contractName,
       functionName,
@@ -338,19 +292,17 @@ export class CargoLocalNodeExecutor implements LocalNodeExecutor {
     ]);
     if (result.exitCode !== 0) {
       throw new LocalExecutionError(
-        `Execute expression on contract failed with bad exit code ${
-          result.exitCode
-        }: ${result.stderr}`,
+        `Execute expression on contract failed with bad exit code ${result.exitCode}: ${
+          result.stderr
+        }`,
         result.exitCode,
         result.stdout,
         result.stderr
       );
     }
-    if (result.stdout !== 'Transaction executed and committed.') {
+    if (result.stdout !== "Transaction executed and committed.") {
       throw new LocalExecutionError(
-        `Execute expression on contract failed with bad output: ${
-          result.stdout
-        }`,
+        `Execute expression on contract failed with bad output: ${result.stdout}`,
         result.exitCode,
         result.stdout,
         result.stderr
@@ -361,17 +313,13 @@ export class CargoLocalNodeExecutor implements LocalNodeExecutor {
     };
   }
 
-  async evalRaw(
-    evalStatement: string
-  ): Promise<{ result: string; debugOutput: string }> {
-    const result = await this.cargoRunLocal(['eval_raw', this.dbFilePath], {
+  async evalRaw(evalStatement: string): Promise<{ result: string; debugOutput: string }> {
+    const result = await this.cargoRunLocal(["eval_raw", this.dbFilePath], {
       stdin: evalStatement
     });
     if (result.exitCode !== 0) {
       throw new LocalExecutionError(
-        `Eval raw expression failed with bad exit code ${result.exitCode}: ${
-          result.stderr
-        }`,
+        `Eval raw expression failed with bad exit code ${result.exitCode}: ${result.stderr}`,
         result.exitCode,
         result.stdout,
         result.stderr
@@ -408,17 +356,14 @@ export class CargoLocalNodeExecutor implements LocalNodeExecutor {
     evalStatement: string,
     includeDebugOutput?: boolean
   ): Promise<string | { result: string; debugOutput: string }> {
-    const result = await this.cargoRunLocal(
-      ['eval', contractName, this.dbFilePath],
-      {
-        stdin: evalStatement
-      }
-    );
+    const result = await this.cargoRunLocal(["eval", contractName, this.dbFilePath], {
+      stdin: evalStatement
+    });
     if (result.exitCode !== 0) {
       throw new LocalExecutionError(
-        `Eval expression on contract failed with bad exit code ${
-          result.exitCode
-        }: ${result.stderr}`,
+        `Eval expression on contract failed with bad exit code ${result.exitCode}: ${
+          result.stderr
+        }`,
         result.exitCode,
         result.stdout,
         result.stderr
@@ -450,23 +395,17 @@ export class CargoLocalNodeExecutor implements LocalNodeExecutor {
 
   async mineBlock(time?: number | bigint): Promise<void> {
     const timeArg = (time || Math.round(Date.now() / 1000)).toString();
-    const result = await this.cargoRunLocal([
-      'mine_block',
-      timeArg,
-      this.dbFilePath
-    ]);
+    const result = await this.cargoRunLocal(["mine_block", timeArg, this.dbFilePath]);
 
     if (result.exitCode !== 0) {
       throw new LocalExecutionError(
-        `Mine block failed with bad exit code ${result.exitCode}: ${
-          result.stderr
-        }`,
+        `Mine block failed with bad exit code ${result.exitCode}: ${result.stderr}`,
         result.exitCode,
         result.stdout,
         result.stderr
       );
     }
-    if (result.stdout !== 'Simulated block mine!') {
+    if (result.stdout !== "Simulated block mine!") {
       throw new LocalExecutionError(
         `Mine block failed with bad output: ${result.stdout}`,
         result.exitCode,
@@ -477,25 +416,18 @@ export class CargoLocalNodeExecutor implements LocalNodeExecutor {
   }
 
   async getBlockHeight(): Promise<bigint> {
-    const result = await this.cargoRunLocal([
-      'get_block_height',
-      this.dbFilePath
-    ]);
+    const result = await this.cargoRunLocal(["get_block_height", this.dbFilePath]);
 
     if (result.exitCode !== 0) {
       throw new LocalExecutionError(
-        `Get block height failed with bad exit code ${result.exitCode}: ${
-          result.stderr
-        }`,
+        `Get block height failed with bad exit code ${result.exitCode}: ${result.stderr}`,
         result.exitCode,
         result.stdout,
         result.stderr
       );
     }
     // Check and trim success prefix line.
-    const successPrefix = result.stdout.match(
-      /(Simulated block height: (\r\n|\r|\n))/
-    );
+    const successPrefix = result.stdout.match(/(Simulated block height: (\r\n|\r|\n))/);
     if (!successPrefix || successPrefix.length < 1) {
       throw new LocalExecutionError(
         `Get block height failed with bad output: ${result.stdout}`,

@@ -11,6 +11,7 @@
   },
   "license": "MIT",
   "scripts": {
+    "lernaupdate": "lernaupdate",
     "version-bump": "lerna version",
     "pub": "lerna publish from-package",
     "prepare": "lerna bootstrap",
@@ -28,6 +29,8 @@
     "codecov": "^3.5.0",
     "cross-env": "^5.2.0",
     "lerna": "^3.14.1",
+    "lerna-update-wizard": "^0.14.0",
     "typescript": "^3.5.1"
-  }
+  },
+  "dependencies": {}
 }

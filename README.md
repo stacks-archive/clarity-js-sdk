@@ -66,7 +66,7 @@ Repo structure and project build instructions for contributors.
 
 ### Build Instructions
 
-* Open terminal / command prompt to the root project directory containg the top-level `package.json`.
+* Open terminal / command prompt to the root project directory containing the top-level `package.json`.
 * Run `npm install`. _This automatically triggers [`lerna bootstrap`](https://github.com/lerna/lerna) to configure local packages in the repo._
 
 #### Pulling Updates

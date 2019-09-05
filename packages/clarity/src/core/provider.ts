@@ -1,4 +1,4 @@
-import { CheckResult, Receipt } from ".";
+import { CheckResult, LaunchContractResult, Receipt } from ".";
 
 export interface ProviderConstructor {
   create(): Promise<Provider>;
@@ -9,7 +9,7 @@ export interface Provider {
 
   checkContract(contractFilePath: string): Promise<CheckResult>;
 
-  launchContract(contractName: string, contractFilePath: string): Promise<Receipt>;
+  launchContract(contractName: string, contractFilePath: string): Promise<LaunchContractResult>;
 
   execute(
     contractName: string,

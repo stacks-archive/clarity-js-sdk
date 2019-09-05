@@ -6,6 +6,8 @@ export class Client {
   name: string;
   filePath: string;
   provider: Provider;
+  isDeployed: boolean = false;
+  contractInterface: string | undefined = undefined;
 
   constructor(name: string, filePath: string, provider: Provider) {
     this.name = name;
@@ -20,6 +22,16 @@ export class Client {
 
   deployContract = async (): Promise<any> => {
     const receipt = await this.provider.launchContract(this.name, this.filePath);
+    Result.match(
+      receipt,
+      _ => {
+        this.isDeployed = true;
+        this.contractInterface = receipt.contractInterfaceJson;
+      },
+      _ => {
+        // Let caller handle return errors.
+      }
+    );
     return receipt;
   };
 
@@ -70,5 +82,22 @@ export class Client {
       true
     );
     return res;
+  };
+
+  readVariable = async (name: string): Promise<Receipt> => {
+    const res = await this.provider.eval(this.name, `${name}`);
+    return res;
+  };
+
+  readMapValue = async (
+    mapName: string,
+    keyTupleName: string,
+    keyTupleValue: string
+  ): Promise<Receipt> => {
+    const fetchResult = await this.provider.eval(
+      this.name,
+      `(fetch-entry ${mapName} (tuple (${keyTupleName} ${keyTupleValue})))`
+    );
+    return fetchResult;
   };
 }

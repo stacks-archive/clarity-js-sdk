@@ -29,7 +29,8 @@
   ],
   "dependencies": {
     "@blockstack/clarity": "^0.1.5-alpha.0",
-    "@blockstack/clarity-native-bin": "^0.1.4-alpha.0"
+    "@blockstack/clarity-native-bin": "^0.1.4-alpha.0",
+    "big-integer": "^1.6.44"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",

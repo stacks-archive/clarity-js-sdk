@@ -1,75 +1,92 @@
-export interface BufferAtomicType {
-  BufferType: number;
+export interface ClarityContractInterface {
+  functions: ClarityFunctionType[];
+  variables: ClarityVariableType[];
+  maps: ClarityMapType[];
 }
 
-export interface OptionalType {
-  OptionalType: TypeSignature;
+export interface ClarityMapType {
+  name: string;
+  key_name: string;
+  key_type: ClarityAtomType;
+  value_name: string;
+  value_type: ClarityAtomType;
 }
 
-export const ResponseTypeOk = 0;
-export const ResponseTypeError = 1;
-
-export interface ResponseType {
-  ResponseType: {
-    [ResponseTypeOk]: TypeSignature;
-    [ResponseTypeError]: TypeSignature;
-  };
+export const enum ClarityVariableAccessType {
+  constant = "constant",
+  variable = "variable"
 }
 
-export interface TupleAtomicType {
-  TupleType: {
-    type_map: {
-      [name: string]: TypeSignature;
+export interface ClarityVariableType {
+  name: string;
+  type: ClarityAtomType;
+  access: ClarityVariableAccessType;
+}
+
+export interface ClarityFunctionArgType {
+  name: string;
+  type: ClarityAtomType;
+}
+
+export interface ClarityFunctionType {
+  name: string;
+  access: ClarityFunctionAccessType;
+  args: ClarityFunctionArgType[];
+  outputs: { type: ClarityAtomType };
+}
+
+export const enum ClarityFunctionAccessType {
+  private = "private",
+  public = "public",
+  read_only = "read_only"
+}
+
+export interface ClarityTupleType {
+  tuple: {
+    [index: number]: {
+      name: string;
+      type: ClarityAtomType;
     };
   };
 }
 
-export type AtomicType =
-  | "NoType"
-  | "IntType"
-  | "BoolType"
-  | "PrincipalType"
-  | BufferAtomicType
-  | OptionalType
-  | ResponseType
-  | TupleAtomicType;
-
-export interface TypeSignature {
-  atomic_type: AtomicType;
-  list_dimensions?: number | null;
-}
-
-export interface FunctionArg extends TypeSignature {
-  name: string;
-}
-
-export const FunctionArgTypes = 0;
-export const FunctionReturnType = 1;
-
-export interface FunctionTypeSignatureArray {
-  [FunctionArgTypes]: FunctionArg[];
-  [FunctionReturnType]: TypeSignature;
-}
-
-export interface FunctionTypeSignature {
-  Fixed: FunctionTypeSignatureArray;
-  // Variadic?: FunctionTypeSignatureArray;
-}
-
-export interface ContractInterface {
-  private_function_types: {
-    [name: string]: FunctionTypeSignature;
-  };
-  public_function_types: {
-    [name: string]: FunctionTypeSignature;
-  };
-  read_only_function_types: {
-    [name: string]: FunctionTypeSignature;
-  };
-  variable_types: {
-    [name: string]: TypeSignature;
-  };
-  map_types: {
-    [name: string]: TypeSignature[];
+export interface ClarityBufferType {
+  buffer: {
+    length: number;
   };
 }
+
+export interface ClarityOptionalType {
+  optional: ClarityAtomType;
+}
+
+export interface ClarityResponseType {
+  response: {
+    ok: ClarityAtomType;
+    error: ClarityAtomType;
+  };
+}
+
+export interface ClarityListType {
+  list: {
+    type: ClarityAtomType;
+    length: number;
+    dimension: number;
+  };
+}
+
+export type ClarityNoneType = "none";
+export type ClarityInt128Type = "int128";
+export type ClarityBoolType = "bool";
+export type ClarityPrincipalType = "principal";
+
+export type ClarityAtomType =
+  | ClarityNoneType
+  | ClarityInt128Type
+  | ClarityBoolType
+  | ClarityPrincipalType
+  | ClarityBufferType
+  | ClarityTupleType
+  | ClarityOptionalType
+  | ClarityResponseType
+  | ClarityListType;
