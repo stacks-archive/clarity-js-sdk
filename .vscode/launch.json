@@ -77,7 +77,14 @@
       "name": "generator-clarity-dev: test",
       "program": "${workspaceFolder}/packages/generator-clarity-dev/node_modules/mocha/bin/_mocha",
       "cwd": "${workspaceFolder}/packages/generator-clarity-dev",
-      "console": "integratedTerminal",
+      "preLaunchTask": "npm: build"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "create-clarity-dev: test",
+      "program": "${workspaceFolder}/packages/create-clarity-dev/node_modules/mocha/bin/_mocha",
+      "cwd": "${workspaceFolder}/packages/create-clarity-dev",
       "preLaunchTask": "npm: build"
     }
   ]

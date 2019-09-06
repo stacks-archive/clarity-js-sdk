@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "declaration": true,
+    "outDir": "./lib",
+    "rootDir": "./src"
+  },
+  "references": [
+    {
+      "path": "../generator-clarity-dev/tsconfig.build.json"
+    }
+  ],
+  "include": [
+    "src/**/*"
+  ]
+}

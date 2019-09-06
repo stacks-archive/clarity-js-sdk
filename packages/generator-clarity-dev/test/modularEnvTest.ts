@@ -1,14 +1,15 @@
 import path = require("path");
 import assert = require("yeoman-assert");
+import YeoEnv = require("yeoman-environment");
 import helpers = require("yeoman-test");
 import * as modularGen from "../src/modularGen";
 import utils = require("./util");
 
-describe("generator tests [generator instance usage]", () => {
-  const projectName = "example-mod-gen-output";
+describe("generator tests [env instance usage]", () => {
+  const projectName = "example-mod-env-output";
   let testingDir: string;
-  let generator: import("yeoman-generator");
-  let runGen: () => Promise<unknown>;
+  let env: YeoEnv<YeoEnv.Options>;
+  let runEnv: () => Promise<unknown>;
 
   before(async () => {
     testingDir = path.join(__dirname, "../.yo-test");
@@ -28,28 +29,21 @@ describe("generator tests [generator instance usage]", () => {
       args: [projectName],
       options: { skipInstall: true }
     });
-    const instance = result.createInstance();
-    generator = instance.generator;
-    runGen = instance.run;
+    env = result.env;
+    runEnv = result.run;
   });
 
   it("generate a project", async () => {
-    await runGen();
+    await runEnv();
   });
 
   it("validate output directory", () => {
-    const outputDir = path.resolve(generator.destinationRoot());
     const expectedOutDir = path.resolve(path.join(testingDir, projectName));
-    assert.strictEqual(outputDir, expectedOutDir);
+    assert.file(path.join(expectedOutDir, "package.json"));
   });
 
   it("generated files", () => {
     assert.file(utils.EXPECTED_OUTPUT_FILES);
-  });
-
-  it("run npm test", () => {
-    // Ensure `npm test` succeeds in generated project.
-    generator.spawnCommandSync("npm", ["test"]);
   });
 
   after(async () => {

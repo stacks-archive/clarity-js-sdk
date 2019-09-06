@@ -1,14 +1,11 @@
 {
   "name": "@blockstack/clarity-tslint",
   "description": "tslint rules for blockstack",
-  "version": "0.1.11-alpha.0",
+  "version": "0.1.12-alpha.0",
   "author": "Blockstack <engineering@blockstack.com> (https://blockstack.com/)",
   "devDependencies": {
-    "prettier": "1.17.1",
     "shx": "^0.3.2",
     "tslint": "^5.17.0",
-    "tslint-config-prettier": "^1.18.0",
-    "tslint-plugin-prettier": "^2.0.1",
     "typescript": "^3.5.1"
   },
   "engines": {

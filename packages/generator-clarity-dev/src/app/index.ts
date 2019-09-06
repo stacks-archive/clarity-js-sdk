@@ -13,7 +13,7 @@ const version = generatorPackage.engines.node;
 if (!semver.satisfies(process.version, version)) {
   console.error(
     `Node.js version ${version} is required. Installed version ${
-      process.version
+    process.version
     } is not compatible.`
   );
   process.exit(1);
@@ -170,7 +170,7 @@ module.exports = class extends Generator {
   }
 
   install() {
-    if (!this.options["skip-install"]) {
+    if (!this.options["skip-install"] && !this.options.skipInstall) {
       this.installDependencies({
         bower: false
       });

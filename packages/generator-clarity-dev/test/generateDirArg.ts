@@ -5,9 +5,10 @@ import Generator = require("yeoman-generator");
 import helpers = require("yeoman-test");
 import utils = require("./util");
 
-describe("generator tests", () => {
+describe("specify output directory arg", () => {
   let testingDir: string;
   let generator: Generator;
+  const projectName = "example-proj-dir-arg";
 
   before(async () => {
     testingDir = path.join(__dirname, "../.yo-test");
@@ -24,15 +25,9 @@ describe("generator tests", () => {
 
   it("generate a project", async () => {
     const appPath = path.join(__dirname, "../generators/app");
-    const projectName = "example-proj";
     generator = helpers.createGenerator(appPath, [], [projectName], {
-      skipInstall: false
+      skipInstall: true
     });
-
-    // Setup local dependencies.
-    const moduleClarityCore = path.join(__dirname, "../../clarity");
-    const moduleClarityNativeBin = path.join(__dirname, "../../clarity-native-bin");
-    generator.npmInstall([moduleClarityCore, moduleClarityNativeBin]);
 
     // Run yo-generator to output project.
     await Promise.resolve(generator.run());
@@ -44,11 +39,6 @@ describe("generator tests", () => {
 
   it("generated files", () => {
     assert.file(utils.EXPECTED_OUTPUT_FILES);
-  });
-
-  it("run npm test", () => {
-    // Ensure `npm test` succeeds in generated project.
-    generator.spawnCommandSync("npm", ["test"]);
   });
 
   after(async () => {
