@@ -1,12 +1,14 @@
 {
   "name": "create-clarity-dev",
   "version": "0.1.12-alpha.0",
-  "description": "Getting started with Clarity",
+  "description": "An npm initializer to setup a Clarity development environment",
   "author": "Blockstack <engineering@blockstack.com> (https://blockstack.com/)",
   "license": "MIT",
   "main": "lib/index.js",
   "bin": "./cmd/index.js",
   "repository": "blockstack/clarity-js-sdk",
+  "homepage": "https://github.com/blockstack/clarity-js-sdk/tree/master/packages/create-clarity-dev#readme",
+  "bugs": "https://github.com/blockstack/clarity-js-sdk/issues",
   "publishConfig": {
     "access": "public"
   },
