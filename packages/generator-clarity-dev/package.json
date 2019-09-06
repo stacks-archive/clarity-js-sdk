@@ -1,6 +1,6 @@
 {
   "name": "generator-clarity-dev",
-  "version": "0.1.11-alpha.0",
+  "version": "0.1.12-alpha.0",
   "description": "Yeoman generator to setup a Clarity development environment",
   "author": "Blockstack <engineering@blockstack.com> (https://blockstack.com/)",
   "license": "MIT",
@@ -31,8 +31,8 @@
     "test": "npm run build && nyc mocha"
   },
   "dependencies": {
-    "@blockstack/clarity": "^0.1.11-alpha.0",
-    "@blockstack/clarity-native-bin": "^0.1.11-alpha.0",
+    "@blockstack/clarity": "^0.1.12-alpha.0",
+    "@blockstack/clarity-native-bin": "^0.1.12-alpha.0",
     "github-username": "^5.0.1",
     "semver": "^6.1.1",
     "yeoman-generator": "^4.0.1"
