@@ -16,7 +16,10 @@
     "node": ">=10"
   },
   "keywords": [
-    "yeoman-generator"
+    "yeoman",
+    "clarity",
+    "blockstack",
+    "smart contract"
   ],
   "files": [
     "/generators"

@@ -6,6 +6,8 @@
   "license": "MIT",
   "main": "lib/index.js",
   "repository": "blockstack/clarity-js-sdk",
+  "homepage": "https://github.com/blockstack/clarity-js-sdk/tree/master/packages/clarity-tutorials#readme",
+  "bugs": "https://github.com/blockstack/clarity-js-sdk/issues",
   "publishConfig": {
     "access": "public"
   },
@@ -21,6 +23,11 @@
   "engines": {
     "node": ">=10"
   },
+  "keywords": [
+    "clarity",
+    "blockstack",
+    "smart contract"
+  ],
   "files": [
     "/src",
     "/test",

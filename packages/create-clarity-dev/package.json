@@ -24,6 +24,13 @@
   "engines": {
     "node": ">=10"
   },
+  "keywords": [
+    "clarity",
+    "blockstack",
+    "smart contract",
+    "npm init",
+    "npm initializer"
+  ],
   "files": [
     "/src",
     "/test",

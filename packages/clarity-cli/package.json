@@ -18,6 +18,11 @@
   "engines": {
     "node": ">=10"
   },
+  "keywords": [
+    "clarity",
+    "blockstack",
+    "smart contract"
+  ],
   "files": [
     "/bin",
     "/lib",

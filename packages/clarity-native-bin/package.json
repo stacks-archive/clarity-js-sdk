@@ -15,6 +15,12 @@
   "engines": {
     "node": ">=10"
   },
+  "keywords": [
+    "clarity",
+    "blockstack",
+    "smart contract",
+    "rust"
+  ],
   "files": [
     "/lib",
     "postInstallScript.js"
