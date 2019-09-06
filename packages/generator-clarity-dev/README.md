@@ -2,9 +2,10 @@
 
 A Clarity development environment [Yeoman](https://yeoman.io/) generator.
 
-
 Generates a TypeScript project that contains a `hello-world.clar` sample smart contract and 
 a minimal Mocha test suite using the Clarity SDK. 
+
+_Visit [create-clarity-dev](/packages/create-clarity-dev/README.md) for usage as an `npm init` initializer without global `yo` installation requirements._
 
 ## Quick Start
 
@@ -16,7 +17,8 @@ cd hello-clarity
 
 #### Run project generator:
 ```
-npm init yo clarity-dev
+npm install -g yo generator-clarity-dev
+yo clarity-dev
 ```
 
 #### Run tests:
@@ -39,10 +41,7 @@ _Expected output:_
 
 ## Troubleshooting
 
-
-#### Project Generator
-
-* Ensure all checks pass when running `npx yo doctor`.
+Ensure all checks pass when running `npx yo doctor`.
   > ```
   > Yeoman Doctor - Running sanity checks on your system
   > ✔ Global configuration file is valid
@@ -53,12 +52,6 @@ _Expected output:_
   > ✔ npm version
   > ✔ yo version
 
-* Alternate install commands
-  > The above `npm init ...` command uses the [`create-yo`](https://github.com/boneskull/create-yo) utility to avoid global package installs. If running into problems then try with regular `yo` installation:
-  > ```
-  > npm install -g yo generator-clarity-dev
-  > yo clarity-dev
-  > ```
 
 #### clarity-native-bin
 
