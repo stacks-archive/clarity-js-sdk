@@ -1,13 +1,14 @@
 {
   "extends": [
-    "tslint:recommended",
-    "tslint-config-prettier"
-  ],
-  "rulesDirectory": [
-    "tslint-plugin-prettier"
+    "tslint:recommended"
   ],
   "rules": {
-    "prettier": true,
+    "semicolon": {
+      "severity": "warn"
+    },
+    "arrow-parens": false,
+    "only-arrow-functions": false,
+    "trailing-comma": false,
     "await-promise": true,
     "no-floating-promises": true,
     "no-unused-expression": {

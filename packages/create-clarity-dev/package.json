@@ -1,63 +1,50 @@
 {
-  "name": "generator-clarity-dev",
+  "name": "create-clarity-dev",
   "version": "0.1.11-alpha.0",
-  "description": "Yeoman generator to setup a Clarity development environment",
+  "description": "Getting started with Clarity",
   "author": "Blockstack <engineering@blockstack.com> (https://blockstack.com/)",
   "license": "MIT",
+  "main": "lib/index.js",
+  "bin": "./cmd/index.js",
   "repository": "blockstack/clarity-js-sdk",
-  "homepage": "https://github.com/blockstack/clarity-js-sdk/tree/master/packages/generator-clarity-dev#readme",
-  "bugs": "https://github.com/blockstack/clarity-js-sdk/issues",
   "publishConfig": {
     "access": "public"
   },
-  "main": "generators/modularGen.js",
-  "types": "generators/modularGen.d.ts",
-  "engines": {
-    "node": ">=10"
-  },
-  "keywords": [
-    "yeoman-generator"
-  ],
-  "files": [
-    "/generators"
-  ],
   "scripts": {
     "build": "npm run clean && npm run compile",
-    "clean": "tsc --build tsconfig.build.json --clean",
+    "clean": "shx rm -rf ./lib tsconfig.build.tsbuildinfo",
     "compile": "tsc --build tsconfig.build.json",
     "prepublishOnly": "npm run build",
     "lint": "tslint -p tsconfig.json 'src/**/*.ts' 'test/**/*.ts'",
     "lint-fix": "tslint --fix -p tsconfig.json 'src/**/*.ts' 'test/**/*.ts'",
     "test": "npm run build && nyc mocha"
   },
+  "engines": {
+    "node": ">=10"
+  },
+  "files": [
+    "/src",
+    "/test",
+    "/lib",
+    "/cmd"
+  ],
   "dependencies": {
-    "@blockstack/clarity": "^0.1.11-alpha.0",
-    "@blockstack/clarity-native-bin": "^0.1.11-alpha.0",
-    "github-username": "^5.0.1",
-    "semver": "^6.1.1",
-    "yeoman-generator": "^4.0.1"
+    "generator-clarity-dev": "^0.1.11-alpha.0"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.7",
     "@types/node": "^10",
-    "@types/semver": "^6.0.1",
-    "@types/yeoman-assert": "^3.1.1",
     "@types/yeoman-environment": "^2.3.2",
     "@types/yeoman-generator": "^3.1.4",
-    "@types/yeoman-test": "^2.0.3",
     "chai": "^4.2.0",
     "mocha": "^6.1.4",
     "nyc": "^14.1.1",
-    "package-json": "^6.4.0",
     "shx": "^0.3.2",
     "source-map-support": "^0.5.12",
     "ts-node": "^8.2.0",
     "tslint": "^5.17.0",
-    "typescript": "^3.5.2",
-    "yeoman-assert": "^3.1.1",
-    "yeoman-environment": "^2.4.0",
-    "yeoman-test": "^2.0.0"
+    "typescript": "^3.5.1"
   },
   "nyc": {
     "all": true,
