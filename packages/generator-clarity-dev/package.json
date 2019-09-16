@@ -1,6 +1,6 @@
 {
   "name": "generator-clarity-dev",
-  "version": "0.1.13-alpha.3",
+  "version": "0.1.13-alpha.4",
   "description": "Yeoman generator to setup a Clarity development environment",
   "author": "Blockstack <engineering@blockstack.com> (https://blockstack.com/)",
   "license": "MIT",
