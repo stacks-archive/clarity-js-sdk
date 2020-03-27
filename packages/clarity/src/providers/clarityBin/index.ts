@@ -43,7 +43,13 @@ export class NativeClarityBinProvider implements Provider {
   static async createEphemeral(clarityBinPath: string): Promise<Provider> {
     const tempDbPath = getTempFilePath("blockstack-local-{uniqueID}.db");
     const instance = await this.create(tempDbPath, clarityBinPath);
-    instance.closeActions.push(() => fs.unlinkSync(instance.dbFilePath));
+    instance.closeActions.push(() => {
+      try {
+        fs.unlinkSync(instance.dbFilePath);
+      } catch (error) {
+        // console.error(error);
+      }
+    });
     return instance;
   }
 
