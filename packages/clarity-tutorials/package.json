@@ -1,6 +1,6 @@
 {
   "name": "@blockstack/clarity-tutorials",
-  "version": "0.1.13-alpha.2",
+  "version": "0.1.13-alpha.5",
   "description": "Getting started with Clarity",
   "author": "Blockstack <engineering@blockstack.com> (https://blockstack.com/)",
   "license": "MIT",
@@ -35,8 +35,8 @@
     "/contracts"
   ],
   "dependencies": {
-    "@blockstack/clarity": "^0.1.13-alpha.2",
-    "@blockstack/clarity-native-bin": "^0.1.13-alpha.2"
+    "@blockstack/clarity": "^0.1.13-alpha.5",
+    "@blockstack/clarity-native-bin": "^0.1.13-alpha.5"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
