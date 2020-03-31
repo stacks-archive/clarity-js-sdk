@@ -59,7 +59,7 @@
       ;; shallow-return 'false if entry doesn't exist
       (unwrap! (get ready-at-block
         (map-get? orderbook ((buyer user)))) 'false)))
-    (>= block-height ready-at-block)))
+    (>= (to-int block-height) ready-at-block)))
 
 ;; Order a rocket
 ;; User not present in the orderbook have the ability to buy a new rocket.
@@ -77,13 +77,13 @@
           (<= size 20)
           (can-user-buy tx-sender))
       (if (and
-           (is-ok (contract-call? .rocket-token transfer-token tx-sender funds-address down-payment))
+           (is-ok (contract-call? .rocket-token transfer-token funds-address (to-uint down-payment)))
            (map-insert orderbook
              ((buyer tx-sender))
              (
                (rocket-id rocket-id)
-               (ordered-at-block block-height)
-               (ready-at-block (+ block-height size))
+               (ordered-at-block (to-int block-height))
+               (ready-at-block (+ (to-int block-height) size))
                (size size)
                (balance (- size down-payment)))))
           (ok (var-get last-rocket-id))
@@ -104,7 +104,7 @@
           (size      (get size order-entry))
           (rocket-id (get rocket-id order-entry)))
       (if (and (can-user-claim buyer)
-               (is-ok (contract-call? .rocket-token transfer-token tx-sender funds-address down-payment))
+               (is-ok (contract-call? .rocket-token transfer-token funds-address (to-uint balance)))
                (is-ok (as-contract (contract-call? .rocket-market mint tx-sender rocket-id size )))
                (map-delete orderbook ((buyer buyer))))
           (ok rocket-id)
