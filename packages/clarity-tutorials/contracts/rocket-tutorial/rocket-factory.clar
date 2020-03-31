@@ -17,6 +17,8 @@
 
 ;;;; Rocket-Factory
 
+(define-non-fungible-token rocket uint)
+
 ;;; Storage
 (define-map orderbook
   ((buyer principal))
@@ -24,41 +26,41 @@
 (define-data-var last-rocket-id int 0)
 
 ;;; Constants
-(define funds-address 'SZ2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKQ9H6DPR)
-(define not-enough-tokens-err (err 1))
-(define invalid-or-duplicate-order-err (err 2))
-(define no-order-on-books-err (err 3))
-(define order-fulfillment-err (err 4))
+(define-constant funds-address 'SZ2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKQ9H6DPR)
+(define-constant not-enough-tokens-err (err 1))
+(define-constant invalid-or-duplicate-order-err (err 2))
+(define-constant no-order-on-books-err (err 3))
+(define-constant order-fulfillment-err (err 4))
 
 ;;; Internals
 
 ;; Fetch, increment, update and return new rocket-id
 ;; returns: int
-(define (new-rocket-id)
+(define-private (new-rocket-id)
   (let ((rocket-id
-      (+ 1 (fetch-var last-rocket-id))))
-    (begin (set-var! last-rocket-id rocket-id)
+      (+ 1 (var-get last-rocket-id))))
+    (begin (var-set last-rocket-id rocket-id)
       rocket-id)))
 
 ;; Check if a given user can buy a new rocket
 ;; args:
 ;; @user (principal) the principal of the user
 ;; returns: boolean
-(define (can-user-buy (user principal))
+(define-private (can-user-buy (user principal))
   (let ((ordered-at-block
       (get ordered-at-block
-        (fetch-entry orderbook ((buyer user))))))
-    (if (is-none? ordered-at-block) 'true 'false)))
+        (map-get? orderbook ((buyer user))))))
+    (if (is-none ordered-at-block) 'true 'false)))
 
 ;; Check if a given user can claim a rocket previously ordered
 ;; args:
 ;; @user (principal) the principal of the user
 ;; returns: boolean
-(define (can-user-claim (user principal))
+(define-private (can-user-claim (user principal))
   (let ((ready-at-block
       ;; shallow-return 'false if entry doesn't exist
-      (expects! (get ready-at-block
-        (fetch-entry orderbook ((buyer user)))) 'false)))
+      (unwrap! (get ready-at-block
+        (map-get? orderbook ((buyer user)))) 'false)))
     (>= block-height ready-at-block)))
 
 ;; Order a rocket
@@ -76,8 +78,8 @@
           (<= size 20)
           (can-user-buy tx-sender))
       (if (and
-           (is-ok? (contract-call! rocket-token transfer funds-address down-payment))
-           (insert-entry! orderbook
+           (is-ok (ft-transfer? rocket-token funds-address tx-sender down-payment))
+           (map-insert orderbook
              ((buyer tx-sender))
              (
                (rocket-id (new-rocket-id))
@@ -85,7 +87,7 @@
                (ready-at-block (+ block-height size))
                (size size)
                (balance (- size down-payment)))))
-          (ok (fetch-var last-rocket-id))
+          (ok (var-get last-rocket-id))
           not-enough-tokens-err)
       invalid-or-duplicate-order-err)))
 
@@ -96,20 +98,20 @@
 ;; returns: Response<int, int>
 (define-public (claim-rocket)
   (let ((order-entry
-         (expects! (fetch-entry orderbook ((buyer tx-sender)))
+         (unwrap! (map-get? orderbook ((buyer tx-sender)))
                    no-order-on-books-err)))
     (let ((buyer     tx-sender)
           (balance   (get balance order-entry))
           (size      (get size order-entry))
           (rocket-id (get rocket-id order-entry)))
       (if (and (can-user-claim buyer)
-               (is-ok? (contract-call! rocket-token transfer funds-address balance))
-               (is-ok? (as-contract (contract-call! rocket-market mint! buyer rocket-id size)))
-               (delete-entry! orderbook ((buyer buyer))))
+               (is-ok (ft-transfer? rocket-token transfer funds-address balance))
+               (is-ok (as-contract (contract-call? rocket-market mint! buyer rocket-id size)))
+               (map-delete orderbook ((buyer buyer))))
           (ok rocket-id)
           order-fulfillment-err))))
 
 ;; Initialize the contract by
 ;; - taking ownership of rocket-market's mint function
 (begin
-  (as-contract (contract-call! rocket-market set-factory)))
+  (as-contract (contract-call? .rocket-market set-factory)))
