@@ -34,6 +34,7 @@
 (define-constant bad-rocket-transfer-err (err 2))
 (define-constant unauthorized-mint-err   (err 3))
 (define-constant factory-already-set-err (err 4))
+(define-constant factory-not-set-err (err 5))
 
 ;;; Internals
 
@@ -71,7 +72,7 @@
 ;; @recipient (principal) the principal of the new owner of the rocket
 ;; @rocket-id (int) the id of the rocket to trade
 ;; returns: Response<int,int>
-(define-public (transfer (recipient principal) (rocket-id uint))
+(define-public (transfer-rocket (recipient principal) (rocket-id uint))
   (let ((balance-sender (balance-of tx-sender))
         (balance-recipient (balance-of recipient)))
     (if (and
@@ -80,7 +81,7 @@
          (> balance-sender 0)
          (not (is-eq recipient tx-sender)))
         (begin
-          (nft-transfer? rocket rocket-id recipient funds-address)
+          (nft-transfer? rocket rocket-id tx-sender recipient)
           (map-set rockets-count
                       ((owner recipient))
                       ((count (+ balance-recipient 1))))
@@ -88,7 +89,8 @@
                       ((owner tx-sender))
                       ((count (- balance-sender 1))))
           (ok rocket-id))
-        bad-rocket-transfer-err)))
+        bad-rocket-transfer-err))
+)
 
 ;; Mint new rockets
 ;; This function can only be called by the factory.
@@ -97,7 +99,7 @@
 ;; @rocket-id (int) the id of the rocket to mint
 ;; @size (int) the size of the rocket to mint
 ;; returns: Response<int, int>
-(define-public (after-minting (owner principal) (rocket-id int) (size int))
+(define-public (mint (owner principal) (rocket-id int) (size int))
   (if (is-tx-from-factory)
       (let ((current-balance (balance-of owner)))
         (begin

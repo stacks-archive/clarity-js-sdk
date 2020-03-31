@@ -17,8 +17,6 @@
 
 ;;;; Rocket-Factory
 
-(define-non-fungible-token rocket uint)
-
 ;;; Storage
 (define-map orderbook
   ((buyer principal))
@@ -72,17 +70,18 @@
 ;; @size (int) the size of the rocket (1 < size <= 20)
 ;; returns: Response<int, int>
 (define-public (order-rocket (size int))
-  (let ((down-payment (/ size 2)))
+  (let ((down-payment (/ size 2))
+    (rocket-id (new-rocket-id)))
     (if (and
           (> size 1)
           (<= size 20)
           (can-user-buy tx-sender))
       (if (and
-           (is-ok (ft-transfer? rocket-token funds-address tx-sender down-payment))
+           (is-ok (contract-call? .rocket-token transfer-token tx-sender funds-address down-payment))
            (map-insert orderbook
              ((buyer tx-sender))
              (
-               (rocket-id (new-rocket-id))
+               (rocket-id rocket-id)
                (ordered-at-block block-height)
                (ready-at-block (+ block-height size))
                (size size)
@@ -105,8 +104,8 @@
           (size      (get size order-entry))
           (rocket-id (get rocket-id order-entry)))
       (if (and (can-user-claim buyer)
-               (is-ok (ft-transfer? rocket-token transfer funds-address balance))
-               (is-ok (as-contract (contract-call? rocket-market mint! buyer rocket-id size)))
+               (is-ok (contract-call? .rocket-token transfer-token tx-sender funds-address down-payment))
+               (is-ok (as-contract (contract-call? .rocket-market mint tx-sender rocket-id size )))
                (map-delete orderbook ((buyer buyer))))
           (ok rocket-id)
           order-fulfillment-err))))
