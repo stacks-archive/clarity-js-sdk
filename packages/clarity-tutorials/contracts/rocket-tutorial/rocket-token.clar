@@ -28,5 +28,5 @@
 
 ;; Initialize the contract
 (begin
-  (ft-mint? rocket-token u20 'ST398K1WZTBVY6FE2YEHM6HP20VSNVSSPJTW0D53M) ;; Alice
+  (ft-mint? rocket-token u20 'ST398K1WZTBVY6FE2YEHM6HP20VSNVSSPJTW0D53M)
 )

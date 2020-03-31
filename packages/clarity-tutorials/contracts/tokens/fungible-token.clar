@@ -33,10 +33,15 @@
 
 ;; Gets the amount of tokens that an owner allowed to a spender.
 (define-private (allowance-of (spender principal) (owner principal))
+  (begin
+    (print
+         (map-get? allowances ((spender spender) (owner owner))))
+    (print (get allowance
+         (map-get? allowances ((spender spender) (owner owner)))))
   (default-to u0
     (get allowance
-         (map-get? allowances ((owner owner)
-                                  (spender spender))))))
+         (map-get? allowances ((spender spender) (owner owner))))))
+)
 
 ;; Transfers tokens to a specified principal.
 (define-private (transfer (sender principal) (recipient principal) (amount uint))
@@ -60,9 +65,9 @@
     (if (<= amount u0)
       'false
       (begin
-        (map-set allowances
+        (print (map-set allowances
           ((spender spender) (owner owner))
-          ((allowance (+ allowance amount))))
+          ((allowance (+ allowance amount)))))
         'true))))
 
 ;; Public functions
@@ -75,13 +80,15 @@
 ;; Transfers tokens to a specified principal, performed by a spender
 (define-public (transfer-from (owner principal) (recipient principal) (amount uint))
   (let ((allowance (allowance-of tx-sender owner)))
-    (if (or (> amount allowance) (<= amount u0))
-      (err 'false)
-      (if (and
-           (unwrap! (transfer owner recipient amount) (err 'false))
-           (decrease-allowance tx-sender owner amount))
-       (ok amount)
-       (err 'false)))))
+    (begin
+      (if (or (> amount allowance) (<= amount u0))
+        (err 'false)
+        (if (and
+            (unwrap! (transfer owner recipient amount) (err 'false))
+            (decrease-allowance tx-sender owner amount))
+        (ok amount)
+        (err 'false)))))
+)
 
 ;; Update the allowance for a given spender
 (define-public (approve (spender principal) (amount uint))
@@ -98,6 +105,9 @@
         (ok 0)
         (err 'false))))
 
+(define-public (balance-of (owner principal))
+  (ok (ft-get-balance fungible-token owner))
+)
 ;; Mint new tokens.
 (define-private (mint (account principal) (amount uint))
   (if (<= amount u0)
@@ -109,5 +119,5 @@
 
 ;; Initialize the contract
 (begin
-  (mint 'SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7 u20)
-  (mint 'S02J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKPVKG2CE u10))
+  (mint 'ST398K1WZTBVY6FE2YEHM6HP20VSNVSSPJTW0D53M u20)
+  (mint 'ST1JDEC841ZDWN9CKXKJMDQGP5TW1AM10B7EV0DV9 u10))
