@@ -21,7 +21,7 @@
 (define-map orderbook
   ((buyer principal))
   ((rocket-id int) (ordered-at-block int) (ready-at-block int) (balance int) (size int)))
-(define-data-var last-rocket-id int 0)
+(define-data-var last-rocket-id int 99)
 
 ;;; Constants
 (define-constant funds-address 'SZ2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKQ9H6DPR)
@@ -86,7 +86,13 @@
                (ready-at-block (+ (to-int block-height) size))
                (size size)
                (balance (- size down-payment)))))
-          (ok (var-get last-rocket-id))
+          (begin
+            (print tx-sender)
+            (print (map-get? orderbook ((buyer tx-sender))))
+            (print rocket-id)
+            (print down-payment)
+            (ok (var-get last-rocket-id))
+          )
           not-enough-tokens-err)
       invalid-or-duplicate-order-err)))
 
@@ -96,6 +102,9 @@
 ;; In returns, a new rocket will receive a freshly minted rocket.
 ;; returns: Response<int, int>
 (define-public (claim-rocket)
+(begin
+  (print tx-sender)
+  (print (map-get? orderbook ((buyer tx-sender))))
   (let ((order-entry
          (unwrap! (map-get? orderbook ((buyer tx-sender)))
                    no-order-on-books-err)))
@@ -109,6 +118,7 @@
                (map-delete orderbook ((buyer buyer))))
           (ok rocket-id)
           order-fulfillment-err))))
+)
 
 ;; Initialize the contract by
 ;; - taking ownership of rocket-market's mint function

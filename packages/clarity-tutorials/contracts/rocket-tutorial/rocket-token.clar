@@ -20,10 +20,13 @@
 (define-fungible-token rocket-token)
 
 (define-public (transfer-token (receiver principal) (amount uint))
-  (ft-transfer? rocket-token amount tx-sender receiver)
+  (begin
+    (print amount)
+    (ft-transfer? rocket-token amount tx-sender receiver)
+  )
 )
 
 ;; Initialize the contract
 (begin
-  (ft-mint? rocket-token u20 'SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7) ;; Alice
-  (ft-mint? rocket-token u10 'S02J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKPVKG2CE)) ;; Bob
+  (ft-mint? rocket-token u20 'ST398K1WZTBVY6FE2YEHM6HP20VSNVSSPJTW0D53M) ;; Alice
+)
