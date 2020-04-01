@@ -45,7 +45,7 @@
 
 ;; Transfers tokens to a specified principal.
 (define-private (transfer (sender principal) (recipient principal) (amount uint))
-  (ft-transfer? fungible-token amount sender recipient)
+  (print (ft-transfer? fungible-token amount sender recipient))
 )
 
 ;; Decrease allowance of a specified spender.
@@ -65,6 +65,7 @@
     (if (<= amount u0)
       'false
       (begin
+        (print (tuple (spender spender) (owner owner)))
         (print (map-set allowances
           ((spender spender) (owner owner))
           ((allowance (+ allowance amount)))))
@@ -86,14 +87,14 @@
         (if (and
             (unwrap! (transfer owner recipient amount) (err 'false))
             (decrease-allowance tx-sender owner amount))
-        (ok amount)
+        (ok 'true)
         (err 'false)))))
 )
 
 ;; Update the allowance for a given spender
 (define-public (approve (spender principal) (amount uint))
   (if (and (> amount u0)
-           (increase-allowance spender tx-sender amount))
+           (print (increase-allowance spender tx-sender amount)))
       (ok amount)
       (err 'false)))
 
@@ -106,7 +107,10 @@
         (err 'false))))
 
 (define-public (balance-of (owner principal))
-  (ok (ft-get-balance fungible-token owner))
+  (begin
+      (print owner)
+      (ok (ft-get-balance fungible-token owner))
+  )
 )
 ;; Mint new tokens.
 (define-private (mint (account principal) (amount uint))

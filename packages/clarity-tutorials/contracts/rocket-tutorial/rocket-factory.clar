@@ -47,8 +47,10 @@
 (define-private (can-user-buy (user principal))
   (let ((ordered-at-block
       (get ordered-at-block
-        (map-get? orderbook ((buyer user))))))
-    (if (is-none ordered-at-block) 'true 'false)))
+        (print (map-get? orderbook {buyer (print user)})))))
+      (is-none ordered-at-block)
+  )
+)
 
 ;; Check if a given user can claim a rocket previously ordered
 ;; args:
@@ -58,7 +60,7 @@
   (let ((ready-at-block
       ;; shallow-return 'false if entry doesn't exist
       (unwrap! (get ready-at-block
-        (map-get? orderbook ((buyer user)))) 'false)))
+        (map-get? orderbook {buyer user})) 'false)))
     (>= (to-int block-height) ready-at-block)))
 
 ;; Order a rocket
@@ -70,6 +72,8 @@
 ;; @size (int) the size of the rocket (1 < size <= 20)
 ;; returns: Response<int, int>
 (define-public (order-rocket (size int))
+(begin
+  (print (map-get? orderbook ((buyer tx-sender))))
   (let ((down-payment (/ size 2))
     (rocket-id (new-rocket-id)))
     (if (and
@@ -78,14 +82,15 @@
           (can-user-buy tx-sender))
       (if (and
            (is-ok (contract-call? .rocket-token transfer-token funds-address (to-uint down-payment)))
-           (map-insert orderbook
-             ((buyer tx-sender))
-             (
-               (rocket-id rocket-id)
-               (ordered-at-block (to-int block-height))
-               (ready-at-block (+ (to-int block-height) size))
-               (size size)
-               (balance (- size down-payment)))))
+           (print (map-insert orderbook
+             {buyer tx-sender}
+             {
+               rocket-id rocket-id
+               ordered-at-block (to-int block-height)
+               ready-at-block (+ (to-int block-height) size)
+               size size
+               balance (- size down-payment)}
+            )))
           (begin
             (print tx-sender)
             (print (map-get? orderbook ((buyer tx-sender))))
@@ -94,7 +99,7 @@
             (ok (var-get last-rocket-id))
           )
           not-enough-tokens-err)
-      invalid-or-duplicate-order-err)))
+      invalid-or-duplicate-order-err))))
 
 ;; Claim a rocket
 ;; This function can only be executed when the rocket is ready.
@@ -105,6 +110,7 @@
 (begin
   (print tx-sender)
   (print (map-get? orderbook ((buyer tx-sender))))
+  (print (map-get? orderbook {buyer tx-sender}))
   (let ((order-entry
          (unwrap! (map-get? orderbook ((buyer tx-sender)))
                    no-order-on-books-err)))
