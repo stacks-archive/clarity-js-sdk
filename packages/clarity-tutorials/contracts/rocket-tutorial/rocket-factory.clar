@@ -80,9 +80,9 @@
           (> size 1)
           (<= size 20)
           (can-user-buy tx-sender))
-      (if (and
-           (is-ok (contract-call? .rocket-token transfer-token funds-address (to-uint down-payment)))
-           (print (map-insert orderbook
+      (if (is-ok (contract-call? .rocket-token transfer-token funds-address (to-uint down-payment)))
+          (begin
+            (print (map-insert orderbook
              {buyer tx-sender}
              {
                rocket-id rocket-id
@@ -90,8 +90,7 @@
                ready-at-block (+ (to-int block-height) size)
                size size
                balance (- size down-payment)}
-            )))
-          (begin
+            ))
             (print tx-sender)
             (print (map-get? orderbook ((buyer tx-sender))))
             (print rocket-id)
