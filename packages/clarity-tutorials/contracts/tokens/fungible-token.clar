@@ -45,7 +45,9 @@
 
 ;; Transfers tokens to a specified principal.
 (define-private (transfer (sender principal) (recipient principal) (amount uint))
-  (print (ft-transfer? fungible-token amount sender recipient))
+  (match (ft-transfer? fungible-token amount sender recipient)
+    result (ok 'true)
+    error (err 'false))
 )
 
 ;; Decrease allowance of a specified spender.
