@@ -23,7 +23,7 @@
 ;;; Storage
 (define-map rockets-count
   ((owner principal))
-  ((count int)))
+  ((count uint)))
 (define-map factory-address
   ((id int))
   ((address principal)))
@@ -32,7 +32,7 @@
 
 (define-constant no-such-rocket-err      (err 1))
 (define-constant bad-rocket-transfer-err (err 2))
-(define-constant unauthorized-mint-err   (err 3))
+(define-constant unauthorized-mint-err   (err u3))
 (define-constant factory-already-set-err (err 4))
 (define-constant factory-not-set-err (err 5))
 
@@ -41,11 +41,16 @@
 ;; Gets the amount of rockets owned by the specified address
 ;; args:
 ;; @account (principal) the principal of the user
-;; returns: int
-(define-private (balance-of (account principal))
-  (default-to 0
-    (get count
-         (map-get? rockets-count ((owner account))))))
+;; returns: uint
+(define-public (balance-of (account principal))
+  (ok
+    (default-to u0
+      (get count
+        (map-get? rockets-count ((owner account)))
+      )
+    )
+  )
+)
 
 ;; Check if the transaction has been sent by the factory-address
 ;; returns: boolean
@@ -72,25 +77,25 @@
 ;; @recipient (principal) the principal of the new owner of the rocket
 ;; @rocket-id (int) the id of the rocket to trade
 ;; returns: Response<int,int>
-(define-public (transfer-rocket (recipient principal) (rocket-id uint))
-  (let ((balance-sender (balance-of tx-sender))
-        (balance-recipient (balance-of recipient)))
-    (if (and
-         (is-eq (unwrap! (owner-of rocket-id) no-such-rocket-err)
-              tx-sender)
-         (> balance-sender 0)
-         (not (is-eq recipient tx-sender)))
-        (begin
-          (nft-transfer? rocket rocket-id tx-sender recipient)
-          (map-set rockets-count
-                      ((owner recipient))
-                      ((count (+ balance-recipient 1))))
-          (map-set rockets-count
-                      ((owner tx-sender))
-                      ((count (- balance-sender 1))))
-          (ok rocket-id))
-        bad-rocket-transfer-err))
-)
+;; (define-public (transfer-rocket (recipient principal) (rocket-id uint))
+;;   (let ((balance-sender (balance-of tx-sender))
+;;         (balance-recipient (balance-of recipient)))
+;;     (if (and
+;;          (is-eq (unwrap! (owner-of rocket-id) no-such-rocket-err)
+;;               tx-sender)
+;;          (> balance-sender 0)
+;;          (not (is-eq recipient tx-sender)))
+;;         (begin
+;;           (nft-transfer? rocket rocket-id tx-sender recipient)
+;;           (map-set rockets-count
+;;                       ((owner recipient))
+;;                       ((count (+ balance-recipient 1))))
+;;           (map-set rockets-count
+;;                       ((owner tx-sender))
+;;                       ((count (- balance-sender 1))))
+;;           (ok rocket-id))
+;;         bad-rocket-transfer-err))
+;; )
 
 ;; Mint new rockets
 ;; This function can only be called by the factory.
@@ -99,14 +104,16 @@
 ;; @rocket-id (int) the id of the rocket to mint
 ;; @size (int) the size of the rocket to mint
 ;; returns: Response<int, int>
-(define-public (mint (owner principal) (rocket-id int) (size int))
+(define-public (mint (owner principal) (rocket-id uint) (size uint))
   (if (is-tx-from-factory)
-      (let ((current-balance (balance-of owner)))
+      (let ((current-balance (unwrap! (balance-of owner) (err u0))))
         (begin
           (map-set rockets-count
                       ((owner owner))
-                      ((count (+ 1 current-balance))))
-          (ok rocket-id)))
+                      ((count (+ u0 current-balance))))
+          (ok 'true)
+        )
+      )
       unauthorized-mint-err))
 
 ;; Set Factory

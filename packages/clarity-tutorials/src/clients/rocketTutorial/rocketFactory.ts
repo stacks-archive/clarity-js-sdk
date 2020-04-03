@@ -2,7 +2,7 @@ import { Client, Provider, Receipt, Result } from "@blockstack/clarity";
 
 export class RocketFactoryClient extends Client {
   constructor(provider: Provider) {
-    super("rocket-factory", "rocket-tutorial/rocket-factory", provider);
+    super("SP3GWX3NE58KXHESRYE4DYQ1S31PQJTCRXB3PE9SB.rocket-factory", "rocket-tutorial/rocket-factory", provider);
   }
 
   async canUserBuy(user: string): Promise<boolean> {

@@ -77,8 +77,20 @@ export function unwrapResult<T extends ResultInterface<unknown, unknown>>(input:
   return input.result as ExtractOk<T>;
 }
 
+export function unwrapUInt(input: ResultInterface<string, unknown>): number {
+  if (input.result) {
+    const match = /^\(ok\su(\d+)\)$/.exec(input.result);
+    if (!match) {
+      throw new Error(`Unable to unwrap result: ${input.result}`);
+    }
+    return parseInt(match[1]);
+  }
+  throw new Error(`Unable to unwrap result: ${input}`);
+}
+
 export const Result = {
   unwrap: unwrapResult,
   extract: extractResult,
-  match: matchResult
+  match: matchResult,
+  unwrapUInt,
 };

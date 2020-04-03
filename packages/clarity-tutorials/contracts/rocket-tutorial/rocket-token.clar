@@ -18,15 +18,31 @@
 ;;;; Rocket-Token
 
 (define-fungible-token rocket-token)
+(define-map balances
+  ((owner principal))
+  ((balance uint)))
+(define-data-var total-supply uint u30)
+
+(define-public (get-total-supply)
+  (ok (var-get total-supply))
+)
+
+(define-public (balance-of (account principal))
+  (ok
+    (ft-get-balance rocket-token account)
+  )
+)
 
 (define-public (transfer-token (receiver principal) (amount uint))
   (begin
     (print amount)
     (ft-transfer? rocket-token amount tx-sender receiver)
+    (ok 'true)
   )
 )
 
 ;; Initialize the contract
 (begin
-  (ft-mint? rocket-token u20 'ST398K1WZTBVY6FE2YEHM6HP20VSNVSSPJTW0D53M)
+  (ft-mint? rocket-token u20 'SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7) ;; alice
+  (ft-mint? rocket-token u10 'S02J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKPVKG2CE) ;; bob
 )

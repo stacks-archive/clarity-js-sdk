@@ -2,13 +2,14 @@ import { Client, Provider, Receipt, Result } from "@blockstack/clarity";
 
 export class RocketMarketClient extends Client {
   constructor(provider: Provider) {
-    super("rocket-market", "rocket-tutorial/rocket-market", provider);
+    super("SP3GWX3NE58KXHESRYE4DYQ1S31PQJTCRXB3PE9SB.rocket-market", "rocket-tutorial/rocket-market", provider);
   }
 
   async balanceOf(owner: string): Promise<number> {
     const query = this.createQuery({ method: { name: "balance-of", args: [`'${owner}`] } });
     const res = await this.submitQuery(query);
-    return parseInt(Result.unwrap(res));
+    return Result.unwrapUInt(res);
+    // return parseInt(Result.unwrap(res));
   }
 
   async ownerOf(tokenId: number): Promise<string> {
