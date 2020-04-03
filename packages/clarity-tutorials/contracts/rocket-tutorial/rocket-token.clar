@@ -35,9 +35,7 @@
 
 (define-public (transfer-token (receiver principal) (amount uint))
   (begin
-    (print amount)
-    (ft-transfer? rocket-token amount tx-sender receiver)
-    (ok 'true)
+    (ok (ft-transfer? rocket-token amount tx-sender receiver))
   )
 )
 

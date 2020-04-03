@@ -7,7 +7,7 @@ export class RocketTokenClient extends Client {
 
   async transfer(to: string, value: number, params: { sender: string }): Promise<Receipt> {
     const tx = this.createTransaction({
-      method: { name: "transfer", args: [`'${to}`, `${value}`] }
+      method: { name: "transfer-token", args: [`'${to}`, `u${value}`] }
     });
     await tx.sign(params.sender);
     const res = await this.submitTransaction(tx);

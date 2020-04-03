@@ -168,7 +168,7 @@ export class NativeClarityBinProvider implements Provider {
         result.stderr
       );
     }
-    if (!result.stdout.startsWith("Transaction executed and committed.")) {
+    if (!result.stdout.startsWith("Transaction executed and committed. Returned: (ok")) {
       throw new ExecutionError(
         `Execute expression on contract failed with bad output: ${result.stdout}`,
         result.exitCode,
