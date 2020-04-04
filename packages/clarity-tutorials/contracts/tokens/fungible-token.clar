@@ -43,11 +43,13 @@
          (map-get? allowances ((spender spender) (owner owner))))))
 )
 
+(define-public (get-allowance-of (spender principal) (owner principal))
+  (ok (allowance-of spender owner))
+)
+
 ;; Transfers tokens to a specified principal.
-(define-private (transfer (sender principal) (recipient principal) (amount uint))
-  (match (ft-transfer? fungible-token amount sender recipient)
-    result (ok 'true)
-    error (err 'false))
+(define-public (transfer (recipient principal) (amount uint))
+  (ft-transfer? fungible-token amount tx-sender recipient)
 )
 
 ;; Decrease allowance of a specified spender.
@@ -77,7 +79,7 @@
 
 ;; Transfers tokens to a specified principal.
 (define-public (transfer-token (recipient principal) (amount uint))
-  (transfer tx-sender recipient amount)
+  (transfer recipient amount)
 )
 
 ;; Transfers tokens to a specified principal, performed by a spender
@@ -87,8 +89,9 @@
       (if (or (> amount allowance) (<= amount u0))
         (err 'false)
         (if (and
-            (unwrap! (transfer owner recipient amount) (err 'false))
-            (decrease-allowance tx-sender owner amount))
+              (is-ok (ft-transfer? fungible-token amount owner recipient))
+              (decrease-allowance tx-sender owner amount)
+            )
         (ok 'true)
         (err 'false)))))
 )
@@ -96,7 +99,7 @@
 ;; Update the allowance for a given spender
 (define-public (approve (spender principal) (amount uint))
   (if (and (> amount u0)
-           (print (increase-allowance spender tx-sender amount)))
+           (increase-allowance spender tx-sender amount))
       (ok amount)
       (err 'false)))
 
@@ -115,7 +118,7 @@
   )
 )
 ;; Mint new tokens.
-(define-private (mint (account principal) (amount uint))
+(define-private (mint! (account principal) (amount uint))
   (if (<= amount u0)
       (err 'false)
       (begin
@@ -125,5 +128,5 @@
 
 ;; Initialize the contract
 (begin
-  (mint 'ST398K1WZTBVY6FE2YEHM6HP20VSNVSSPJTW0D53M u20)
-  (mint 'ST1JDEC841ZDWN9CKXKJMDQGP5TW1AM10B7EV0DV9 u10))
+  (mint! 'SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7 u20)
+  (mint! 'S02J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKPVKG2CE u10))

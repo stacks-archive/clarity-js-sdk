@@ -1,5 +1,4 @@
 import { Provider, ProviderRegistry, Receipt } from "@blockstack/clarity";
-import { expect } from "chai";
 import { FungibleTokenClient } from "../../src/clients/tokens/fungibleToken";
 
 describe("FungibleTokenClient Test Suite", () => {
@@ -15,9 +14,10 @@ describe("FungibleTokenClient Test Suite", () => {
   const bob = addresses[1];
   const zoe = addresses[2];
 
-  before(async () => {
+  beforeAll(async () => {
     provider = await ProviderRegistry.createProvider();
     stacksTokenClient = new FungibleTokenClient(provider);
+    await stacksTokenClient.deployContract();
   });
 
   it("should have a valid syntax", async () => {
@@ -25,229 +25,227 @@ describe("FungibleTokenClient Test Suite", () => {
   });
 
   describe("Deploying an instance of the contract", () => {
-    before(async () => {
-      await stacksTokenClient.deployContract();
-    });
 
     it("should initialize Alice's balance (20 STX)", async () => {
       const balanceAlice = await stacksTokenClient.balanceOf(alice);
-      expect(balanceAlice).to.equal(20);
+      expect(balanceAlice).toEqual(20);
     });
 
     it("should initialize Bob's balance (10 STX)", async () => {
       const balanceBob = await stacksTokenClient.balanceOf(bob);
-      expect(balanceBob).to.equal(10);
+      expect(balanceBob).toEqual(10);
     });
 
     it("should initialize Zoe's balance (0 STX)", async () => {
       const balanceZoe = await stacksTokenClient.balanceOf(zoe);
-      expect(balanceZoe).to.equal(0);
+      expect(balanceZoe).toEqual(0);
     });
   });
 
   describe("Alice transfering 5 STX to Bob", () => {
-    before(async () => {
+    beforeAll(async () => {
       await stacksTokenClient.transfer(bob, 5, { sender: alice });
     });
 
     it("should decrease Alice's balance (15 STX)", async () => {
       const balanceAlice = await stacksTokenClient.balanceOf(alice);
-      expect(balanceAlice).to.equal(15);
+      expect(balanceAlice).toEqual(15);
     });
 
     it("should increase Bob's balance (15 STX)", async () => {
       const balanceBob = await stacksTokenClient.balanceOf(bob);
-      expect(balanceBob).to.equal(15);
+      expect(balanceBob).toEqual(15);
     });
   });
 
   describe("Alice transfering -5 STX to Bob", () => {
     let receipt: Receipt;
 
-    before(async () => {
+    beforeAll(async () => {
       receipt = await stacksTokenClient.transfer(bob, 16, { sender: alice });
     });
 
     it("should return an invalid receipt", async () => {
-      expect(receipt.success).to.be.false;
+      expect(receipt.success).toBeFalsy();
     });
 
     it("should not increase Alice's balance (15 STX)", async () => {
       const balanceAlice = await stacksTokenClient.balanceOf(alice);
-      expect(balanceAlice).to.equal(15);
+      expect(balanceAlice).toEqual(15);
     });
 
     it("should not decrease Bob's balance (15 STX)", async () => {
       const balanceBob = await stacksTokenClient.balanceOf(bob);
-      expect(balanceBob).to.equal(15);
+      expect(balanceBob).toEqual(15);
     });
   });
 
   describe("Bob transfering 16 STX to Alice", () => {
     let receipt: Receipt;
 
-    before(async () => {
+    beforeAll(async () => {
       receipt = await stacksTokenClient.transfer(bob, 16, { sender: alice });
     });
 
     it("should return an invalid receipt", async () => {
-      expect(receipt.success).to.be.false;
+      expect(receipt.success).toBeFalsy();
     });
 
     it("should not increase Alice's balance (15 STX)", async () => {
       const balanceAlice = await stacksTokenClient.balanceOf(alice);
-      expect(balanceAlice).to.equal(15);
+      expect(balanceAlice).toEqual(15);
     });
 
     it("should not decrease Bob's balance (15 STX)", async () => {
       const balanceBob = await stacksTokenClient.balanceOf(bob);
-      expect(balanceBob).to.equal(15);
+      expect(balanceBob).toEqual(15);
     });
   });
 
   describe("Alice approving Zoe to spend 10 STX on her behalf, with allowance <= balance", () => {
-    before(async () => {
-      await stacksTokenClient.approve(zoe, 10, { sender: alice });
+    let receipt: Receipt;
+    beforeAll(async () => {
+      receipt = await stacksTokenClient.approve(zoe, 10, { sender: alice });
     });
 
     it("should increase Zoe's allowance (10 STX)", async () => {
       const allowanceZoe = await stacksTokenClient.allowanceOf(zoe, alice);
-      expect(allowanceZoe).to.equal(10);
+      expect(allowanceZoe).toEqual(10);
     });
 
     describe("Zoe transfering 10 STX to Bob on Alice behalf", () => {
-      before(async () => {
+      beforeAll(async () => {
         await stacksTokenClient.transferFrom(alice, bob, 10, { sender: zoe });
       });
 
       it("should decrease Alice's balance (5 STX)", async () => {
         const balanceAlice = await stacksTokenClient.balanceOf(alice);
-        expect(balanceAlice).to.equal(5);
+        expect(balanceAlice).toEqual(5);
       });
 
       it("should increase Bob's balance (25 STX)", async () => {
         const balanceBob = await stacksTokenClient.balanceOf(bob);
-        expect(balanceBob).to.equal(25);
+        expect(balanceBob).toEqual(25);
       });
 
       it("should decrease Zoe's allowance (0 STX)", async () => {
         const allowanceZoe = await stacksTokenClient.allowanceOf(zoe, alice);
-        expect(allowanceZoe).to.equal(0);
+        expect(allowanceZoe).toEqual(0);
       });
     });
 
     describe("Zoe transfering 1 STX to Bob on Alice behalf", () => {
       let receipt: Receipt;
 
-      before(async () => {
+      beforeAll(async () => {
         receipt = await stacksTokenClient.transferFrom(alice, bob, 10, { sender: zoe });
       });
 
       it("should return an invalid receipt", async () => {
-        expect(receipt.success).to.be.false;
+        expect(receipt.success).toBeFalsy();
       });
 
       it("should not decrease Alice's balance (5 STX)", async () => {
         const balanceAlice = await stacksTokenClient.balanceOf(alice);
-        expect(balanceAlice).to.equal(5);
+        expect(balanceAlice).toEqual(5);
       });
 
       it("should not increase Bob's balance (25 STX)", async () => {
         const balanceBob = await stacksTokenClient.balanceOf(bob);
-        expect(balanceBob).to.equal(25);
+        expect(balanceBob).toEqual(25);
       });
     });
   });
 
   // tslint:disable-next-line: max-line-length
   describe("Alice approving Zoe to spend 10 STX on her behalf, with allowance >= balance, allowance > 0", () => {
-    before(async () => {
+    beforeAll(async () => {
       await stacksTokenClient.approve(zoe, 10, { sender: alice });
     });
 
     it("should increase Zoe's allowance (10 STX)", async () => {
       const allowanceZoe = await stacksTokenClient.allowanceOf(zoe, alice);
-      expect(allowanceZoe).to.equal(10);
+      expect(allowanceZoe).toEqual(10);
     });
 
     describe("Zoe transfering 10 STX to Bob on Alice behalf", () => {
       let receipt: Receipt;
 
-      before(async () => {
+      beforeAll(async () => {
         receipt = await stacksTokenClient.transferFrom(alice, bob, 10, { sender: zoe });
       });
 
       it("should return an invalid receipt", async () => {
-        expect(receipt.success).to.be.false;
+        expect(receipt.success).toBeFalsy();
       });
 
       it("should not decrease Alice's balance (5 STX)", async () => {
         const balanceAlice = await stacksTokenClient.balanceOf(alice);
-        expect(balanceAlice).to.equal(5);
+        expect(balanceAlice).toEqual(5);
       });
 
       it("should not increase Bob's balance (25 STX)", async () => {
         const balanceBob = await stacksTokenClient.balanceOf(bob);
-        expect(balanceBob).to.equal(25);
+        expect(balanceBob).toEqual(25);
       });
 
       it("should not decrease Zoe's allowance (10 STX)", async () => {
         const allowanceZoe = await stacksTokenClient.allowanceOf(zoe, alice);
-        expect(allowanceZoe).to.equal(10);
+        expect(allowanceZoe).toEqual(10);
       });
     });
 
     describe("Zoe transfering 5 STX to Bob on Alice behalf", () => {
-      before(async () => {
+      beforeAll(async () => {
         await stacksTokenClient.transferFrom(alice, bob, 5, { sender: zoe });
       });
 
       it("should decrease Alice's balance (0 STX)", async () => {
         const balanceAlice = await stacksTokenClient.balanceOf(alice);
-        expect(balanceAlice).to.equal(0);
+        expect(balanceAlice).toEqual(0);
       });
 
       it("should increase Bob's balance (30 STX)", async () => {
         const balanceBob = await stacksTokenClient.balanceOf(bob);
-        expect(balanceBob).to.equal(30);
+        expect(balanceBob).toEqual(30);
       });
 
       it("should decrease Zoe's allowance (5 STX)", async () => {
         const allowanceZoe = await stacksTokenClient.allowanceOf(zoe, alice);
-        expect(allowanceZoe).to.equal(5);
+        expect(allowanceZoe).toEqual(5);
       });
     });
   });
 
   describe("Alice revoking Zoe as a spender", () => {
-    before(async () => {
+    beforeAll(async () => {
       const receipt = await stacksTokenClient.revoke(zoe, { sender: alice });
     });
 
     it("should decrease Zoe's allowance (0 STX)", async () => {
       const allowanceZoe = await stacksTokenClient.allowanceOf(zoe, alice);
-      expect(allowanceZoe).to.equal(0);
+      expect(allowanceZoe).toEqual(0);
     });
 
     describe("Zoe transfering 1 STX to Bob on Alice behalf", () => {
       let receipt: Receipt;
 
-      before(async () => {
+      beforeAll(async () => {
         receipt = await stacksTokenClient.transferFrom(alice, bob, 1, { sender: zoe });
       });
 
       it("should return an invalid receipt", async () => {
-        expect(receipt.success).to.be.false;
+        expect(receipt.success).toBeFalsy();
       });
 
       it("should not decrease Alice's balance (0 STX)", async () => {
         const balanceAlice = await stacksTokenClient.balanceOf(alice);
-        expect(balanceAlice).to.equal(0);
+        expect(balanceAlice).toEqual(0);
       });
 
       it("should not increase Bob's balance (30 STX)", async () => {
         const balanceBob = await stacksTokenClient.balanceOf(bob);
-        expect(balanceBob).to.equal(30);
+        expect(balanceBob).toEqual(30);
       });
     });
   });
@@ -255,21 +253,21 @@ describe("FungibleTokenClient Test Suite", () => {
   describe("Alice approving Zoe to spend -10 STX on her behalf", () => {
     let receipt: Receipt;
 
-    before(async () => {
+    beforeAll(async () => {
       receipt = await stacksTokenClient.approve(zoe, -10, { sender: alice });
     });
 
     it("should return an invalid receipt", async () => {
-      expect(receipt.success).to.be.false;
+      expect(receipt.success).toBeFalsy();
     });
 
     it("should impact Zoe's allowance (0 STX)", async () => {
       const allowanceZoe = await stacksTokenClient.allowanceOf(zoe, alice);
-      expect(allowanceZoe).to.equal(0);
+      expect(allowanceZoe).toEqual(0);
     });
   });
 
-  after(async () => {
+  afterAll(async () => {
     await provider.close();
   });
 });
