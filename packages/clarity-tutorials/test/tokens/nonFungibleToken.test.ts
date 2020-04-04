@@ -278,7 +278,6 @@ describe("NonFungibleTokenClient Test Suite", () => {
       });
 
       it("should return an valid receipt", async () => {
-        console.log(receipt.result);
         expect(receipt.success).toBeTruthy();
       });
 
