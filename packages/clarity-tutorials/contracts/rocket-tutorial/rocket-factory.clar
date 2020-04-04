@@ -81,7 +81,7 @@
           (<= size u20)
           (can-user-buy tx-sender))
       (if (and
-        (unwrap! (contract-call? .rocket-token transfer-token funds-address down-payment) (err 6))
+        (is-ok (contract-call? .rocket-token transfer-token funds-address down-payment))
         (map-set orderbook
           ((buyer tx-sender))
           (
@@ -112,8 +112,8 @@
           (size      (get size order-entry))
           (rocket-id (get rocket-id order-entry)))
       (if (and (can-user-claim buyer)
-               (unwrap! (contract-call? .rocket-token transfer-token funds-address balance) (err 6))
-               (unwrap! (as-contract (contract-call? .rocket-market mint tx-sender rocket-id size )) (err 6))
+               (is-ok (contract-call? .rocket-token transfer-token funds-address balance))
+               (is-ok (as-contract (contract-call? .rocket-market mint tx-sender rocket-id size )))
                (map-delete orderbook ((buyer buyer))))
           (ok rocket-id)
           order-fulfillment-err))))
