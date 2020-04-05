@@ -6,14 +6,14 @@ export class RocketMarketClient extends Client {
   }
 
   async balanceOf(owner: string): Promise<number> {
-    const query = this.createQuery({ method: { name: "balance-of", args: [`'${owner}`] } });
+    const query = this.createQuery({ atChaintip: true, method: { name: "balance-of", args: [`'${owner}`] } });
     const res = await this.submitQuery(query);
     return Result.unwrapUInt(res);
     // return parseInt(Result.unwrap(res));
   }
 
   async ownerOf(tokenId: number): Promise<string> {
-    const query = this.createQuery({ method: { name: "owner-of", args: [`${tokenId}`] } });
+    const query = this.createQuery({ atChaintip: true, method: { name: "owner-of", args: [`${tokenId}`] } });
     const res = await this.submitQuery(query);
     return Result.unwrap(res).replace(/'/g, "");
   }

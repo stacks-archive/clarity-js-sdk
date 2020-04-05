@@ -23,6 +23,8 @@
   ((balance uint)))
 (define-data-var total-supply uint u30)
 
+(define-constant err-min-transfer u1)
+
 (define-public (get-total-supply)
   (ok (var-get total-supply))
 )
@@ -35,7 +37,10 @@
 
 (define-public (transfer-token (receiver principal) (amount uint))
   (begin
-    (ok (ft-transfer? rocket-token amount tx-sender receiver))
+    (if (> amount u0)
+      (ok (ft-transfer? rocket-token amount tx-sender receiver))
+      (err err-min-transfer)
+    )
   )
 )
 

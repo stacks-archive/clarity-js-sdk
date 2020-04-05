@@ -6,6 +6,11 @@
     "outDir": "./lib",
     "rootDir": "./src"
   },
+  "typeAcquisition": {
+    "include": [
+      "jest"
+    ]
+  },
   "references": [
     {
       "path": "../clarity/tsconfig.build.json"

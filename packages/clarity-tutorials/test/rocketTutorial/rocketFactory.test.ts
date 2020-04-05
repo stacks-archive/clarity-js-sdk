@@ -126,9 +126,7 @@ describe("RocketFactoryClient Test Suite", () => {
   describe("Alice buying a rocket of size 2", () => {
     describe("first order", () => {
       beforeAll(async () => {
-        console.log('first block');
         const res = await rocketFactoryClient.orderRocket(2, { sender: alice });
-        console.log(res.debugOutput);
       });
 
       it("should make Alice unable to buy a new rocket", async () => {
@@ -136,33 +134,28 @@ describe("RocketFactoryClient Test Suite", () => {
         expect(canAliceBuy).toBeFalsy();
       });
 
-      // it("should decrease Alice's balance to 19 RKT", async () => {
-      //   const balanceAlice = await rocketTokenClient.balanceOf(alice);
-      //   expect(balanceAlice).toEqual(19);
-      // });
+      it("should decrease Alice's balance to 19 RKT", async () => {
+        const balanceAlice = await rocketTokenClient.balanceOf(alice);
+        expect(balanceAlice).toEqual(19);
+      });
 
-      // it("should not produce a claimable rocket", async () => {
-      //   const isRocketClaimable = await rocketFactoryClient.canUserBuy(alice);
-      //   expect(isRocketClaimable).toBeFalsy();
-      // });
+      it("should not produce a claimable rocket", async () => {
+        const isRocketClaimable = await rocketFactoryClient.canUserBuy(alice);
+        expect(isRocketClaimable).toBeFalsy();
+      });
 
-      // it("should not impact Bob's ability to buy a new rocket", async () => {
-      //   const canBobBuy = await rocketFactoryClient.canUserBuy(bob);
-      //   expect(canBobBuy).toBeTruthy();
-      // });
+      it("should not impact Bob's ability to buy a new rocket", async () => {
+        const canBobBuy = await rocketFactoryClient.canUserBuy(bob);
+        expect(canBobBuy).toBeTruthy();
+      });
 
       it("should not impact Bob's balance (10 RKT)", async () => {
         const balanceBob = await rocketTokenClient.balanceOf(bob);
         expect(balanceBob).toEqual(10);
       });
-    })
+    });
 
     describe("1 block after the transaction, Alice's rocket", () => {
-      // beforeAll(async () => {
-      //   console.log('second block');
-      //   const res = await rocketFactoryClient.mineBlock(alice);
-      //   console.log(res.debugOutput);
-      // });
 
       it("should not be claimable", async () => {
         const isRocketClaimable = await rocketFactoryClient.canUserClaim(alice);
@@ -170,10 +163,9 @@ describe("RocketFactoryClient Test Suite", () => {
       });
     });
 
-    describe.skip("2 blocks after the transaction, Alice's rocket", () => {
+    describe("2 blocks after the transaction, Alice's rocket", () => {
       beforeAll(async () => {
-        await provider.mineBlock();
-        await provider.mineBlock();
+        await rocketFactoryClient.mineBlock(alice);
       });
 
       it("should be claimable", async () => {
@@ -210,12 +202,9 @@ describe("RocketFactoryClient Test Suite", () => {
     });
   });
 
-  describe.skip("Alice buying a rocket of size 11", () => {
-    let minedAt: bigint;
-
+  describe("Alice buying a rocket of size 11", () => {
     beforeAll(async () => {
       await rocketFactoryClient.orderRocket(11, { sender: alice });
-      minedAt = await provider.getBlockHeight();
     });
 
     it("should make Alice unable to buy a new rocket", async () => {
@@ -244,9 +233,6 @@ describe("RocketFactoryClient Test Suite", () => {
     });
 
     describe("1 block after the transaction, Alice's rocket", () => {
-      beforeAll(async () => {
-        await provider.mineBlock();
-      });
 
       it("should not be claimable", async () => {
         const isRocketClaimable = await rocketFactoryClient.canUserClaim(alice);
@@ -256,10 +242,10 @@ describe("RocketFactoryClient Test Suite", () => {
 
     describe("5 blocks after the transaction, Alice's rocket", () => {
       beforeAll(async () => {
-        await provider.mineBlock();
-        await provider.mineBlock();
-        await provider.mineBlock();
-        await provider.mineBlock();
+        await rocketFactoryClient.mineBlock(alice);
+        await rocketFactoryClient.mineBlock(alice);
+        await rocketFactoryClient.mineBlock(alice);
+        await rocketFactoryClient.mineBlock(alice);
       });
 
       it("should not be claimable", async () => {
@@ -270,12 +256,14 @@ describe("RocketFactoryClient Test Suite", () => {
 
     describe("11 blocks after the transaction, Alice's rocket", () => {
       beforeAll(async () => {
-        await provider.mineBlock();
-        await provider.mineBlock();
-        await provider.mineBlock();
-        await provider.mineBlock();
-        await provider.mineBlock();
-        await provider.mineBlock();
+        await rocketFactoryClient.mineBlock(alice);
+        await rocketFactoryClient.mineBlock(alice);
+        await rocketFactoryClient.mineBlock(alice);
+        await rocketFactoryClient.mineBlock(alice);
+        await rocketFactoryClient.mineBlock(alice);
+        await rocketFactoryClient.mineBlock(alice);
+        await rocketFactoryClient.mineBlock(alice);
+        await rocketFactoryClient.mineBlock(alice);
       });
 
       it("should be claimable", async () => {
@@ -306,12 +294,10 @@ describe("RocketFactoryClient Test Suite", () => {
     });
   });
 
-  describe.skip("Alice buying a rocket of size 14", () => {
-    let minedAt: bigint;
+  describe("Alice buying a rocket of size 14", () => {
 
     beforeAll(async () => {
       await rocketFactoryClient.orderRocket(14, { sender: alice });
-      minedAt = await provider.getBlockHeight();
     });
 
     it("should make Alice unable to buy a new rocket", async () => {
@@ -331,8 +317,8 @@ describe("RocketFactoryClient Test Suite", () => {
 
     describe("14 blocks after the transaction, Alice's rocket", () => {
       beforeAll(async () => {
-        for (let i = 0; i < 14; i++) {
-          await provider.mineBlock();
+        for (let i = 0; i < 13; i++) {
+          await rocketFactoryClient.mineBlock(alice);
         }
       });
 
@@ -341,7 +327,7 @@ describe("RocketFactoryClient Test Suite", () => {
         expect(isRocketClaimable).toBeTruthy();
       });
 
-      describe("Alice claiming her rocket (with a RKT balance of 0)", () => {
+      describe.skip("Alice claiming her rocket (with a RKT balance of 0)", () => {
         let receipt: Receipt;
 
         beforeAll(async () => {
@@ -349,6 +335,10 @@ describe("RocketFactoryClient Test Suite", () => {
         });
 
         it("should return an invalid receipt", async () => {
+          console.log(receipt.result);
+          console.log(receipt.debugOutput);
+          const balanceAlice = await rocketTokenClient.balanceOf(alice);
+          console.log(balanceAlice);
           expect(receipt.success).toBeFalsy();
         });
       });

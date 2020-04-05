@@ -8,5 +8,10 @@
       "generator-clarity-dev": ["packages/generator-clarity-dev/src"],
       "create-clarity-dev": ["packages/create-clarity-dev/src"]
     }
+  },
+  "typeAcquisition": {
+    "include": [
+      "jest"
+    ]
   }
 }

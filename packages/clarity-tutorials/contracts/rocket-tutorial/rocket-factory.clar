@@ -126,12 +126,16 @@
           (balance   (get balance order-entry))
           (size      (get size order-entry))
           (rocket-id (get rocket-id order-entry)))
-      (if (and (can-user-claim buyer)
+      (begin
+        (print 256)
+        (print balance)
+        (if (and (can-user-claim buyer)
                (is-ok (contract-call? .rocket-token transfer-token funds-address balance))
-               (is-ok (as-contract (contract-call? .rocket-market mint tx-sender rocket-id size )))
+               (is-ok (as-contract (contract-call? .rocket-market mint buyer rocket-id size )))
                (map-delete orderbook ((buyer buyer))))
           (ok rocket-id)
           order-fulfillment-err))))
+      )
 )
 
 ;; Stub method to force a new block

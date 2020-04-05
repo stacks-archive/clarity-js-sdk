@@ -108,9 +108,13 @@
   (if (is-tx-from-factory)
       (let ((current-balance (unwrap! (balance-of owner) (err u0))))
         (begin
+          (print u128)
+          (print current-balance)
+          (print size)
+          (print owner)
           (map-set rockets-count
                       ((owner owner))
-                      ((count (+ u0 current-balance))))
+                      ((count (+ u1 current-balance))))
           (ok 'true)
         )
       )

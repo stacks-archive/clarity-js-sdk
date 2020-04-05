@@ -15,13 +15,13 @@ export class RocketTokenClient extends Client {
   }
 
   async balanceOf(owner: string): Promise<number> {
-    const query = this.createQuery({ method: { name: "balance-of", args: [`'${owner}`] } });
+    const query = this.createQuery({ atChaintip: true, method: { name: "balance-of", args: [`'${owner}`] } });
     const res = await this.submitQuery(query);
     return Result.unwrapUInt(res);
   }
 
   async totalSupply(): Promise<number> {
-    const query = this.createQuery({ method: { name: "get-total-supply", args: [] } });
+    const query = this.createQuery({ atChaintip: true, method: { name: "get-total-supply", args: [] } });
     const res = await this.submitQuery(query);
     return Result.unwrapUInt(res);
   }

@@ -49,8 +49,8 @@ export class Client {
     return receipt;
   };
 
-  createQuery = (params: { method?: Method }): Query => {
-    const query = new Query(params.method);
+  createQuery = (params: { method?: Method, atChaintip?: boolean }): Query => {
+    const query = new Query(params.method, params.atChaintip);
     return query;
   };
 
@@ -68,7 +68,7 @@ export class Client {
       this.name,
       `(${query.method.name} ${query.method.args.join(" ")})`,
       true,
-      true,
+      query.atChaintip,
     );
     return res;
   };
