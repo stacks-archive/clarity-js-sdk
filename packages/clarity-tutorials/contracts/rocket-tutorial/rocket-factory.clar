@@ -57,11 +57,26 @@
 ;; @user (principal) the principal of the user
 ;; returns: boolean
 (define-private (can-user-claim (user principal))
-  (let ((ready-at-block
-      ;; shallow-return 'false if entry doesn't exist
-      (unwrap! (get ready-at-block
-        (map-get? orderbook {buyer user})) 'false)))
-    (>= block-height ready-at-block)))
+  (begin
+    (print "can-claim")
+    (print block-height)
+    (let ((ready-at-block
+        ;; shallow-return 'false if entry doesn't exist
+        (unwrap! (get ready-at-block
+          (map-get? orderbook {buyer user})) 'false)))
+      (begin
+        (print ready-at-block)
+        (>= block-height ready-at-block)
+      )
+    )
+  )
+)
+
+(define-public (do-can-user-claim (user principal))
+  (begin
+    (ok (can-user-claim user))
+  )
+)
 
 ;; Order a rocket
 ;; User not present in the orderbook have the ability to buy a new rocket.
@@ -117,6 +132,14 @@
                (map-delete orderbook ((buyer buyer))))
           (ok rocket-id)
           order-fulfillment-err))))
+)
+
+;; Stub method to force a new block
+(define-public (mine-block)
+  (begin
+    (print block-height)
+    (ok 'true)
+  )
 )
 
 ;; Initialize the contract by

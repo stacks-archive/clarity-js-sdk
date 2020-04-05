@@ -23,7 +23,6 @@ export class RocketTokenClient extends Client {
   async totalSupply(): Promise<number> {
     const query = this.createQuery({ method: { name: "get-total-supply", args: [] } });
     const res = await this.submitQuery(query);
-    console.log(res.result);
     return Result.unwrapUInt(res);
   }
 }

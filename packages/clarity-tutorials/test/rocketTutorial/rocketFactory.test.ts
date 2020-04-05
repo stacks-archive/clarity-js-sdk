@@ -123,44 +123,46 @@ describe("RocketFactoryClient Test Suite", () => {
     });
   });
 
-  describe.skip("Alice buying a rocket of size 2", () => {
-    let minedAt: bigint;
+  describe("Alice buying a rocket of size 2", () => {
+    describe("first order", () => {
+      beforeAll(async () => {
+        console.log('first block');
+        const res = await rocketFactoryClient.orderRocket(2, { sender: alice });
+        console.log(res.debugOutput);
+      });
 
-    beforeAll(async () => {
-      await deployContracts();
-      await rocketFactoryClient.orderRocket(2, { sender: alice });
-      minedAt = await provider.getBlockHeight();
-    });
+      it("should make Alice unable to buy a new rocket", async () => {
+        const canAliceBuy = await rocketFactoryClient.canUserBuy(alice);
+        expect(canAliceBuy).toBeFalsy();
+      });
 
-    it("should make Alice unable to buy a new rocket", async () => {
-      const canAliceBuy = await rocketFactoryClient.canUserBuy(alice);
-      expect(canAliceBuy).toBeFalsy();
-    });
+      // it("should decrease Alice's balance to 19 RKT", async () => {
+      //   const balanceAlice = await rocketTokenClient.balanceOf(alice);
+      //   expect(balanceAlice).toEqual(19);
+      // });
 
-    it("should decrease Alice's balance to 19 RKT", async () => {
-      const balanceAlice = await rocketTokenClient.balanceOf(alice);
-      expect(balanceAlice).toEqual(19);
-    });
+      // it("should not produce a claimable rocket", async () => {
+      //   const isRocketClaimable = await rocketFactoryClient.canUserBuy(alice);
+      //   expect(isRocketClaimable).toBeFalsy();
+      // });
 
-    it("should not produce a claimable rocket", async () => {
-      const isRocketClaimable = await rocketFactoryClient.canUserBuy(alice);
-      expect(isRocketClaimable).toBeFalsy();
-    });
+      // it("should not impact Bob's ability to buy a new rocket", async () => {
+      //   const canBobBuy = await rocketFactoryClient.canUserBuy(bob);
+      //   expect(canBobBuy).toBeTruthy();
+      // });
 
-    it("should not impact Bob's ability to buy a new rocket", async () => {
-      const canBobBuy = await rocketFactoryClient.canUserBuy(bob);
-      expect(canBobBuy).toBeTruthy();
-    });
-
-    it("should not impact Bob's balance (10 RKT)", async () => {
-      const balanceBob = await rocketTokenClient.balanceOf(bob);
-      expect(balanceBob).toEqual(10);
-    });
+      it("should not impact Bob's balance (10 RKT)", async () => {
+        const balanceBob = await rocketTokenClient.balanceOf(bob);
+        expect(balanceBob).toEqual(10);
+      });
+    })
 
     describe("1 block after the transaction, Alice's rocket", () => {
-      beforeAll(async () => {
-        await provider.mineBlock();
-      });
+      // beforeAll(async () => {
+      //   console.log('second block');
+      //   const res = await rocketFactoryClient.mineBlock(alice);
+      //   console.log(res.debugOutput);
+      // });
 
       it("should not be claimable", async () => {
         const isRocketClaimable = await rocketFactoryClient.canUserClaim(alice);
@@ -168,7 +170,7 @@ describe("RocketFactoryClient Test Suite", () => {
       });
     });
 
-    describe("2 blocks after the transaction, Alice's rocket", () => {
+    describe.skip("2 blocks after the transaction, Alice's rocket", () => {
       beforeAll(async () => {
         await provider.mineBlock();
         await provider.mineBlock();

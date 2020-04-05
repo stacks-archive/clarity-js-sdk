@@ -14,6 +14,7 @@ export class RocketFactoryClient extends Client {
   async canUserClaim(user: string): Promise<boolean> {
     const query = this.createQuery({ method: { name: "can-user-claim", args: [`'${user}`] } });
     const res = await this.submitQuery(query);
+    console.log(res.debugOutput);
     return res.result === "true";
   }
 
@@ -25,7 +26,7 @@ export class RocketFactoryClient extends Client {
 
   async orderRocket(size: number, params: { sender: string }): Promise<Receipt> {
     const tx = this.createTransaction({
-      method: { name: "order-rocket", args: [`${size}`] }
+      method: { name: "order-rocket", args: [`u${size}`] }
     });
     await tx.sign(params.sender);
     const res = await this.submitTransaction(tx);
@@ -39,5 +40,16 @@ export class RocketFactoryClient extends Client {
     await tx.sign(params.sender);
     const res = await this.submitTransaction(tx);
     return res;
+  }
+
+  async mineBlock(sender: string): Promise<Receipt> {
+    const tx = this.createTransaction({
+      method: {
+        name: 'mine-block',
+        args: [],
+      }
+    });
+    await tx.sign(sender);
+    return this.submitTransaction(tx);
   }
 }
