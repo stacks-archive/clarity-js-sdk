@@ -221,11 +221,16 @@ export class NativeClarityBinProvider implements Provider {
   async eval(
     contractName: string,
     evalStatement: string,
-    includeDebugOutput?: boolean
+    includeDebugOutput?: boolean,
+    atChaintip: boolean = true,
   ): Promise<Receipt> {
-    const result = await this.runCommand(["eval", contractName, this.dbFilePath], {
-      stdin: evalStatement
-    });
+    const result = await this.runCommand([
+      `eval${atChaintip ? "_at_chaintip" : ""}`,
+      contractName, this.dbFilePath],
+      {
+        stdin: evalStatement
+      }
+    );
     if (result.exitCode !== 0) {
       throw new ExecutionError(
         `Eval expression on contract failed with bad exit code ${result.exitCode}: ${

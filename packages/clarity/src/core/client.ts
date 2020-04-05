@@ -67,7 +67,8 @@ export class Client {
     const res = await this.provider.eval(
       this.name,
       `(${query.method.name} ${query.method.args.join(" ")})`,
-      true
+      true,
+      true,
     );
     return res;
   };

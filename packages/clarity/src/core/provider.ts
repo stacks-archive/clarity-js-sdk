@@ -18,7 +18,7 @@ export interface Provider {
     ...args: string[]
   ): Promise<Receipt>;
 
-  eval(contractName: string, evalStatement: string, includeDebugOutput?: boolean): Promise<Receipt>;
+  eval(contractName: string, evalStatement: string, includeDebugOutput?: boolean, atChaintip?: boolean): Promise<Receipt>;
 
   evalRaw(evalStatement: string): Promise<Receipt>;
 
