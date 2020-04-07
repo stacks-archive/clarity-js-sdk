@@ -5,7 +5,8 @@ import { CORE_SDK_TAG, install } from "../src";
 import { makeUniqueTempDir } from "../src/fsUtil";
 import { ConsoleLogger } from "../src/logger";
 
-describe("install via build from source", () => {
+// TODO: re-enable once core-node git repo removes the gigabytes of legacy data
+describe.skip("install via build from source", () => {
   let tempDir: string;
   let filePath: string;
 

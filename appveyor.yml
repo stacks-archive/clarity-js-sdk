@@ -3,11 +3,11 @@ platform: x64
 environment:
   nodejs_version: "10"
 install:
-  - appveyor-retry appveyor DownloadFile https://win.rustup.rs/ -FileName rustup-init.exe
-  - rustup-init.exe -y --default-host x86_64-pc-windows-msvc --default-toolchain 1.34.0
-  - set PATH=%PATH%;C:\Users\appveyor\.cargo\bin
-  - rustc -V
-  - cargo -V
+  # - appveyor-retry appveyor DownloadFile https://win.rustup.rs/ -FileName rustup-init.exe
+  # - rustup-init.exe -y --default-host x86_64-pc-windows-msvc --default-toolchain 1.34.0
+  # - set PATH=%PATH%;C:\Users\appveyor\.cargo\bin
+  # - rustc -V
+  # - cargo -V
   # Get the latest stable version of Node.js or io.js
   - ps: Install-Product node $env:nodejs_version x64
   - node --version
