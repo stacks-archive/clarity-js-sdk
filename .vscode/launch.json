@@ -58,10 +58,15 @@
       "type": "node",
       "request": "launch",
       "name": "clarity-tutorials: test",
-      "program": "${workspaceFolder}/packages/clarity-tutorials/node_modules/mocha/bin/_mocha",
+      "program": "${workspaceFolder}/packages/clarity-tutorials/node_modules/.bin/jest",
       "cwd": "${workspaceFolder}/packages/clarity-tutorials",
-      "console": "integratedTerminal",
-      "preLaunchTask": "npm: build"
+      "args": [
+        "--testTimeout=3600000",
+        "--runInBand",
+        "--no-cache",
+        "--config",
+        "${workspaceFolder}/packages/clarity-tutorials/jest.config.js"
+      ]
     },
     {
       "type": "node",
