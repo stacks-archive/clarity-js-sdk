@@ -9,10 +9,9 @@ jobs:
       # - restore_cache:
       #     keys:
       #       - v1-dependencies-{{ checksum "package-lock.json" }}
-      # - run:
-          # command: |
-          #   curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain 1.34.0
-          #   npm install
+      - run:
+          command:
+            npm install
 
       # - save_cache:
       #     paths:
