@@ -15,5 +15,5 @@ export class Query {
       throw Error("Query should target a method");
     }
     return true;
-  };
+  }
 }

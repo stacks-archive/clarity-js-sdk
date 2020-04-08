@@ -18,7 +18,10 @@ export class RocketFactoryClient extends Client {
   }
 
   async rocketClaimableAt(user: string): Promise<number> {
-    const query = this.createQuery({ atChaintip: true, method: { name: "rocket-claimable-at", args: [`'${user}`] } });
+    const query = this.createQuery({
+      atChaintip: true,
+      method: { name: "rocket-claimable-at", args: [`'${user}`] }
+    });
     const res = await this.submitQuery(query);
     return parseInt(Result.unwrap(res));
   }
@@ -44,7 +47,7 @@ export class RocketFactoryClient extends Client {
   async mineBlock(sender: string): Promise<Receipt> {
     const tx = this.createTransaction({
       method: {
-        name: 'mine-block',
+        name: "mine-block",
         args: [],
       }
     });

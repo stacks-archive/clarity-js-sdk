@@ -86,7 +86,7 @@ const getWrappedResult = (input: ResultInterface<string, unknown>, r: RegExp) =>
     return match[1];
   }
   throw new Error(`Unable to unwrap result: ${input}`);
-}
+};
 
 export function unwrapUInt(input: ResultInterface<string, unknown>): number {
   const match = getWrappedResult(input, /^\(ok\su(\d+)\)$/);

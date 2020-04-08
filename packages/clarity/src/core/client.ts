@@ -16,17 +16,17 @@ export class Client {
 
   checkContract = async (): Promise<void> => {
     await this.provider.checkContract(this.filePath);
-  };
+  }
 
   deployContract = async (): Promise<Receipt> => {
     const receipt = await this.provider.launchContract(this.name, this.filePath);
     return receipt;
-  };
+  }
 
   createTransaction = (params?: { method?: Method }): Transaction => {
     const tx = new Transaction(params && params.method);
     return tx;
-  };
+  }
 
   submitTransaction = async (tx: Transaction): Promise<Receipt> => {
     if (!tx.sender) {
@@ -47,12 +47,12 @@ export class Client {
       receipt = { success: false, error: error };
     }
     return receipt;
-  };
+  }
 
   createQuery = (params: { method?: Method, atChaintip?: boolean }): Query => {
     const query = new Query(params.method, params.atChaintip);
     return query;
-  };
+  }
 
   submitQuery = async (query: Query): Promise<Receipt> => {
     // let res = await this.node.execute(
@@ -71,5 +71,5 @@ export class Client {
       query.atChaintip,
     );
     return res;
-  };
+  }
 }

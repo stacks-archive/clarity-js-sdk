@@ -21,7 +21,8 @@ export const BLOCKSTACK_CORE_SOURCE_PATH_ENV_VAR = "BLOCKSTACK_CORE_SOURCE_PATH"
  * @returns If an environment var is specified then returns the tag/branch string value.
  * Otherwise returns false.
  */
-function getOverriddenCoreSource(): false | { specifier: "branch" | "tag" | "path"; value: string } {
+function getOverriddenCoreSource():
+  false | { specifier: "branch" | "tag" | "path"; value: string } {
   for (const [key, val] of Object.entries(process.env)) {
     if (val === undefined) {
       continue;

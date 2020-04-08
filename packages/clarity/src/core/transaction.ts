@@ -14,10 +14,10 @@ export class Transaction {
       throw Error("Transaction should be signed");
     }
     return true;
-  };
+  }
 
   sign = async (sender: string): Promise<boolean> => {
     this.sender = sender;
     return true;
-  };
+  }
 }
