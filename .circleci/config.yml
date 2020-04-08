@@ -23,7 +23,6 @@ jobs:
 
       - run:
           command: |
-            source $HOME/.cargo/env
             npm run test
 
       - run: npm run codecov-upload
