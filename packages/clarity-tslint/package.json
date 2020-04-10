@@ -1,7 +1,7 @@
 {
   "name": "@blockstack/clarity-tslint",
   "description": "tslint rules for blockstack",
-  "version": "0.1.13-alpha.6",
+  "version": "0.1.13",
   "author": "Blockstack <engineering@blockstack.com> (https://blockstack.com/)",
   "devDependencies": {
     "shx": "^0.3.2",
