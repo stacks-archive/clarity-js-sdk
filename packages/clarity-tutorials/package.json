@@ -18,7 +18,8 @@
     "prepublishOnly": "npm run build",
     "lint": "tslint -p tsconfig.json 'src/**/*.ts' 'test/**/*.ts'",
     "lint-fix": "tslint --fix -p tsconfig.json 'src/**/*.ts' 'test/**/*.ts'",
-    "test": "npm run build && nyc mocha"
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "engines": {
     "node": ">=10"
@@ -40,13 +41,15 @@
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
-    "@types/mocha": "^5.2.7",
+    "@types/jest": "^25.2.1",
     "@types/node": "^10",
     "chai": "^4.2.0",
-    "mocha": "^6.1.4",
+    "jest": "^25.2.6",
+    "jest-circus": "^25.2.6",
     "nyc": "^14.1.1",
     "shx": "^0.3.2",
     "source-map-support": "^0.5.12",
+    "ts-jest": "^25.3.0",
     "ts-node": "^8.2.0",
     "tslint": "^5.17.0",
     "typescript": "^3.5.1"

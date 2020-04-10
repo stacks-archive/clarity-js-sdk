@@ -16,6 +16,8 @@ environment variables. The variable must be available during the npm install scr
 a pre-compiled distributable. The value must be set to a git tag or branch on the `https://github.com/blockstack/blockstack-core` 
 repo. 
 
+To move a local copy of the `clarity-cli` binary from a different folder on your machine, include the environment variable `BLOCKSTACK_CORE_SOURCE_PATH`.
+
 For example, the following commands test a blockstack-core repo feature branch using the `clarity-tutorials` package:
 ```
 git clone git@github.com:blockstack/clarity-js-sdk.git

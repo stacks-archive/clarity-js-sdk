@@ -3,9 +3,11 @@ import { Method, Receipt } from ".";
 export class Query {
   receipt?: Receipt;
   method?: Method;
+  atChaintip?: boolean;
 
-  constructor(method?: Method) {
+  constructor(method?: Method, atChaintip?: boolean) {
     this.method = method;
+    this.atChaintip = atChaintip;
   }
 
   validate = async (): Promise<boolean> => {
@@ -13,5 +15,5 @@ export class Query {
       throw Error("Query should target a method");
     }
     return true;
-  };
+  }
 }

@@ -2,17 +2,17 @@ import { Client, Provider, Receipt, Result } from "@blockstack/clarity";
 
 export class NonFungibleTokenClient extends Client {
   constructor(provider: Provider) {
-    super("non-fungible-stock", "tokens/non-fungible-token", provider);
+    super("SP3GWX3NE58KXHESRYE4DYQ1S31PQJTCRXB3PE9SB.non-fungible-token", "tokens/non-fungible-token", provider);
   }
 
   async balanceOf(owner: string): Promise<number> {
     const query = this.createQuery({ method: { name: "balance-of", args: [`'${owner}`] } });
     const res = await this.submitQuery(query);
-    return parseInt(Result.unwrap(res));
+    return parseInt(res.result as string);
   }
 
   async ownerOf(tokenId: number): Promise<string> {
-    const query = this.createQuery({ method: { name: "owner-of", args: [`${tokenId}`] } });
+    const query = this.createQuery({ method: { name: "owner-of?", args: [`${tokenId}`] } });
     const res = await this.submitQuery(query);
     return Result.unwrap(res).replace(/'/g, "");
   }

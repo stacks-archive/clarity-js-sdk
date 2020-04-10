@@ -17,135 +17,116 @@
 
 ;; Fungible Token, modeled after ERC-20
 
+(define-fungible-token fungible-token)
+
 ;; Storage
-(define-map balances
-  ((owner principal))
-  ((balance int)))
 (define-map allowances
   ((spender principal) (owner principal))
-  ((allowance int)))
-(define-data-var total-supply int 0)
+  ((allowance uint)))
+(define-data-var total-supply uint u0)
 
 ;; Internals
 
 ;; Total number of tokens in existence.
-(define (get-total-supply)
-  (fetch-var total-supply))
-
-;; Gets the amount of tokens owned by the specified address.
-(define (balance-of (account principal))
-  (default-to 0
-    (get balance
-         (fetch-entry balances ((owner account))))))
+(define-private (get-total-supply)
+  (var-get total-supply))
 
 ;; Gets the amount of tokens that an owner allowed to a spender.
-(define (allowance-of (spender principal) (owner principal))
-  (default-to 0
+(define-private (allowance-of (spender principal) (owner principal))
+  (begin
+    (print
+         (map-get? allowances ((spender spender) (owner owner))))
+    (print (get allowance
+         (map-get? allowances ((spender spender) (owner owner)))))
+  (default-to u0
     (get allowance
-         (fetch-entry allowances (
-                                  (owner owner)
-                                  (spender spender))))))
+         (map-get? allowances ((spender spender) (owner owner))))))
+)
 
-;; Credits balance of a specified principal.
-(define (credit-balance! (account principal) (amount int))
-  (if (<= amount 0)
-    'false
-    (let ((current-balance (balance-of account)))
-      (begin
-        (set-entry! balances
-          ((owner account))
-          ((balance (+ amount current-balance))))
-        'true)))) ;; Overflow management?
-
-;; Debits balance of a specified principal.
-(define (debit-balance! (account principal) (amount int))
-  (let ((balance (balance-of account)))
-    (if (or (> amount balance) (<= amount 0))
-      'false
-      (begin
-        (set-entry! balances
-          ((owner account))
-          ((balance (- balance amount))))
-        'true))))
+(define-public (get-allowance-of (spender principal) (owner principal))
+  (ok (allowance-of spender owner))
+)
 
 ;; Transfers tokens to a specified principal.
-(define (transfer! (sender principal) (recipient principal) (amount int))
-  (if (and
-        (not (eq? sender recipient))
-        (debit-balance! sender amount)
-        (credit-balance! recipient amount))
-    'true
-    'false))
+(define-public (transfer (recipient principal) (amount uint))
+  (ft-transfer? fungible-token amount tx-sender recipient)
+)
 
 ;; Decrease allowance of a specified spender.
-(define (decrease-allowance! (spender principal) (owner principal) (amount int))
+(define-private (decrease-allowance (spender principal) (owner principal) (amount uint))
   (let ((allowance (allowance-of spender owner)))
-    (if (or (> amount allowance) (<= amount 0))
+    (if (or (> amount allowance) (<= amount u0))
       'true
       (begin
-        (set-entry! allowances
+        (map-set allowances
           ((spender spender) (owner owner))
           ((allowance (- allowance amount))))
         'true))))
 
 ;; Internal - Increase allowance of a specified spender.
-(define (increase-allowance! (spender principal) (owner principal) (amount int))
+(define-private (increase-allowance (spender principal) (owner principal) (amount uint))
   (let ((allowance (allowance-of spender owner)))
-    (if (<= amount 0)
+    (if (<= amount u0)
       'false
       (begin
-        (set-entry! allowances
+        (print (tuple (spender spender) (owner owner)))
+        (print (map-set allowances
           ((spender spender) (owner owner))
-          ((allowance (+ allowance amount))))
+          ((allowance (+ allowance amount)))))
         'true))))
 
 ;; Public functions
 
 ;; Transfers tokens to a specified principal.
-(define-public (transfer (recipient principal) (amount int))
-  (if (transfer! tx-sender recipient amount)
-      (ok amount)
-      (err 'false)))
+(define-public (transfer-token (recipient principal) (amount uint))
+  (transfer recipient amount)
+)
 
 ;; Transfers tokens to a specified principal, performed by a spender
-(define-public (transfer-from (owner principal) (recipient principal) (amount int))
+(define-public (transfer-from (owner principal) (recipient principal) (amount uint))
   (let ((allowance (allowance-of tx-sender owner)))
-    (if (or (> amount allowance) (<= amount 0))
-      (err 'false)
-      (if (and
-           (transfer! owner recipient amount)
-           (decrease-allowance! tx-sender owner amount))
-       (ok amount)
-       (err 'false)))))
+    (begin
+      (if (or (> amount allowance) (<= amount u0))
+        (err 'false)
+        (if (and
+              (is-ok (ft-transfer? fungible-token amount owner recipient))
+              (decrease-allowance tx-sender owner amount)
+            )
+        (ok 'true)
+        (err 'false)))))
+)
 
 ;; Update the allowance for a given spender
-(define-public (approve (spender principal) (amount int))
-  (if (and (> amount 0)
-           (increase-allowance! spender tx-sender amount))
+(define-public (approve (spender principal) (amount uint))
+  (if (and (> amount u0)
+           (increase-allowance spender tx-sender amount))
       (ok amount)
       (err 'false)))
 
 ;; Revoke a given spender
 (define-public (revoke (spender principal))
   (let ((allowance (allowance-of spender tx-sender)))
-    (if (and (> allowance 0)
-             (decrease-allowance! spender tx-sender allowance))
+    (if (and (> allowance u0)
+             (decrease-allowance spender tx-sender allowance))
         (ok 0)
         (err 'false))))
 
+(define-public (balance-of (owner principal))
+  (begin
+      (print owner)
+      (ok (ft-get-balance fungible-token owner))
+  )
+)
 ;; Mint new tokens.
-(define (mint! (account principal) (amount int))
-  (if (<= amount 0)
+(define-private (mint! (account principal) (amount uint))
+  (if (<= amount u0)
       (err 'false)
-      (let ((balance (balance-of account)))
-        (begin
-          (set-var! total-supply (+ (fetch-var total-supply) amount))
-          (set-entry! balances
-                      ((owner account))
-                      ((balance (+ balance amount))))
-          (ok amount)))))
+      (begin
+        (var-set total-supply (+ (var-get total-supply) amount))
+        (ft-mint? fungible-token amount account)
+        (ok amount))))
 
 ;; Initialize the contract
 (begin
-  (mint! 'SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7 20)
-  (mint! 'S02J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKPVKG2CE 10))
+  (mint! 'SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7 u20)
+  (mint! 'S02J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKPVKG2CE u10))

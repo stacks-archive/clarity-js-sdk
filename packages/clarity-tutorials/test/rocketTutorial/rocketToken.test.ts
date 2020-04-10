@@ -1,5 +1,4 @@
 import { Provider, ProviderRegistry, Receipt } from "@blockstack/clarity";
-import { expect } from "chai";
 import { RocketTokenClient } from "../../src/clients/rocketTutorial/rocketToken";
 
 describe("RocketTokenClient Test Suite", () => {
@@ -15,9 +14,10 @@ describe("RocketTokenClient Test Suite", () => {
   const bob = addresses[1];
   const zoe = addresses[2];
 
-  before(async () => {
+  beforeAll(async () => {
     provider = await ProviderRegistry.createProvider();
     rocketTokenClient = new RocketTokenClient(provider);
+    await rocketTokenClient.deployContract();
   });
 
   it("should have a valid syntax", async () => {
@@ -25,114 +25,111 @@ describe("RocketTokenClient Test Suite", () => {
   });
 
   describe("Deploying an instance of the contract", () => {
-    before(async () => {
-      await rocketTokenClient.deployContract();
-    });
 
     it("should initialize Alice's balance (20 RKT)", async () => {
       const balanceAlice = await rocketTokenClient.balanceOf(alice);
-      expect(balanceAlice).to.equal(20);
+      expect(balanceAlice).toEqual(20);
     });
 
     it("should initialize Bob's balance (10 RKT)", async () => {
       const balanceBob = await rocketTokenClient.balanceOf(bob);
-      expect(balanceBob).to.equal(10);
+      expect(balanceBob).toEqual(10);
     });
 
     it("should initialize the total supply of RKT to 30", async () => {
       const totalSupply = await rocketTokenClient.totalSupply();
-      expect(totalSupply).to.equal(30);
+      expect(totalSupply).toEqual(30);
     });
 
     it("should initialize Zoe's balance (0 RKT)", async () => {
       const balanceZoe = await rocketTokenClient.balanceOf(zoe);
-      expect(balanceZoe).to.equal(0);
+      expect(balanceZoe).toEqual(0);
     });
   });
 
   describe("Alice transfering 5 RKT to Bob", () => {
-    before(async () => {
+    beforeAll(async () => {
       await rocketTokenClient.transfer(bob, 5, { sender: alice });
     });
 
     it("should decrease Alice's balance (15 RKT)", async () => {
       const balanceAlice = await rocketTokenClient.balanceOf(alice);
-      expect(balanceAlice).to.equal(15);
+      expect(balanceAlice).toEqual(15);
     });
 
     it("should increase Bob's balance (15 RKT)", async () => {
       const balanceBob = await rocketTokenClient.balanceOf(bob);
-      expect(balanceBob).to.equal(15);
+      expect(balanceBob).toEqual(15);
     });
   });
 
   describe("Alice transfering -5 RKT to Bob", () => {
     let receipt: Receipt;
 
-    before(async () => {
+    beforeAll(async () => {
       receipt = await rocketTokenClient.transfer(bob, 16, { sender: alice });
     });
 
     it("should return an invalid receipt", async () => {
-      expect(receipt.success).to.be.false;
+      expect(receipt.success).toBeFalsy();
     });
 
     it("should not increase Alice's balance (15 RKT)", async () => {
       const balanceAlice = await rocketTokenClient.balanceOf(alice);
-      expect(balanceAlice).to.equal(15);
+      expect(balanceAlice).toEqual(15);
     });
 
     it("should not decrease Bob's balance (15 RKT)", async () => {
       const balanceBob = await rocketTokenClient.balanceOf(bob);
-      expect(balanceBob).to.equal(15);
+      expect(balanceBob).toEqual(15);
     });
   });
 
   describe("Alice transfering 5 RKT to herself", () => {
     let receipt: Receipt;
 
-    before(async () => {
+    beforeAll(async () => {
       receipt = await rocketTokenClient.transfer(alice, 5, { sender: alice });
     });
 
     it("should return an invalid receipt", async () => {
-      expect(receipt.success).to.be.false;
+      expect(receipt.success).toBeFalsy();
     });
 
     it("should not increase Alice's balance (15 RKT)", async () => {
       const balanceAlice = await rocketTokenClient.balanceOf(alice);
-      expect(balanceAlice).to.equal(15);
+      expect(balanceAlice).toEqual(15);
     });
 
     it("should not decrease Bob's balance (15 RKT)", async () => {
       const balanceBob = await rocketTokenClient.balanceOf(bob);
-      expect(balanceBob).to.equal(15);
+      expect(balanceBob).toEqual(15);
     });
   });
 
   describe("Bob transfering 16 RKT to Alice", () => {
     let receipt: Receipt;
 
-    before(async () => {
+    beforeAll(async () => {
       receipt = await rocketTokenClient.transfer(bob, 16, { sender: alice });
     });
 
     it("should return an invalid receipt", async () => {
-      expect(receipt.success).to.be.false;
+      expect(receipt.success).toBeFalsy();
     });
 
     it("should not increase Alice's balance (15 RKT)", async () => {
       const balanceAlice = await rocketTokenClient.balanceOf(alice);
-      expect(balanceAlice).to.equal(15);
+      expect(balanceAlice).toEqual(15);
     });
 
     it("should not decrease Bob's balance (15 RKT)", async () => {
       const balanceBob = await rocketTokenClient.balanceOf(bob);
-      expect(balanceBob).to.equal(15);
+      expect(balanceBob).toEqual(15);
     });
   });
 
-  after(async () => {
+  afterAll(async () => {
     await provider.close();
   });
 });

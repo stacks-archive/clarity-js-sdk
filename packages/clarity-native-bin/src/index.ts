@@ -2,17 +2,18 @@ import * as fs from "fs-extra";
 import * as path from "path";
 import { cargoInstall } from "./cargoBuild";
 import { fetchDistributable, getDownloadUrl } from "./fetchDist";
-import { getExecutableFileName, verifyOutputFile } from "./fsUtil";
+import { getExecutableFileName, moveFromPath, verifyOutputFile } from "./fsUtil";
 import { ConsoleLogger, ILogger } from "./logger";
 
 /**
  * Should correspond to both a git tag on the blockstack-core repo and a
  * set of clarity-binary distributables uploaded to the cloud storage endpoint.
  */
-export const CORE_SDK_TAG = "clarity-sdk-v0.0.6";
+export const CORE_SDK_TAG = "clarity-sdk-v0.0.8";
 
 export const BLOCKSTACK_CORE_SOURCE_TAG_ENV_VAR = "BLOCKSTACK_CORE_SOURCE_TAG";
 export const BLOCKSTACK_CORE_SOURCE_BRANCH_ENV_VAR = "BLOCKSTACK_CORE_SOURCE_BRANCH";
+export const BLOCKSTACK_CORE_SOURCE_PATH_ENV_VAR = "BLOCKSTACK_CORE_SOURCE_PATH";
 
 /**
  * A git tag or branch name can be specified as an env var.
@@ -20,7 +21,8 @@ export const BLOCKSTACK_CORE_SOURCE_BRANCH_ENV_VAR = "BLOCKSTACK_CORE_SOURCE_BRA
  * @returns If an environment var is specified then returns the tag/branch string value.
  * Otherwise returns false.
  */
-function getOverriddenCoreSource(): false | { specifier: "branch" | "tag"; value: string } {
+function getOverriddenCoreSource():
+  false | { specifier: "branch" | "tag" | "path"; value: string } {
   for (const [key, val] of Object.entries(process.env)) {
     if (val === undefined) {
       continue;
@@ -30,6 +32,8 @@ function getOverriddenCoreSource(): false | { specifier: "branch" | "tag"; value
       return { specifier: "tag", value: val };
     } else if (keyStr === BLOCKSTACK_CORE_SOURCE_BRANCH_ENV_VAR) {
       return { specifier: "branch", value: val };
+    } else if (keyStr === BLOCKSTACK_CORE_SOURCE_PATH_ENV_VAR) {
+      return { specifier: "path", value: val };
     }
   }
   return false;
@@ -76,7 +80,7 @@ export async function installDefaultPath(): Promise<boolean> {
 
   // Check if source git tag/branch was specified using env var
   const sourceOverride = getOverriddenCoreSource();
-  if (sourceOverride !== false) {
+  if (sourceOverride !== false && sourceOverride.specifier !== "path") {
     logger.log(`Found git source env var ${sourceOverride.specifier}=${sourceOverride.value}`);
     fromSource = true;
     if (sourceOverride.specifier === "branch") {
@@ -107,6 +111,12 @@ export async function installDefaultPath(): Promise<boolean> {
       outputFilePath: installPath,
       gitBranch: versionBranch,
       gitTag: versionTag
+    });
+  } else if (sourceOverride && sourceOverride.specifier === "path") {
+    success = moveFromPath({
+      logger,
+      outputFilePath: installPath,
+      inputFilePAth: sourceOverride.value,
     });
   } else {
     success = await fetchDistributable({

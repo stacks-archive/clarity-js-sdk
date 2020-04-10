@@ -77,8 +77,37 @@ export function unwrapResult<T extends ResultInterface<unknown, unknown>>(input:
   return input.result as ExtractOk<T>;
 }
 
+const getWrappedResult = (input: ResultInterface<string, unknown>, r: RegExp) => {
+  if (input.result) {
+    const match = r.exec(input.result);
+    if (!match) {
+      throw new Error(`Unable to unwrap result: ${input.result}`);
+    }
+    return match[1];
+  }
+  throw new Error(`Unable to unwrap result: ${input}`);
+};
+
+export function unwrapUInt(input: ResultInterface<string, unknown>): number {
+  const match = getWrappedResult(input, /^\(ok\su(\d+)\)$/);
+  return parseInt(match);
+}
+
+export function unwrapInt(input: ResultInterface<string, unknown>): number {
+  const match = getWrappedResult(input, /^\(ok\s(\d+)\)$/);
+  return parseInt(match);
+}
+
+export function unwrapString(input: ResultInterface<string, unknown>): string {
+  const match = getWrappedResult(input, /^\(ok\s0x(\w+)\)$/);
+  return Buffer.from(match, "hex").toString();
+}
+
 export const Result = {
   unwrap: unwrapResult,
   extract: extractResult,
-  match: matchResult
+  match: matchResult,
+  unwrapUInt,
+  unwrapInt,
+  unwrapString,
 };

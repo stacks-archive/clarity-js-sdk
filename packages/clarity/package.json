@@ -27,6 +27,7 @@
     "build": "npm run clean && npm run compile",
     "clean": "shx rm -rf ./lib tsconfig.build.tsbuildinfo",
     "compile": "tsc --build tsconfig.build.json",
+    "compile:watch": "tsc --build tsconfig.build.json --watch",
     "prepublishOnly": "npm run build",
     "lint": "tslint -p tsconfig.json 'src/**/*.ts' 'test/**/*.ts'",
     "lint-fix": "tslint --fix -p tsconfig.json 'src/**/*.ts' 'test/**/*.ts'",

@@ -1,5 +1,5 @@
-(define (say-hi)
-   "hello world")
+(define-public (say-hi)
+   (ok "hello world"))
 
-(define (echo-number (val int))
-   val)
+(define-public (echo-number (val int))
+   (ok val))

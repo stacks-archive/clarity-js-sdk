@@ -20,46 +20,63 @@
 ;;; Storage
 (define-map orderbook
   ((buyer principal))
-  ((rocket-id int) (ordered-at-block int) (ready-at-block int) (balance int) (size int)))
-(define-data-var last-rocket-id int 0)
+  ((rocket-id uint) (ordered-at-block uint) (ready-at-block uint) (balance uint) (size uint)))
+(define-data-var last-rocket-id uint u0)
 
 ;;; Constants
-(define funds-address 'SZ2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKQ9H6DPR)
-(define not-enough-tokens-err (err 1))
-(define invalid-or-duplicate-order-err (err 2))
-(define no-order-on-books-err (err 3))
-(define order-fulfillment-err (err 4))
+(define-constant funds-address 'SZ2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKQ9H6DPR)
+(define-constant not-enough-tokens-err (err 1))
+(define-constant invalid-or-duplicate-order-err (err 2))
+(define-constant no-order-on-books-err (err 3))
+(define-constant order-fulfillment-err (err 4))
 
 ;;; Internals
 
 ;; Fetch, increment, update and return new rocket-id
 ;; returns: int
-(define (new-rocket-id)
+(define-private (new-rocket-id)
   (let ((rocket-id
-      (+ 1 (fetch-var last-rocket-id))))
-    (begin (set-var! last-rocket-id rocket-id)
+      (+ u1 (var-get last-rocket-id))))
+    (begin (var-set last-rocket-id rocket-id)
       rocket-id)))
 
 ;; Check if a given user can buy a new rocket
 ;; args:
 ;; @user (principal) the principal of the user
 ;; returns: boolean
-(define (can-user-buy (user principal))
+(define-private (can-user-buy (user principal))
   (let ((ordered-at-block
       (get ordered-at-block
-        (fetch-entry orderbook ((buyer user))))))
-    (if (is-none? ordered-at-block) 'true 'false)))
+        (print (map-get? orderbook {buyer (print user)})))))
+      (is-none ordered-at-block)
+  )
+)
 
 ;; Check if a given user can claim a rocket previously ordered
 ;; args:
 ;; @user (principal) the principal of the user
 ;; returns: boolean
-(define (can-user-claim (user principal))
-  (let ((ready-at-block
-      ;; shallow-return 'false if entry doesn't exist
-      (expects! (get ready-at-block
-        (fetch-entry orderbook ((buyer user)))) 'false)))
-    (>= block-height ready-at-block)))
+(define-private (can-user-claim (user principal))
+  (begin
+    (print "can-claim")
+    (print block-height)
+    (let ((ready-at-block
+        ;; shallow-return 'false if entry doesn't exist
+        (unwrap! (get ready-at-block
+          (map-get? orderbook {buyer user})) 'false)))
+      (begin
+        (print ready-at-block)
+        (>= block-height ready-at-block)
+      )
+    )
+  )
+)
+
+(define-public (do-can-user-claim (user principal))
+  (begin
+    (ok (can-user-claim user))
+  )
+)
 
 ;; Order a rocket
 ;; User not present in the orderbook have the ability to buy a new rocket.
@@ -69,25 +86,28 @@
 ;; args:
 ;; @size (int) the size of the rocket (1 < size <= 20)
 ;; returns: Response<int, int>
-(define-public (order-rocket (size int))
-  (let ((down-payment (/ size 2)))
+(define-public (order-rocket (size uint))
+(begin
+  (print (map-get? orderbook ((buyer tx-sender))))
+  (let ((down-payment (/ size u2))
+    (rocket-id (new-rocket-id)))
     (if (and
-          (> size 1)
-          (<= size 20)
+          (> size u1)
+          (<= size u20)
           (can-user-buy tx-sender))
       (if (and
-           (is-ok? (contract-call! rocket-token transfer funds-address down-payment))
-           (insert-entry! orderbook
-             ((buyer tx-sender))
-             (
-               (rocket-id (new-rocket-id))
-               (ordered-at-block block-height)
-               (ready-at-block (+ block-height size))
-               (size size)
-               (balance (- size down-payment)))))
-          (ok (fetch-var last-rocket-id))
-          not-enough-tokens-err)
-      invalid-or-duplicate-order-err)))
+        (is-ok (contract-call? .rocket-token transfer-token funds-address down-payment))
+        (map-set orderbook
+          ((buyer tx-sender))
+          (
+            (rocket-id (new-rocket-id))
+            (ordered-at-block block-height)
+            (ready-at-block (+ block-height size))
+            (size size)
+            (balance (- size down-payment)))))
+        (ok (var-get last-rocket-id))
+        not-enough-tokens-err)
+      invalid-or-duplicate-order-err))))
 
 ;; Claim a rocket
 ;; This function can only be executed when the rocket is ready.
@@ -95,21 +115,38 @@
 ;; In returns, a new rocket will receive a freshly minted rocket.
 ;; returns: Response<int, int>
 (define-public (claim-rocket)
+(begin
+  (print tx-sender)
+  (print (map-get? orderbook ((buyer tx-sender))))
+  (print (map-get? orderbook {buyer tx-sender}))
   (let ((order-entry
-         (expects! (fetch-entry orderbook ((buyer tx-sender)))
+         (unwrap! (map-get? orderbook ((buyer tx-sender)))
                    no-order-on-books-err)))
     (let ((buyer     tx-sender)
           (balance   (get balance order-entry))
           (size      (get size order-entry))
           (rocket-id (get rocket-id order-entry)))
-      (if (and (can-user-claim buyer)
-               (is-ok? (contract-call! rocket-token transfer funds-address balance))
-               (is-ok? (as-contract (contract-call! rocket-market mint! buyer rocket-id size)))
-               (delete-entry! orderbook ((buyer buyer))))
+      (begin
+        (print 256)
+        (print balance)
+        (if (and (can-user-claim buyer)
+               (is-ok (contract-call? .rocket-token transfer-token funds-address balance))
+               (is-ok (as-contract (contract-call? .rocket-market mint buyer rocket-id size )))
+               (map-delete orderbook ((buyer buyer))))
           (ok rocket-id)
           order-fulfillment-err))))
+      )
+)
+
+;; Stub method to force a new block
+(define-public (mine-block)
+  (begin
+    (print block-height)
+    (ok 'true)
+  )
+)
 
 ;; Initialize the contract by
 ;; - taking ownership of rocket-market's mint function
 (begin
-  (as-contract (contract-call! rocket-market set-factory)))
+  (as-contract (contract-call? .rocket-market set-factory)))

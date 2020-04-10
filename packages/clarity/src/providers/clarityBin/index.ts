@@ -168,7 +168,9 @@ export class NativeClarityBinProvider implements Provider {
         result.stderr
       );
     }
-    if (!result.stdout.startsWith("Transaction executed and committed.")) {
+    const executed = result.stdout.startsWith("Transaction executed and committed.");
+    const didReturnErr = result.stdout.includes(" Returned: (err");
+    if (!executed || didReturnErr) {
       throw new ExecutionError(
         `Execute expression on contract failed with bad output: ${result.stdout}`,
         result.exitCode,
@@ -219,11 +221,16 @@ export class NativeClarityBinProvider implements Provider {
   async eval(
     contractName: string,
     evalStatement: string,
-    includeDebugOutput?: boolean
+    includeDebugOutput?: boolean,
+    atChaintip: boolean = true,
   ): Promise<Receipt> {
-    const result = await this.runCommand(["eval", contractName, this.dbFilePath], {
-      stdin: evalStatement
-    });
+    const result = await this.runCommand([
+      `eval${atChaintip ? "_at_chaintip" : ""}`,
+      contractName, this.dbFilePath],
+      {
+        stdin: evalStatement
+      }
+    );
     if (result.exitCode !== 0) {
       throw new ExecutionError(
         `Eval expression on contract failed with bad exit code ${result.exitCode}: ${
