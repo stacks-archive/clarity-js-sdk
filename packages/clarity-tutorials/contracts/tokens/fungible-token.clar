@@ -85,16 +85,13 @@
 ;; Transfers tokens to a specified principal, performed by a spender
 (define-public (transfer-from (owner principal) (recipient principal) (amount uint))
   (let ((allowance (allowance-of tx-sender owner)))
-    (begin
       (if (or (> amount allowance) (<= amount u0))
         (err 'false)
         (if (and
               (is-ok (ft-transfer? fungible-token amount owner recipient))
-              (decrease-allowance tx-sender owner amount)
-            )
-        (ok 'true)
-        (err 'false)))))
-)
+              (decrease-allowance tx-sender owner amount))
+          (ok 'true)
+          (err 'false)))))
 
 ;; Update the allowance for a given spender
 (define-public (approve (spender principal) (amount uint))
