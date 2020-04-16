@@ -87,9 +87,9 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "create-clarity-dev: test",
-      "program": "${workspaceFolder}/packages/create-clarity-dev/node_modules/mocha/bin/_mocha",
-      "cwd": "${workspaceFolder}/packages/create-clarity-dev",
+      "name": "create-clarity-starter: test",
+      "program": "${workspaceFolder}/packages/create-clarity-starter/node_modules/mocha/bin/_mocha",
+      "cwd": "${workspaceFolder}/packages/create-clarity-starter",
       "preLaunchTask": "npm: build"
     }
   ]

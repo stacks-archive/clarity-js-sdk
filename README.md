@@ -19,11 +19,11 @@ A development environment, testing framework, and deployment tool for Clarity sm
 
 Quick Start:
 ```
-npm init clarity-dev
+npm init clarity-starter
 npm test
 ```
 
-_See [`create-clarity-dev`](packages/create-clarity-dev/README.md) for more details._
+_See [`create-clarity-starter`](packages/create-clarity-starter/README.md) for more details._
 
 #### JavaScript
 
