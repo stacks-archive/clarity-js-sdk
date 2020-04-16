@@ -25,7 +25,8 @@ describe("specify output arg as existing directory", () => {
   it("generate a project", async () => {
     const appPath = path.join(__dirname, "../generators/app");
     generator = helpers.createGenerator(appPath, [], [], {
-      skipInstall: true
+      skipInstall: true,
+      template: "hello-world",
     });
 
     // Run yo-generator to output project.
