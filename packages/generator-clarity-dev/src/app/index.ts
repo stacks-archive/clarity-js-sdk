@@ -75,6 +75,9 @@ module.exports = class extends Generator {
     };
 
     let projDirArg: string | undefined = this.options[PROJECT_DIR];
+    this.answers = {
+      example: this.options[EXAMPLE_ARGUMENT],
+    };
 
     let destRoot: string | undefined;
     if (projDirArg) {
