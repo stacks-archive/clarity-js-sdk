@@ -10,7 +10,7 @@ $ npm install -g @blockstack/clarity-cli
 $ clarity COMMAND
 running command...
 $ clarity (-v|--version|version)
-@blockstack/clarity-cli/0.1.14-alpha.1 darwin-x64 node-v12.16.1
+@blockstack/clarity-cli/0.1.14-alpha.2 darwin-x64 node-v12.16.1
 $ clarity --help [COMMAND]
 USAGE
   $ clarity COMMAND
