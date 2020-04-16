@@ -9,7 +9,7 @@ const baseFiles = [
 
 export const EXPECTED_OUTPUT_FILES = [
   ...baseFiles,
-  "contracts/sample/hello-world.clar",
+  "contracts/hello-world.clar",
   "test/hello-world.ts",
 ];
 
