@@ -1,5 +1,5 @@
 {
-  "name": "create-clarity-dev",
+  "name": "create-clarity-starter",
   "version": "0.1.14-alpha.1",
   "description": "An npm initializer to setup a Clarity development environment",
   "author": "Blockstack <engineering@blockstack.com> (https://blockstack.com/)",
@@ -7,7 +7,7 @@
   "main": "lib/index.js",
   "bin": "./cmd/index.js",
   "repository": "blockstack/clarity-js-sdk",
-  "homepage": "https://github.com/blockstack/clarity-js-sdk/tree/master/packages/create-clarity-dev#readme",
+  "homepage": "https://github.com/blockstack/clarity-js-sdk/tree/master/packages/create-clarity-starter#readme",
   "bugs": "https://github.com/blockstack/clarity-js-sdk/issues",
   "publishConfig": {
     "access": "public",

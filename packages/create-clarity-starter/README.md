@@ -1,4 +1,4 @@
-# create-clarity-dev
+# create-clarity-starter
 
 A Clarity development environment generator, usable as an [npm init initializer](https://docs.npmjs.com/cli/init#description). 
 
@@ -11,7 +11,7 @@ a minimal Mocha test suite using the Clarity SDK.
 #### Generate a project
 
 ```
-npm init clarity-dev my-proj
+npm init clarity-starter my-proj
 cd my-proj
 ```
 _Replace `my-proj` with your app name. The app directory is created if it does not already exist._
@@ -53,7 +53,7 @@ The package is a thin wrapper around the [yeoman](https://www.npmjs.com/package/
 
   #### Using `npx` directly
   > ```
-  > npx create-clarity-dev
+  > npx create-clarity-starter
   > ```
 
 

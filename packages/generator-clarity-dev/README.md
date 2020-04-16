@@ -5,7 +5,7 @@ A Clarity development environment [Yeoman](https://yeoman.io/) generator.
 Generates a TypeScript project that contains a `hello-world.clar` sample smart contract and 
 a minimal Mocha test suite using the Clarity SDK. 
 
-_Visit [create-clarity-dev](/packages/create-clarity-dev/README.md) for usage as an `npm init` initializer without global `yo` installation requirements._
+_Visit [create-clarity-starter](/packages/create-clarity-starter/README.md) for usage as an `npm init` initializer without global `yo` installation requirements._
 
 ## Quick Start
 
