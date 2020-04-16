@@ -1,10 +1,20 @@
-export const EXPECTED_OUTPUT_FILES = [
+const baseFiles = [
   ".gitignore",
   "package.json",
   "tsconfig.json",
-  "contracts/sample/hello-world.clar",
-  "test/hello-world.ts",
   "test/mocha.opts",
   ".vscode/extensions.json",
   ".vscode/launch.json"
+];
+
+export const EXPECTED_OUTPUT_FILES = [
+  ...baseFiles,
+  "contracts/sample/hello-world.clar",
+  "test/hello-world.ts",
+];
+
+export const EXPECTED_COUNTER_FILES = [
+  ...baseFiles,
+  "contracts/counter.clar",
+  "test/counter.ts",
 ];

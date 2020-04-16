@@ -3,3 +3,4 @@
 --extension ts
 --timeout 0
 --recursive
+--ignore .yo-test
