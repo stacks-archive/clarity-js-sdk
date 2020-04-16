@@ -54,13 +54,18 @@ function inheritDevDependencies(src: PackageJson, target: PackageJson, names: st
 }
 
 const PROJECT_DIR = "project_name";
+const EXAMPLE_SAMPLE = "sample";
+const EXAMPLE_COUNTER = "counter";
+const EXAMPLE_ARGUMENT = "example";
 
 module.exports = class extends Generator {
   packageJsonTemplateData: any;
+  answers?: Generator.Answers;
 
   constructor(args: string | string[], options: any) {
     super(args, options);
     this.argument(PROJECT_DIR, { type: String, required: false });
+    this.argument(EXAMPLE_ARGUMENT, { type: String, required: false, default: EXAMPLE_SAMPLE });
   }
 
   async prompting() {
@@ -81,14 +86,20 @@ module.exports = class extends Generator {
       projDirArg = path.basename(destRoot);
 
       if (!isDirEmpty(destRoot)) {
-        const answers = await this.prompt([
+        this.answers = await this.prompt([
           {
             name: PROJECT_DIR,
             message: "Project name",
             default: "clarity-dev-project"
+          },
+          {
+            name: EXAMPLE_ARGUMENT,
+            message: "Sample - one of [sample, counter]",
+            choices: ["sample", "counter"],
+            default: "sample",
           }
         ]);
-        projDirArg = answers[PROJECT_DIR];
+        projDirArg = this.answers[PROJECT_DIR];
         destRoot = this.destinationRoot(projDirArg);
       }
     }
@@ -130,12 +141,30 @@ module.exports = class extends Generator {
       }
     };
 
-    copyFiles([".vscode/", "contracts/", "test/", "tsconfig.json"]);
+    copyFiles([".vscode/", "tsconfig.json", "test/mocha.opts"]);
 
-    this.fs.move(
-      this.destinationPath("test/hello-world.ts_template"),
-      this.destinationPath("test/hello-world.ts")
-    );
+    if (!this.answers || !this.answers.example) {
+      this.log("Missing sample argument!");
+      process.exit(1);
+      return;
+    }
+
+    switch (this.answers.example) {
+      case EXAMPLE_COUNTER:
+        copyFiles(["contracts/counter.clar", "test/counter.ts_template"]);
+        this.fs.move(
+          this.destinationPath("test/counter.ts_template"),
+          this.destinationPath("test/counter.ts")
+        );
+        break;
+      default:
+        copyFiles(["contracts/sample/hello-world.clar", "test/hello-world.ts_template"]);
+        this.fs.move(
+          this.destinationPath("test/hello-world.ts_template"),
+          this.destinationPath("test/hello-world.ts")
+        );
+        break;
+    }
 
     this.fs.copy(this.templatePath("_.gitignore"), this.destinationPath(".gitignore"));
     try {
