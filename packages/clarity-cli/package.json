@@ -1,6 +1,6 @@
 {
   "name": "@blockstack/clarity-cli",
-  "version": "0.1.14-alpha.1",
+  "version": "0.1.14-alpha.2",
   "description": "The Clarity CLI is used to manage Clarity smart contracts from the command line.",
   "author": "Blockstack <engineering@blockstack.com> (https://blockstack.com/)",
   "license": "MIT",
@@ -56,7 +56,7 @@
     "@oclif/config": "^1.13.0",
     "@oclif/plugin-help": "^2.1.6",
     "fs-extra": "^8.0.1",
-    "generator-clarity-dev": "^0.1.14-alpha.1",
+    "generator-clarity-dev": "^0.1.14-alpha.2",
     "tslib": "^1.9.3"
   },
   "devDependencies": {
