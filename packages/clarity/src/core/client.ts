@@ -15,8 +15,13 @@ export class Client {
   }
 
   checkContract = async (): Promise<void> => {
-    await this.provider.checkContract(this.filePath);
-  }
+    const checkResult = await this.provider.checkContract(this.filePath);
+    if (!checkResult.success) {
+      return Promise.reject();
+    } else {
+      return Promise.resolve();
+    }
+  };
 
   deployContract = async (): Promise<Receipt> => {
     const receipt = await this.provider.launchContract(this.name, this.filePath);
