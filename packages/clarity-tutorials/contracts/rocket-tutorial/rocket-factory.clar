@@ -93,7 +93,7 @@
           (<= size u20)
           (can-user-buy tx-sender))
       (if (and
-        (is-ok (contract-call? .rocket-token transfer-token funds-address down-payment))
+        (is-ok (contract-call? 'SP3GWX3NE58KXHESRYE4DYQ1S31PQJTCRXB3PE9SB.rocket-token transfer-token funds-address down-payment))
         (map-set orderbook
           {buyer: tx-sender}
           { rocket-id: (new-rocket-id),
@@ -125,8 +125,8 @@
         (print 256)
         (print balance)
         (if (and (can-user-claim buyer)
-               (is-ok (contract-call? .rocket-token transfer-token funds-address balance))
-               (is-ok (as-contract (contract-call? .rocket-market mint buyer rocket-id size )))
+               (is-ok (contract-call? 'SP3GWX3NE58KXHESRYE4DYQ1S31PQJTCRXB3PE9SB.rocket-token transfer-token funds-address balance))
+               (is-ok (as-contract (contract-call? 'SP3GWX3NE58KXHESRYE4DYQ1S31PQJTCRXB3PE9SB.rocket-market mint buyer rocket-id size )))
                (map-delete orderbook ((buyer buyer))))
           (ok rocket-id)
           order-fulfillment-err)))))
@@ -142,4 +142,4 @@
 ;; Initialize the contract by
 ;; - taking ownership of rocket-market's mint function
 (begin
-  (as-contract (contract-call? .rocket-market set-factory)))
+  (as-contract (contract-call? 'SP3GWX3NE58KXHESRYE4DYQ1S31PQJTCRXB3PE9SB.rocket-market set-factory)))
