@@ -47,7 +47,7 @@
   (let ((approved-spender
          (unwrap! (get spender
                         (map-get? tokens-spender ((token-id token-id))))
-                   'false))) ;; return false if no specified spender
+                   false))) ;; return false if no specified spender
     (is-eq spender approved-spender)))
 
 ;; Tells whether an operator is approved by a given owner (isApprovedForAll method in ERC721)
@@ -56,9 +56,9 @@
     (get is-approved
       (map-get? accounts-operator ((operator operator) (account account)))
     )
-    'false
+    false
   )
-  ;; (default-to 'false
+  ;; (default-to false
   ;;   (get is-approved
   ;;   )
   ;; )
@@ -67,7 +67,7 @@
 (define-private (is-owner (actor principal) (token-id int))
   (is-eq actor
     ;; if no owner, return false
-    (unwrap! (nft-get-owner? non-fungible-token token-id) 'false)
+    (unwrap! (nft-get-owner? non-fungible-token token-id) false)
   )
 )
 
@@ -77,7 +77,7 @@
   (or
    (is-owner actor token-id)
    (is-spender-approved actor token-id)
-   (is-operator-approved (unwrap! (nft-get-owner? non-fungible-token token-id) 'false) actor)))
+   (is-operator-approved (unwrap! (nft-get-owner? non-fungible-token token-id) false) actor)))
 
 ;; Internal - Register token
 (define-private (register-token (new-owner principal) (token-id int))
@@ -87,7 +87,7 @@
       (map-set tokens-count
         ((owner new-owner))
         ((count (+ 1 current-balance))))
-      'true)))
+      true)))
 
 ;; Internal - Release token
 (define-private (release-token (owner principal) (token-id int))
@@ -98,7 +98,7 @@
       (map-set tokens-count
         ((owner owner))
         ((count (- current-balance 1))))
-      'true)))
+      true)))
 
 ;; Public functions
 
@@ -132,7 +132,7 @@
         (map-set accounts-operator
                     ((operator operator) (account tx-sender))
                     ((is-approved is-approved)))
-        (ok 'true))))
+        (ok true))))
 
 ;; Transfers the ownership of a given token ID to another address.
 (define-public (transfer-from (owner principal) (recipient principal) (token-id int))

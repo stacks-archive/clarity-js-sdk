@@ -1,5 +1,6 @@
+import * as fs from "fs";
 import * as path from "path";
-import { fileExists } from "./fsUtil";
+import { fileExists, getTempFilePath } from "./fsUtil";
 
 export const CONTRACT_FILE_EXT = ".clar";
 
@@ -30,4 +31,15 @@ export function getContractFilePath(contractFile: string): string {
   }
 
   throw new Error(`Could not find contract file: ${contractFile}`);
+}
+
+export function getNormalizedContractFilePath(contractFilePath: string): string {
+  const filePath = getContractFilePath(contractFilePath);
+  const contractSource = fs.readFileSync(filePath, "utf8")
+    .replace(/\r/g, "")
+    .replace(/\t/g, " ");
+  const tempName = `blockstack-contract-${path.basename(contractFilePath)}`;
+  const tempFilePath = getTempFilePath(`${tempName}-{uniqueID}.clar`);
+  fs.writeFileSync(tempFilePath, contractSource);
+  return tempFilePath;
 }

@@ -22,7 +22,7 @@ export class NonFungibleTokenClient extends Client {
       method: { name: "can-transfer", args: [`'${actor}`, `${tokenId}`] }
     });
     const res = await this.submitQuery(query);
-    return Result.unwrap(res).replace(/'/g, "") === "true";
+    return Result.unwrap(res) === "true";
   }
 
   async isSpenderApproved(spender: string, tokenId: number): Promise<number> {
@@ -60,7 +60,7 @@ export class NonFungibleTokenClient extends Client {
     params: { sender: string }
   ): Promise<Receipt> {
     const tx = this.createTransaction({
-      method: { name: "set-operator-approval", args: [`'${operator}`, `'${isApproved}`] }
+      method: { name: "set-operator-approval", args: [`'${operator}`, `${isApproved}`] }
     });
     await tx.sign(params.sender);
     const res = await this.submitTransaction(tx);
