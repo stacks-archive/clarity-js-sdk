@@ -58,7 +58,7 @@
   (let ((address
          (get address
               (unwrap! (map-get? factory-address ((id 0)))
-                        'false))))
+                        false))))
     (is-eq tx-sender address)))
 
 ;; Gets the owner of the specified rocket ID
@@ -115,7 +115,7 @@
           (map-set rockets-count
                       ((owner owner))
                       ((count (+ u1 current-balance))))
-          (ok 'true)
+          (ok true)
         )
       )
       unauthorized-mint-err))

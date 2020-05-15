@@ -10,6 +10,6 @@
     (print contract-caller)
     (print block-height)
     (print arg0)
-    (ok 'true)
+    (ok true)
   )
 )

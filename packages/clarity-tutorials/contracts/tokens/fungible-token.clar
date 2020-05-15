@@ -56,24 +56,24 @@
 (define-private (decrease-allowance (spender principal) (owner principal) (amount uint))
   (let ((allowance (allowance-of spender owner)))
     (if (or (> amount allowance) (<= amount u0))
-      'true
+      true
       (begin
         (map-set allowances
           ((spender spender) (owner owner))
           ((allowance (- allowance amount))))
-        'true))))
+        true))))
 
 ;; Internal - Increase allowance of a specified spender.
 (define-private (increase-allowance (spender principal) (owner principal) (amount uint))
   (let ((allowance (allowance-of spender owner)))
     (if (<= amount u0)
-      'false
+      false
       (begin
         (print (tuple (spender spender) (owner owner)))
         (print (map-set allowances
           ((spender spender) (owner owner))
           ((allowance (+ allowance amount)))))
-        'true))))
+        true))))
 
 ;; Public functions
 
@@ -86,19 +86,19 @@
 (define-public (transfer-from (owner principal) (recipient principal) (amount uint))
   (let ((allowance (allowance-of tx-sender owner)))
       (if (or (> amount allowance) (<= amount u0))
-        (err 'false)
+        (err false)
         (if (and
               (is-ok (ft-transfer? fungible-token amount owner recipient))
               (decrease-allowance tx-sender owner amount))
-          (ok 'true)
-          (err 'false)))))
+          (ok true)
+          (err false)))))
 
 ;; Update the allowance for a given spender
 (define-public (approve (spender principal) (amount uint))
   (if (and (> amount u0)
            (increase-allowance spender tx-sender amount))
       (ok amount)
-      (err 'false)))
+      (err false)))
 
 ;; Revoke a given spender
 (define-public (revoke (spender principal))
@@ -106,7 +106,7 @@
     (if (and (> allowance u0)
              (decrease-allowance spender tx-sender allowance))
         (ok 0)
-        (err 'false))))
+        (err false))))
 
 (define-public (balance-of (owner principal))
   (begin
@@ -117,7 +117,7 @@
 ;; Mint new tokens.
 (define-private (mint! (account principal) (amount uint))
   (if (<= amount u0)
-      (err 'false)
+      (err false)
       (begin
         (var-set total-supply (+ (var-get total-supply) amount))
         (ft-mint? fungible-token amount account)

@@ -46,7 +46,7 @@
 (define-private (can-user-buy (user principal))
   (let ((ordered-at-block
       (get ordered-at-block
-        (print (map-get? orderbook {buyer (print user)})))))
+        (print (map-get? orderbook {buyer: (print user)})))))
       (is-none ordered-at-block)))
 
 ;; Check if a given user can claim a rocket previously ordered
@@ -58,9 +58,9 @@
     (print "can-claim")
     (print block-height)
     (let ((ready-at-block
-        ;; shallow-return 'false if entry doesn't exist
+        ;; shallow-return false if entry doesn't exist
         (unwrap! (get ready-at-block
-          (map-get? orderbook {buyer user})) 'false)))
+          (map-get? orderbook {buyer: user})) false)))
       (begin
         (print ready-at-block)
         (>= block-height ready-at-block)
@@ -85,7 +85,7 @@
 ;; returns: Response<int, int>
 (define-public (order-rocket (size uint))
 (begin
-  (print (map-get? orderbook {buyer tx-sender}))
+  (print (map-get? orderbook {buyer: tx-sender}))
   (let ((down-payment (/ size u2))
     (rocket-id (new-rocket-id)))
     (if (and
@@ -95,12 +95,12 @@
       (if (and
         (is-ok (contract-call? .rocket-token transfer-token funds-address down-payment))
         (map-set orderbook
-          {buyer tx-sender}
-          { rocket-id (new-rocket-id)
-            ordered-at-block block-height
-            ready-at-block (+ block-height size)
-            size size
-            balance (- size down-payment) }))
+          {buyer: tx-sender}
+          { rocket-id: (new-rocket-id),
+            ordered-at-block: block-height,
+            ready-at-block: (+ block-height size),
+            size: size,
+            balance: (- size down-payment) }))
         (ok (var-get last-rocket-id))
         not-enough-tokens-err)
       invalid-or-duplicate-order-err))))
@@ -113,10 +113,10 @@
 (define-public (claim-rocket)
 (begin
   (print tx-sender)
-  (print (map-get? orderbook {buyer tx-sender}))
-  (print (map-get? orderbook {buyer tx-sender}))
+  (print (map-get? orderbook {buyer: tx-sender}))
+  (print (map-get? orderbook {buyer: tx-sender}))
   (let ((order-entry
-         (unwrap! (map-get? orderbook {buyer tx-sender})
+         (unwrap! (map-get? orderbook {buyer: tx-sender})
                    no-order-on-books-err)))
     (let ((buyer     tx-sender)
           (balance   (get balance order-entry))
@@ -135,7 +135,7 @@
 (define-public (mine-block)
   (begin
     (print block-height)
-    (ok 'true)
+    (ok true)
   )
 )
 
