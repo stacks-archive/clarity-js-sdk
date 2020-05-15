@@ -25,7 +25,7 @@ describe("generator tests [generator instance usage]", () => {
 
   it("create app generator", async () => {
     const result = modularGen.createAppGen({
-      args: [projectName],
+      args: [projectName, "hello-world"],
       options: { skipInstall: true }
     });
     const instance = result.createInstance();

@@ -26,7 +26,7 @@ describe("generator tests [env instance usage]", () => {
 
   it("create app generator", async () => {
     const result = modularGen.createAppGen({
-      args: [projectName],
+      args: [projectName, "hello-world"],
       options: { skipInstall: true }
     });
     env = result.env;
