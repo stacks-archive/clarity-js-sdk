@@ -54,13 +54,20 @@ function inheritDevDependencies(src: PackageJson, target: PackageJson, names: st
 }
 
 const PROJECT_DIR = "project_name";
+const TEMPLATE_HELLO_WORLD = "hello-world";
+const TEMPLATE_COUNTER = "counter";
+const TEMPLATE_ARGUMENT = "template";
 
-module.exports = class extends Generator {
+class ClarityGenerator extends Generator {
   packageJsonTemplateData: any;
 
   constructor(args: string | string[], options: any) {
     super(args, options);
     this.argument(PROJECT_DIR, { type: String, required: false });
+    this.argument(TEMPLATE_ARGUMENT, {
+      type: String,
+      required: false,
+    });
   }
 
   async prompting() {
@@ -76,18 +83,19 @@ module.exports = class extends Generator {
       const normalizedPath = projDirArg.replace(/\/|\\/g, path.sep);
       projDirArg = normalizedPath;
       destRoot = this.destinationRoot(projDirArg);
+      await this.promptForTemplate();
     } else {
       destRoot = this.destinationRoot();
       projDirArg = path.basename(destRoot);
 
       if (!isDirEmpty(destRoot)) {
-        const answers = await this.prompt([
-          {
-            name: PROJECT_DIR,
-            message: "Project name",
-            default: "clarity-dev-project"
-          }
-        ]);
+        await this.promptForTemplate();
+        const answers = await this.prompt([{
+          name: PROJECT_DIR,
+          message: "Project name",
+          default: `clarity-${this.options.template}`,
+          type: "input"
+        }]);
         projDirArg = answers[PROJECT_DIR];
         destRoot = this.destinationRoot(projDirArg);
       }
@@ -130,12 +138,24 @@ module.exports = class extends Generator {
       }
     };
 
-    copyFiles([".vscode/", "contracts/", "test/", "tsconfig.json"]);
+    copyFiles([".vscode/", "tsconfig.json", "test/mocha.opts"]);
 
-    this.fs.move(
-      this.destinationPath("test/hello-world.ts_template"),
-      this.destinationPath("test/hello-world.ts")
-    );
+    switch (this.options.template) {
+      case TEMPLATE_COUNTER:
+        copyFiles(["contracts/counter.clar", "test/counter.ts_template"]);
+        this.fs.move(
+          this.destinationPath("test/counter.ts_template"),
+          this.destinationPath("test/counter.ts")
+        );
+        break;
+      default:
+        copyFiles(["contracts/hello-world.clar", "test/hello-world.ts_template"]);
+        this.fs.move(
+          this.destinationPath("test/hello-world.ts_template"),
+          this.destinationPath("test/hello-world.ts")
+        );
+        break;
+    }
 
     this.fs.copy(this.templatePath("_.gitignore"), this.destinationPath(".gitignore"));
     try {
@@ -177,8 +197,25 @@ module.exports = class extends Generator {
     }
   }
 
+  async promptForTemplate() {
+    if (this.options.template) {
+      return this.options.template;
+    }
+
+    const { template } = await this.prompt([{
+      name: TEMPLATE_ARGUMENT,
+      message: `Template: one of [${TEMPLATE_HELLO_WORLD}, ${TEMPLATE_COUNTER}]`,
+      choices: [TEMPLATE_HELLO_WORLD, TEMPLATE_COUNTER],
+      default: TEMPLATE_HELLO_WORLD,
+    }]);
+    this.options.template = template;
+    return template;
+  }
+
   end() {
     const outputPath = this.destinationRoot();
     this.log(`Project created at ${outputPath}`);
   }
-};
+}
+
+module.exports = ClarityGenerator;

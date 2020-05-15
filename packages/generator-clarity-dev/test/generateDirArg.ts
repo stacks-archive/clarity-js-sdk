@@ -25,7 +25,7 @@ describe("specify output directory arg", () => {
 
   it("generate a project", async () => {
     const appPath = path.join(__dirname, "../generators/app");
-    generator = helpers.createGenerator(appPath, [], [projectName], {
+    generator = helpers.createGenerator(appPath, [], [projectName, "hello-world"], {
       skipInstall: true
     });
 

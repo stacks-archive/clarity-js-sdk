@@ -6,7 +6,7 @@
     "paths": {
       "@blockstack/*": ["packages/*/src"],
       "generator-clarity-dev": ["packages/generator-clarity-dev/src"],
-      "create-clarity-dev": ["packages/create-clarity-dev/src"]
+      "create-clarity-starter": ["packages/create-clarity-starter/src"]
     }
   }
 }

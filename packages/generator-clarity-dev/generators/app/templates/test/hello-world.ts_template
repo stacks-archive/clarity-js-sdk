@@ -7,7 +7,7 @@ describe("hello world contract test suite", () => {
 
   before(async () => {
     provider = await ProviderRegistry.createProvider();
-    helloWorldClient = new Client("SP3GWX3NE58KXHESRYE4DYQ1S31PQJTCRXB3PE9SB.hello-world", "sample/hello-world", provider);
+    helloWorldClient = new Client("SP3GWX3NE58KXHESRYE4DYQ1S31PQJTCRXB3PE9SB.hello-world", "hello-world", provider);
   });
 
   it("should have a valid syntax", async () => {

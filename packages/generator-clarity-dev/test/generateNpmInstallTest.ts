@@ -25,7 +25,8 @@ describe("generate project with `npm install` and `npm test`", () => {
   it("create app generator instance", async () => {
     const appPath = path.join(__dirname, "../generators/app");
     generator = helpers.createGenerator(appPath, [], [projectName], {
-      skipInstall: false
+      skipInstall: false,
+      template: "hello-world",
     });
   });
 

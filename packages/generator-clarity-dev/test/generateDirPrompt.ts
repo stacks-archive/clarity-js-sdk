@@ -32,7 +32,7 @@ describe("prompt user for outputting into in non-empty dir", () => {
     generator = helpers.createGenerator(appPath, [], [], {
       skipInstall: true
     });
-    helpers.mockPrompt(generator, { project_name: "tmp-example" });
+    helpers.mockPrompt(generator, { project_name: "tmp-example", template: "hello-world" });
 
     // Run yo-generator to output project.
     await Promise.resolve(generator.run());
