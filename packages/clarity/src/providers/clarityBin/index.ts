@@ -1,7 +1,7 @@
 import fs from "fs-extra";
 import { CheckResult, Receipt } from "../../core";
 import { Provider } from "../../core/provider";
-import { getContractFilePath } from "../../utils/contractSourceDir";
+import { getNormalizedContractFilePath } from "../../utils/contractSourceDir";
 import { getTempFilePath } from "../../utils/fsUtil";
 import { executeCommand } from "../../utils/processUtil";
 
@@ -102,7 +102,7 @@ export class NativeClarityBinProvider implements Provider {
   }
 
   async checkContract(contractFilePath: string): Promise<CheckResult> {
-    const filePath = getContractFilePath(contractFilePath);
+    const filePath = getNormalizedContractFilePath(contractFilePath);
     const result = await this.runCommand(["check", filePath, this.dbFilePath, "--output_analysis"]);
     if (result.exitCode !== 0) {
       return {
@@ -119,7 +119,7 @@ export class NativeClarityBinProvider implements Provider {
   }
 
   async launchContract(contractName: string, contractFilePath: string): Promise<Receipt> {
-    const filePath = getContractFilePath(contractFilePath);
+    const filePath = getNormalizedContractFilePath(contractFilePath);
 
     const result = await this.runCommand(["launch", contractName, filePath, this.dbFilePath]);
     if (result.exitCode !== 0) {
