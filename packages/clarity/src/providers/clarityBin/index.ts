@@ -107,7 +107,7 @@ export class NativeClarityBinProvider implements Provider {
     if (result.exitCode !== 0) {
       return {
         success: false,
-        error: result.stdout + '\n' + result.stderr
+        error: result.stdout + "\n" + result.stderr
       };
     } else {
       const contractInterface = JSON.parse(result.stdout);

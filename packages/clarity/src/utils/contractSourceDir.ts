@@ -1,5 +1,5 @@
-import * as path from "path";
 import * as fs from "fs";
+import * as path from "path";
 import { fileExists, getTempFilePath } from "./fsUtil";
 
 export const CONTRACT_FILE_EXT = ".clar";
@@ -35,10 +35,11 @@ export function getContractFilePath(contractFile: string): string {
 
 export function getNormalizedContractFilePath(contractFilePath: string): string {
   const filePath = getContractFilePath(contractFilePath);
-  const contractSource = fs.readFileSync(filePath, 'utf8')
-    .replace(/\r/g, '')
-    .replace(/\t/g, ' ');
-  const tempFilePath = getTempFilePath("blockstack-contract-{uniqueID}.db");
+  const contractSource = fs.readFileSync(filePath, "utf8")
+    .replace(/\r/g, "")
+    .replace(/\t/g, " ");
+  const tempName = `blockstack-contract-${path.basename(contractFilePath)}`;
+  const tempFilePath = getTempFilePath(`${tempName}-{uniqueID}.clar`);
   fs.writeFileSync(tempFilePath, contractSource);
-  return contractSource;
+  return tempFilePath;
 }
