@@ -37,7 +37,8 @@
   ],
   "dependencies": {
     "@blockstack/clarity": "^0.1.16",
-    "@blockstack/clarity-native-bin": "^0.1.16"
+    "@blockstack/clarity-native-bin": "^0.1.16",
+    "@blockstack/stacks-transactions": "^0.4.6"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",

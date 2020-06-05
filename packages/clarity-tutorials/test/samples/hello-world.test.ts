@@ -1,12 +1,29 @@
-import { Client, Provider, ProviderRegistry, Result } from "@blockstack/clarity";
+import { Client, Provider, ProviderRegistry, Result, JsonRpcProvider } from "@blockstack/clarity";
+import { StacksTestnet } from "@blockstack/stacks-transactions";
 
 describe("hello world contract test suite", () => {
   let helloWorldClient: Client;
   let provider: Provider;
 
   beforeAll(async () => {
+    ProviderRegistry.registerProvider({
+      create: async () => {
+        const provider = JsonRpcProvider.create(
+          new StacksTestnet(),
+          "https://sidecar.staging.blockstack.xyz/",
+          "44767e169d5146c704a308d7ff2e3edac573e2649fb690aa4e8526480678d19e01"
+        );
+
+        return provider;
+      },
+    });
     provider = await ProviderRegistry.createProvider();
-    helloWorldClient = new Client("SP3GWX3NE58KXHESRYE4DYQ1S31PQJTCRXB3PE9SB.hello-world", "samples/hello-world", provider);
+
+    helloWorldClient = new Client(
+      "ST398K1WZTBVY6FE2YEHM6HP20VSNVSSPJTW0D53M.hello-world",
+      "samples/hello-world",
+      provider
+    );
   });
 
   it("should have a valid syntax", async () => {
@@ -27,7 +44,7 @@ describe("hello world contract test suite", () => {
 
     it("should echo number", async () => {
       const query = helloWorldClient.createQuery({
-        method: { name: "echo-number", args: ["123"] }
+        method: { name: "echo-number", args: ["123"] },
       });
       const receipt = await helloWorldClient.submitQuery(query);
       const result = Result.unwrapInt(receipt);
