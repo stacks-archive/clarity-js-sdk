@@ -8,8 +8,10 @@ describe("hello world contract test suite", () => {
   beforeAll(async () => {
     ProviderRegistry.registerProvider({
       create: async () => {
+        const network = new StacksTestnet();
+        network.coreApiUrl = "http://localhost:20443";
         const provider = JsonRpcProvider.create(
-          new StacksTestnet(),
+          network,
           "https://sidecar.staging.blockstack.xyz/",
           "44767e169d5146c704a308d7ff2e3edac573e2649fb690aa4e8526480678d19e01"
         );
