@@ -40,6 +40,7 @@ describe("hello world contract test suite", () => {
     it("should return 'hello world'", async () => {
       const query = helloWorldClient.createQuery({ method: { name: "say-hi", args: [] } });
       const receipt = await helloWorldClient.submitQuery(query);
+      expect(receipt.success).toBeTruthy();
       const result = Result.unwrapString(receipt);
       expect(result).toEqual("hello world");
     });
@@ -49,6 +50,7 @@ describe("hello world contract test suite", () => {
         method: { name: "echo-number", args: ["123"] },
       });
       const receipt = await helloWorldClient.submitQuery(query);
+      expect(receipt.success).toBeTruthy();
       const result = Result.unwrapInt(receipt);
       expect(result).toEqual(123);
     });

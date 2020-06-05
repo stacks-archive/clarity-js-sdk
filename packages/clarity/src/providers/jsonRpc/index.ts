@@ -43,7 +43,6 @@ export class JsonRpcProvider implements Provider {
 
   async launchContract(contractName: string, contractFilePath: string): Promise<Receipt> {
     const contractNameParts = contractName.split(".");
-    console.log(contractNameParts);
     const filePath = getNormalizedContractFilePath(contractFilePath);
     const codeBody = readFileSync(filePath);
     let tx = await makeSmartContractDeploy({
@@ -53,7 +52,6 @@ export class JsonRpcProvider implements Provider {
       network: this.network,
       fee: new BN(0),
     });
-    console.log("estimate fees");
     const fee = await estimateContractDeploy(tx, this.network);
     tx = await makeSmartContractDeploy({
       contractName: contractNameParts[1],
@@ -62,9 +60,7 @@ export class JsonRpcProvider implements Provider {
       network: this.network,
       fee: fee,
     });
-    console.log("fees " + fee);
     const txId = await broadcastTransaction(tx, this.network);
-    console.log(txId);
     return {
       success: true,
     };
@@ -76,7 +72,6 @@ export class JsonRpcProvider implements Provider {
     senderAddress: string,
     ...args: string[]
   ): Promise<Receipt> {
-    console.log({ contractName });
     const abi = await getAbi(this.contractAddress, contractName, this.network);
     const filtered = abi.functions.filter((fn) => fn.name === functionName);
     if (filtered.length === 1) {
@@ -93,7 +88,6 @@ export class JsonRpcProvider implements Provider {
       });
 
       const txId = await broadcastTransaction(tx, this.network);
-      console.log(txId);
     }
     return {
       success: true,
@@ -111,6 +105,13 @@ export class JsonRpcProvider implements Provider {
     evalStatement: string,
     includeDebugOutput = true
   ): Promise<Receipt> {
+    const queryParts = evalStatement.split(" ");
+    const result = await this.execute(
+      contractName,
+      queryParts[0],
+      this.privateKey,
+      ...queryParts.slice(1)
+    );
     return {
       success: false,
     };
