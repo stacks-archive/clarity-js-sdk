@@ -41,10 +41,10 @@ export class ProviderRegistry {
               "error loading dynamically imported module",
               "error resolving module specifier",
               "failed to fetch dynamically imported module",
-              "failed to resolve module"
+              "failed to resolve module",
             ];
             const errMsg = (e.message as string).toLowerCase();
-            if (importErrStrings.some(errStr => errMsg.includes(errStr))) {
+            if (importErrStrings.some((errStr) => errMsg.includes(errStr))) {
               return false;
             }
           }
@@ -52,7 +52,7 @@ export class ProviderRegistry {
         }
         const nativeBinFile = nativeBinModule.getDefaultBinaryFilePath();
         const providerConstructor: ProviderConstructor = {
-          create: () => NativeClarityBinProvider.createEphemeral(nativeBinFile)
+          create: () => NativeClarityBinProvider.createEphemeral(nativeBinFile),
         };
         // Reset the cached promise so that future invocations have the chance to retry.
         this.defaultLoadCachedPromise = undefined;

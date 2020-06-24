@@ -10,15 +10,16 @@ describe("hello world contract test suite", () => {
       create: async () => {
         const network = new StacksTestnet();
         network.coreApiUrl = "http://localhost:20443";
-        const provider = JsonRpcProvider.create(
+        const provider = await JsonRpcProvider.create(
           network,
-          "https://sidecar.staging.blockstack.xyz/",
+          "https://sidecar.staging.blockstack.xyz",
           "44767e169d5146c704a308d7ff2e3edac573e2649fb690aa4e8526480678d19e01"
         );
 
         return provider;
       },
     });
+
     provider = await ProviderRegistry.createProvider();
 
     helloWorldClient = new Client(
