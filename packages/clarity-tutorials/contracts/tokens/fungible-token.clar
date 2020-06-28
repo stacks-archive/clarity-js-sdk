@@ -108,7 +108,7 @@
         (ok 0)
         (err false))))
 
-(define-public (balance-of (owner principal))
+(define-read-only (balance-of (owner principal))
   (begin
       (print owner)
       (ok (ft-get-balance fungible-token owner))
@@ -125,5 +125,5 @@
 
 ;; Initialize the contract
 (begin
-  (mint! 'SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7 u20)
+  (mint! 'ST398K1WZTBVY6FE2YEHM6HP20VSNVSSPJTW0D53M u20)
   (mint! 'S02J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKPVKG2CE u10))

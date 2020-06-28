@@ -13,3 +13,12 @@
     (ok true)
   )
 )
+
+(define-read-only (info-read-only (arg0 principal))
+  {
+    tx-sender: tx-sender,
+    contract-caller: contract-caller,
+    block-height: block-height,
+    arg0: arg0,
+  }
+)
