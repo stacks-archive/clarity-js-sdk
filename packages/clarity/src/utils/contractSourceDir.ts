@@ -1,14 +1,14 @@
-import * as fs from "fs";
-import * as path from "path";
-import { fileExists, getTempFilePath } from "./fsUtil";
+import * as fs from 'fs';
+import * as path from 'path';
+import { fileExists, getTempFilePath } from './fsUtil';
 
-export const CONTRACT_FILE_EXT = ".clar";
+export const CONTRACT_FILE_EXT = '.clar';
 
 export function getContractFilePath(contractFile: string): string {
   function* getLocations(file: string): IterableIterator<string> {
     yield path.resolve(file);
-    yield path.resolve("contracts", file);
-    yield path.resolve(__dirname, "contracts", file);
+    yield path.resolve('contracts', file);
+    yield path.resolve(__dirname, 'contracts', file);
     yield path.resolve(__dirname, file);
     if (!file.endsWith(CONTRACT_FILE_EXT)) {
       for (const f of getLocations(file + CONTRACT_FILE_EXT)) {
@@ -35,9 +35,7 @@ export function getContractFilePath(contractFile: string): string {
 
 export function getNormalizedContractFilePath(contractFilePath: string): string {
   const filePath = getContractFilePath(contractFilePath);
-  const contractSource = fs.readFileSync(filePath, "utf8")
-    .replace(/\r/g, "")
-    .replace(/\t/g, " ");
+  const contractSource = fs.readFileSync(filePath, 'utf8').replace(/\r/g, '').replace(/\t/g, ' ');
   const tempName = `blockstack-contract-${path.basename(contractFilePath)}`;
   const tempFilePath = getTempFilePath(`${tempName}-{uniqueID}.clar`);
   fs.writeFileSync(tempFilePath, contractSource);

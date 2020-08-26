@@ -1,27 +1,27 @@
-import * as fs from "fs-extra";
-import fetch from "node-fetch";
-import * as os from "os";
-import * as path from "path";
-import * as tar from "tar";
-import { detectArch } from "./detectArch";
-import { detectLibc } from "./detectLibc";
-import { getExecutableFileName, makeUniqueTempDir } from "./fsUtil";
-import { ILogger } from "./logger";
-import { pipelineAsync } from "./streamUtil";
+import * as fs from 'fs-extra';
+import fetch from 'node-fetch';
+import * as os from 'os';
+import * as path from 'path';
+import * as tar from 'tar';
+import { detectArch } from './detectArch';
+import { detectLibc } from './detectLibc';
+import { getExecutableFileName, makeUniqueTempDir } from './fsUtil';
+import { ILogger } from './logger';
+import { pipelineAsync } from './streamUtil';
 
 const DIST_DOWNLOAD_URL_TEMPLATE =
-  "https://github.com/blockstack/clarity-js-sdk/releases/" +
-  "download/{tag}/clarity-cli-{platform}-{arch}.tar.gz";
+  'https://github.com/blockstack/clarity-js-sdk/releases/' +
+  'download/{tag}/clarity-cli-{platform}-{arch}.tar.gz';
 
 const enum SupportedDistPlatform {
-  WINDOWS = "win",
-  MACOS = "mac",
-  LINUX = "linux",
-  LINUX_MUSL = "linux-musl"
+  WINDOWS = 'win',
+  MACOS = 'mac',
+  LINUX = 'linux',
+  LINUX_MUSL = 'linux-musl',
 }
 
 const enum SupportedDistArch {
-  x64 = "x64"
+  x64 = 'x64',
 }
 
 /**
@@ -35,7 +35,7 @@ export function isDistAvailable(
   let arch: SupportedDistArch;
   const detectedArch = detectArch(logger);
   switch (detectedArch) {
-    case "x64":
+    case 'x64':
       arch = SupportedDistArch.x64;
       break;
     default:
@@ -47,14 +47,14 @@ export function isDistAvailable(
 
   let platform: SupportedDistPlatform;
   switch (os.platform()) {
-    case "win32":
-    case "cygwin":
+    case 'win32':
+    case 'cygwin':
       platform = SupportedDistPlatform.WINDOWS;
       break;
-    case "darwin":
+    case 'darwin':
       platform = SupportedDistPlatform.MACOS;
       break;
-    case "linux":
+    case 'linux':
       if (detectLibc().isNonGlibcLinux) {
         platform = SupportedDistPlatform.LINUX_MUSL;
       } else {
@@ -69,7 +69,7 @@ export function isDistAvailable(
   }
   return {
     platform,
-    arch
+    arch,
   };
 }
 
@@ -83,9 +83,9 @@ export function getDownloadUrl(logger: ILogger, versionTag: string): string | fa
   if (!distInfo) {
     return false;
   }
-  const downloadUrl = DIST_DOWNLOAD_URL_TEMPLATE.replace("{tag}", versionTag)
-    .replace("{platform}", distInfo.platform)
-    .replace("{arch}", distInfo.arch);
+  const downloadUrl = DIST_DOWNLOAD_URL_TEMPLATE.replace('{tag}', versionTag)
+    .replace('{platform}', distInfo.platform)
+    .replace('{arch}', distInfo.arch);
   return downloadUrl;
 }
 
@@ -105,7 +105,7 @@ export async function fetchDistributable(opts: {
   }
 
   opts.logger.log(`Fetching ${downloadUrl}`);
-  const httpResponse = await fetch(downloadUrl, { redirect: "follow" });
+  const httpResponse = await fetch(downloadUrl, { redirect: 'follow' });
   if (!httpResponse.ok) {
     opts.logger.error(`Bad http response ${httpResponse.status} ${httpResponse.statusText}`);
     return false;
@@ -117,7 +117,7 @@ export async function fetchDistributable(opts: {
   const tarStream = tar.extract({ cwd: tempExtractDir });
   await pipelineAsync(httpResponse.body, tarStream);
 
-  const binFileName = getExecutableFileName("clarity-cli");
+  const binFileName = getExecutableFileName('clarity-cli');
   const tempBinFilePath = path.join(tempExtractDir, binFileName);
 
   opts.logger.log(`Moving ${tempBinFilePath} to ${opts.outputFilePath}`);

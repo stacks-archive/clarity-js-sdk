@@ -1,4 +1,4 @@
-import { installDefaultPath } from ".";
+import { installDefaultPath } from '.';
 
 // Warning: Importing this module will trigger an immediate installation attempt that will
 // exit the process if failed. This script is only intended to be invoked from the

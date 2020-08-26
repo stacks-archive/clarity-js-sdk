@@ -25,10 +25,10 @@ export interface TupleAtomicType {
 }
 
 export type AtomicType =
-  | "NoType"
-  | "IntType"
-  | "BoolType"
-  | "PrincipalType"
+  | 'NoType'
+  | 'IntType'
+  | 'BoolType'
+  | 'PrincipalType'
   | BufferAtomicType
   | OptionalType
   | ResponseType

@@ -1,4 +1,4 @@
-import { Method, Receipt } from ".";
+import { Method, Receipt } from '.';
 
 export class Transaction {
   sender?: string;
@@ -11,13 +11,13 @@ export class Transaction {
 
   validate = async (): Promise<boolean> => {
     if (!this.sender) {
-      throw Error("Transaction should be signed");
+      throw Error('Transaction should be signed');
     }
     return true;
-  }
+  };
 
   sign = async (sender: string): Promise<boolean> => {
     this.sender = sender;
     return true;
-  }
+  };
 }

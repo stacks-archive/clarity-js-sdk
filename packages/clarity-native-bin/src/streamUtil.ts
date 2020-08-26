@@ -1,4 +1,4 @@
-import * as readline from "readline";
+import * as readline from 'readline';
 import {
   finished,
   PassThrough,
@@ -6,9 +6,9 @@ import {
   Readable,
   Transform,
   Writable,
-  WritableOptions
-} from "stream";
-import { promisify } from "util";
+  WritableOptions,
+} from 'stream';
+import { promisify } from 'util';
 
 export const pipelineAsync = promisify(pipeline);
 
@@ -45,9 +45,9 @@ export async function readStream(
       const passThrough = new PassThrough();
       const readStreamLine = readline.createInterface({
         input: passThrough,
-        crlfDelay: Infinity
+        crlfDelay: Infinity,
       });
-      readStreamLine.on("line", lineData => {
+      readStreamLine.on('line', lineData => {
         monitorCallback(lineData);
       });
       streamArr.push(passThrough);

@@ -10,19 +10,19 @@
  > os.arch() will return a misleading 'x86' (32-bit) value, instead of 'x64' (64-bit).
  */
 
-import cp from "child_process";
-import fs from "fs";
-import os from "os";
-import path from "path";
-import { ConsoleLogger, ILogger } from "./logger";
+import cp from 'child_process';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
+import { ConsoleLogger, ILogger } from './logger';
 
 export function detectArch(logger: ILogger = ConsoleLogger): string {
   try {
     /**
      * The running binary is 64-bit, so the OS is clearly 64-bit.
      */
-    if (process.arch === "x64") {
-      return "x64";
+    if (process.arch === 'x64') {
+      return 'x64';
     }
 
     /**
@@ -30,7 +30,7 @@ export function detectArch(logger: ILogger = ConsoleLogger): string {
      * app is based on the presence of a WOW64 file: %SystemRoot%\SysNative.
      * See: https://twitter.com/feross/status/776949077208510464
      */
-    if (process.platform === "win32" && os.arch() === "ia32") {
+    if (process.platform === 'win32' && os.arch() === 'ia32') {
       let useEnv = false;
       try {
         useEnv = !!(process.env.SYSTEMROOT && fs.statSync(process.env.SYSTEMROOT));
@@ -38,27 +38,27 @@ export function detectArch(logger: ILogger = ConsoleLogger): string {
         // ignore
       }
 
-      const sysRoot = useEnv ? process.env.SYSTEMROOT! : "C:\\Windows";
+      const sysRoot = useEnv ? process.env.SYSTEMROOT! : 'C:\\Windows';
 
       // If %SystemRoot%\SysNative exists, we are in a WOW64 FS Redirected application.
       let isWOW64 = false;
       try {
-        isWOW64 = !!fs.statSync(path.join(sysRoot, "sysnative"));
+        isWOW64 = !!fs.statSync(path.join(sysRoot, 'sysnative'));
       } catch (err) {
         // ignore
       }
       if (isWOW64) {
-        return "x64";
+        return 'x64';
       }
     }
 
     /**
      * On Linux, use the `getconf` command to get the architecture.
      */
-    if (process.platform === "linux" && os.arch() === "ia32") {
-      const output = cp.execSync("getconf LONG_BIT", { encoding: "utf8" });
-      if (output === "64\n") {
-        return "x64";
+    if (process.platform === 'linux' && os.arch() === 'ia32') {
+      const output = cp.execSync('getconf LONG_BIT', { encoding: 'utf8' });
+      if (output === '64\n') {
+        return 'x64';
       }
     }
   } catch (error) {

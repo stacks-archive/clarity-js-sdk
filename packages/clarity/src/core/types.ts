@@ -1,5 +1,5 @@
-import { ContractInterface } from "./contractInterface";
-import { ResultInterface } from "./result";
+import { ContractInterface } from './contractInterface';
+import { ResultInterface } from './result';
 
 export interface Var {
   name: string;

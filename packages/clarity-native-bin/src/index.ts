@@ -1,19 +1,19 @@
-import * as fs from "fs-extra";
-import * as path from "path";
-import { cargoInstall } from "./cargoBuild";
-import { fetchDistributable, getDownloadUrl } from "./fetchDist";
-import { getExecutableFileName, moveFromPath, verifyOutputFile } from "./fsUtil";
-import { ConsoleLogger, ILogger } from "./logger";
+import * as fs from 'fs-extra';
+import * as path from 'path';
+import { cargoInstall } from './cargoBuild';
+import { fetchDistributable, getDownloadUrl } from './fetchDist';
+import { getExecutableFileName, moveFromPath, verifyOutputFile } from './fsUtil';
+import { ConsoleLogger, ILogger } from './logger';
 
 /**
  * Should correspond to both a git tag on the blockstack-core repo and a
  * set of clarity-binary distributables uploaded to the cloud storage endpoint.
  */
-export const CORE_SDK_TAG = "clarity-sdk-v0.1.0";
+export const CORE_SDK_TAG = 'clarity-sdk-v0.1.0';
 
-export const BLOCKSTACK_CORE_SOURCE_TAG_ENV_VAR = "BLOCKSTACK_CORE_SOURCE_TAG";
-export const BLOCKSTACK_CORE_SOURCE_BRANCH_ENV_VAR = "BLOCKSTACK_CORE_SOURCE_BRANCH";
-export const BLOCKSTACK_CORE_SOURCE_PATH_ENV_VAR = "BLOCKSTACK_CORE_SOURCE_PATH";
+export const BLOCKSTACK_CORE_SOURCE_TAG_ENV_VAR = 'BLOCKSTACK_CORE_SOURCE_TAG';
+export const BLOCKSTACK_CORE_SOURCE_BRANCH_ENV_VAR = 'BLOCKSTACK_CORE_SOURCE_BRANCH';
+export const BLOCKSTACK_CORE_SOURCE_PATH_ENV_VAR = 'BLOCKSTACK_CORE_SOURCE_PATH';
 
 /**
  * A git tag or branch name can be specified as an env var.
@@ -22,18 +22,19 @@ export const BLOCKSTACK_CORE_SOURCE_PATH_ENV_VAR = "BLOCKSTACK_CORE_SOURCE_PATH"
  * Otherwise returns false.
  */
 function getOverriddenCoreSource():
-  false | { specifier: "branch" | "tag" | "path"; value: string } {
+  | false
+  | { specifier: 'branch' | 'tag' | 'path'; value: string } {
   for (const [key, val] of Object.entries(process.env)) {
     if (val === undefined) {
       continue;
     }
     const keyStr = key.toLocaleUpperCase();
     if (keyStr === BLOCKSTACK_CORE_SOURCE_TAG_ENV_VAR) {
-      return { specifier: "tag", value: val };
+      return { specifier: 'tag', value: val };
     } else if (keyStr === BLOCKSTACK_CORE_SOURCE_BRANCH_ENV_VAR) {
-      return { specifier: "branch", value: val };
+      return { specifier: 'branch', value: val };
     } else if (keyStr === BLOCKSTACK_CORE_SOURCE_PATH_ENV_VAR) {
-      return { specifier: "path", value: val };
+      return { specifier: 'path', value: val };
     }
   }
   return false;
@@ -44,7 +45,7 @@ function getOverriddenCoreSource():
  * @see https://stackoverflow.com/a/49455609/794962
  */
 function getThisPackageDir(): string {
-  const packagePath = path.dirname(require.resolve("../package.json"));
+  const packagePath = path.dirname(require.resolve('../package.json'));
   return packagePath;
 }
 
@@ -56,14 +57,14 @@ function getThisPackageDir(): string {
  */
 export function getDefaultBinaryFilePath({
   checkExists = true,
-  versionTag
+  versionTag,
 }: { checkExists?: boolean; versionTag?: string } = {}): string {
   if (!versionTag) {
     versionTag = CORE_SDK_TAG;
   }
   const thisPkgDir = path.resolve(getThisPackageDir());
-  const binFileName = getExecutableFileName("clarity-cli");
-  const binFilePath = path.join(thisPkgDir, ".native-bin", versionTag, binFileName);
+  const binFileName = getExecutableFileName('clarity-cli');
+  const binFilePath = path.join(thisPkgDir, '.native-bin', versionTag, binFileName);
   if (checkExists && !fs.existsSync(binFilePath)) {
     throw new Error(`Native binary does not appear to be installed at ${binFilePath}`);
   }
@@ -80,10 +81,10 @@ export async function installDefaultPath(): Promise<boolean> {
 
   // Check if source git tag/branch was specified using env var
   const sourceOverride = getOverriddenCoreSource();
-  if (sourceOverride !== false && sourceOverride.specifier !== "path") {
+  if (sourceOverride !== false && sourceOverride.specifier !== 'path') {
     logger.log(`Found git source env var ${sourceOverride.specifier}=${sourceOverride.value}`);
     fromSource = true;
-    if (sourceOverride.specifier === "branch") {
+    if (sourceOverride.specifier === 'branch') {
       versionTag = undefined;
       versionBranch = sourceOverride.value;
     } else {
@@ -110,9 +111,9 @@ export async function installDefaultPath(): Promise<boolean> {
       overwriteExisting: true,
       outputFilePath: installPath,
       gitBranch: versionBranch,
-      gitTag: versionTag
+      gitTag: versionTag,
     });
-  } else if (sourceOverride && sourceOverride.specifier === "path") {
+  } else if (sourceOverride && sourceOverride.specifier === 'path') {
     success = moveFromPath({
       logger,
       outputFilePath: installPath,
@@ -123,7 +124,7 @@ export async function installDefaultPath(): Promise<boolean> {
       logger: logger,
       overwriteExisting: true,
       outputFilePath: installPath,
-      versionTag: versionTag!
+      versionTag: versionTag!,
     });
   }
 

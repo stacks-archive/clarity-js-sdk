@@ -1,7 +1,7 @@
-import { Method, Query, Receipt, Transaction } from ".";
-import { Provider } from "./provider";
-import { Result } from "./result";
-import { CheckResult } from "./types";
+import { Method, Query, Receipt, Transaction } from '.';
+import { Provider } from './provider';
+import { Result } from './result';
+import { CheckResult } from './types';
 
 export class Client {
   name: string;
@@ -19,24 +19,24 @@ export class Client {
     if (!checkResult.success) {
       throw new Error(checkResult.error);
     }
-  }
+  };
 
   deployContract = async (): Promise<Receipt> => {
     const receipt = await this.provider.launchContract(this.name, this.filePath);
     return receipt;
-  }
+  };
 
   createTransaction = (params?: { method?: Method }): Transaction => {
     const tx = new Transaction(params && params.method);
     return tx;
-  }
+  };
 
   submitTransaction = async (tx: Transaction): Promise<Receipt> => {
     if (!tx.sender) {
-      throw new Error("Transaction should have `sender` property");
+      throw new Error('Transaction should have `sender` property');
     }
     if (!tx.method) {
-      throw new Error("Transaction should have `method` property");
+      throw new Error('Transaction should have `method` property');
     }
     let receipt: Receipt;
     try {
@@ -50,12 +50,12 @@ export class Client {
       receipt = { success: false, error: error };
     }
     return receipt;
-  }
+  };
 
-  createQuery = (params: { method?: Method, atChaintip?: boolean }): Query => {
+  createQuery = (params: { method?: Method; atChaintip?: boolean }): Query => {
     const query = new Query(params.method, params.atChaintip);
     return query;
-  }
+  };
 
   submitQuery = async (query: Query): Promise<Receipt> => {
     // let res = await this.node.execute(
@@ -65,14 +65,14 @@ export class Client {
     //     ...query.method.args)
 
     if (!query.method) {
-      throw new Error("Query should target a method");
+      throw new Error('Query should target a method');
     }
     const res = await this.provider.eval(
       this.name,
-      `(${query.method.name} ${query.method.args.join(" ")})`,
+      `(${query.method.name} ${query.method.args.join(' ')})`,
       true,
-      query.atChaintip,
+      query.atChaintip
     );
     return res;
-  }
+  };
 }

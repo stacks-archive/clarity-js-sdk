@@ -1,4 +1,4 @@
-import { CheckResult, Receipt } from ".";
+import { CheckResult, Receipt } from '.';
 
 export interface ProviderConstructor {
   create(): Promise<Provider>;
@@ -19,7 +19,10 @@ export interface Provider {
   ): Promise<Receipt>;
 
   eval(
-    contractName: string, evalStatement: string, includeDebugOutput?: boolean, atChaintip?: boolean
+    contractName: string,
+    evalStatement: string,
+    includeDebugOutput?: boolean,
+    atChaintip?: boolean
   ): Promise<Receipt>;
 
   evalRaw(evalStatement: string): Promise<Receipt>;

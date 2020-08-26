@@ -1,4 +1,4 @@
-import { Method, Receipt } from ".";
+import { Method, Receipt } from '.';
 
 export class Query {
   receipt?: Receipt;
@@ -12,8 +12,8 @@ export class Query {
 
   validate = async (): Promise<boolean> => {
     if (!this.method) {
-      throw Error("Query should target a method");
+      throw Error('Query should target a method');
     }
     return true;
-  }
+  };
 }

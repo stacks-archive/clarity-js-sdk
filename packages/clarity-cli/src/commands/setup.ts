@@ -1,20 +1,20 @@
-import * as clarityNativeBin from "@blockstack/clarity-native-bin";
-import { Command, flags } from "@oclif/command";
+import * as clarityNativeBin from '@blockstack/clarity-native-bin';
+import { Command, flags } from '@oclif/command';
 
 export default class Setup extends Command {
-  static description = "Install blockstack-core and its dependencies";
+  static description = 'Install blockstack-core and its dependencies';
 
   static examples = [`$ clarity setup`];
 
   static flags = {
     from_source: flags.boolean({
-      description: "Compile binary from Rust source instead of downloading distributable.",
-      default: false
+      description: 'Compile binary from Rust source instead of downloading distributable.',
+      default: false,
     }),
     overwrite: flags.boolean({
-      description: "Overwrites an existing installed clarity-cli bin file.",
-      default: false
-    })
+      description: 'Overwrites an existing installed clarity-cli bin file.',
+      default: false,
+    }),
   };
 
   static args: any[] = [];
@@ -29,13 +29,13 @@ export default class Setup extends Command {
       logger: this,
       overwriteExisting: flags.overwrite,
       outputFilePath: installPath,
-      versionTag: versionTag
+      versionTag: versionTag,
     });
 
     if (!success) {
       this.exit(1);
     } else {
-      this.log("Installed native clarity-cli binary successful.");
+      this.log('Installed native clarity-cli binary successful.');
     }
   }
 }

@@ -1,12 +1,12 @@
-import path = require("path");
-import YeoEnv = require("yeoman-environment");
-import Generator = require("yeoman-generator");
+import path = require('path');
+import YeoEnv = require('yeoman-environment');
+import Generator = require('yeoman-generator');
 
-export const GENERATOR_NAME = "clarity:dev";
+export const GENERATOR_NAME = 'clarity:dev';
 
 export function createAppGen({
   args,
-  options
+  options,
 }: {
   args?: string | string[];
   options?: {
@@ -14,7 +14,7 @@ export function createAppGen({
     skipInstall?: boolean;
   };
 } = {}) {
-  const appPath = path.join(__dirname, "../generators/app");
+  const appPath = path.join(__dirname, '../generators/app');
   const env = YeoEnv.createEnv();
   env.register(appPath, GENERATOR_NAME);
 
@@ -23,13 +23,13 @@ export function createAppGen({
     const instance = (env.create(GENERATOR_NAME, genOpts) as unknown) as Generator;
     return {
       generator: instance,
-      run: () => Promise.resolve(instance.run()) as Promise<unknown>
+      run: () => Promise.resolve(instance.run()) as Promise<unknown>,
     };
   };
 
   const runFn = () => {
     const runArgs = [GENERATOR_NAME];
-    if (typeof args === "string") {
+    if (typeof args === 'string') {
       runArgs.push(args);
     } else if (Array.isArray(args)) {
       runArgs.push(...args);

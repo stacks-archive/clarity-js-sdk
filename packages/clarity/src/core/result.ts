@@ -65,13 +65,13 @@ export function unwrapResult<T extends ResultInterface<unknown, unknown>>(input:
     if (input.error) {
       if (input.error instanceof Error) {
         throw input.error;
-      } else if (typeof input.error === "string") {
+      } else if (typeof input.error === 'string') {
         throw new Error(input.error);
       } else {
         throw input.error;
       }
     } else {
-      throw new Error("Result not successful and did not include an error message.");
+      throw new Error('Result not successful and did not include an error message.');
     }
   }
   return input.result as ExtractOk<T>;
@@ -100,7 +100,7 @@ export function unwrapInt(input: ResultInterface<string, unknown>): number {
 
 export function unwrapString(input: ResultInterface<string, unknown>): string {
   const match = getWrappedResult(input, /^\(ok\s0x(\w+)\)$/);
-  return Buffer.from(match, "hex").toString();
+  return Buffer.from(match, 'hex').toString();
 }
 
 export const Result = {

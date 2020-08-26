@@ -1,18 +1,18 @@
-import { CheckResult, Receipt } from "../../core";
-import { Provider } from "../../core/provider";
+import { CheckResult, Receipt } from '../../core';
+import { Provider } from '../../core/provider';
 
 export class JsonRpcProvider implements Provider {
   async initialize(): Promise<void> {}
 
   async checkContract(contractFilePath: string): Promise<CheckResult> {
     return {
-      success: false
+      success: false,
     };
   }
 
   async launchContract(contractName: string, contractFilePath: string): Promise<Receipt> {
     return {
-      success: false
+      success: false,
     };
   }
 
@@ -23,13 +23,13 @@ export class JsonRpcProvider implements Provider {
     ...args: string[]
   ): Promise<Receipt> {
     return {
-      success: false
+      success: false,
     };
   }
 
   async evalRaw(evalStatement: string): Promise<Receipt> {
     return {
-      success: false
+      success: false,
     };
   }
 
@@ -39,7 +39,7 @@ export class JsonRpcProvider implements Provider {
     includeDebugOutput = true
   ): Promise<Receipt> {
     return {
-      success: false
+      success: false,
     };
   }
 

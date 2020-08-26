@@ -1,5 +1,5 @@
-import { pipeline, Readable, Writable, WritableOptions } from "stream";
-import { promisify } from "util";
+import { pipeline, Readable, Writable, WritableOptions } from 'stream';
+import { promisify } from 'util';
 
 export const pipelineAsync = promisify(pipeline);
 

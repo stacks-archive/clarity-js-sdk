@@ -1,5 +1,5 @@
-import { Provider, ProviderConstructor } from "../core/provider";
-import { NativeClarityBinProvider } from "./clarityBin";
+import { Provider, ProviderConstructor } from '../core/provider';
+import { NativeClarityBinProvider } from './clarityBin';
 
 export class ProviderRegistry {
   static availableProviders: ProviderConstructor[] = [];
@@ -29,19 +29,19 @@ export class ProviderRegistry {
       (async () => {
         let nativeBinModule: { getDefaultBinaryFilePath: () => string };
         try {
-          nativeBinModule = await import("@blockstack/clarity-native-bin");
+          nativeBinModule = await import('@blockstack/clarity-native-bin');
         } catch (e) {
           // node.js runtime require error
-          if (e.code === "MODULE_NOT_FOUND") {
+          if (e.code === 'MODULE_NOT_FOUND') {
             return false;
           }
           // es6 dynamic import errors
           if (e.message) {
             const importErrStrings = [
-              "error loading dynamically imported module",
-              "error resolving module specifier",
-              "failed to fetch dynamically imported module",
-              "failed to resolve module"
+              'error loading dynamically imported module',
+              'error resolving module specifier',
+              'failed to fetch dynamically imported module',
+              'failed to resolve module',
             ];
             const errMsg = (e.message as string).toLowerCase();
             if (importErrStrings.some(errStr => errMsg.includes(errStr))) {
@@ -52,7 +52,7 @@ export class ProviderRegistry {
         }
         const nativeBinFile = nativeBinModule.getDefaultBinaryFilePath();
         const providerConstructor: ProviderConstructor = {
-          create: () => NativeClarityBinProvider.createEphemeral(nativeBinFile)
+          create: () => NativeClarityBinProvider.createEphemeral(nativeBinFile),
         };
         // Reset the cached promise so that future invocations have the chance to retry.
         this.defaultLoadCachedPromise = undefined;
@@ -72,8 +72,8 @@ export class ProviderRegistry {
       const defaultProvider = await this.tryLoadDefaultBinProvider();
       if (defaultProvider === false) {
         throw new Error(
-          "No provider is registered. Install the `@blockstack/clarity-native-bin` peer " +
-            "dependency or register a provider manually with `registerProvider()`."
+          'No provider is registered. Install the `@blockstack/clarity-native-bin` peer ' +
+            'dependency or register a provider manually with `registerProvider()`.'
         );
       } else {
         this.availableProviders.push(defaultProvider);
@@ -81,7 +81,7 @@ export class ProviderRegistry {
     }
     if (!noWarn && this.availableProviders.length > 1) {
       console.warn(
-        "Multiple providers are registered. The last registered provider will be returned."
+        'Multiple providers are registered. The last registered provider will be returned.'
       );
     }
     // Return the last registered provider

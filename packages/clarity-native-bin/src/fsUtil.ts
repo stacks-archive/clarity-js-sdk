@@ -1,7 +1,7 @@
-import * as fs from "fs-extra";
-import * as os from "os";
-import * as path from "path";
-import { ILogger } from "./logger";
+import * as fs from 'fs-extra';
+import * as os from 'os';
+import * as path from 'path';
+import { ILogger } from './logger';
 
 export function makeUniqueTempDir() {
   const osTempDir = os.tmpdir();
@@ -16,8 +16,8 @@ export function makeUniqueTempDir() {
  * @param file A file name or path to file.
  */
 export function getExecutableFileName(file: string) {
-  if (os.platform() === "win32" || os.platform() === "cygwin") {
-    const windowsExecutableExt = ".exe";
+  if (os.platform() === 'win32' || os.platform() === 'cygwin') {
+    const windowsExecutableExt = '.exe';
     if (path.extname(file) !== windowsExecutableExt) {
       return `${file}${windowsExecutableExt}`;
     }
@@ -46,7 +46,7 @@ export function verifyOutputFile(
       }
       if (!overwriteExisting) {
         logger.error(`The specified output file path already exists: ${fullFilePath}`);
-        logger.error("Specify the overwrite option to ignore this error.");
+        logger.error('Specify the overwrite option to ignore this error.');
         return false;
       }
       logger.log(`Overwriting existing file: ${fullFilePath}`);
@@ -58,9 +58,9 @@ export function verifyOutputFile(
   } catch (error) {
     logger.error(error);
     const fsErr = error as NodeJS.ErrnoException;
-    if (fsErr.code === "EACCES" || fsErr.code === "EPERM") {
+    if (fsErr.code === 'EACCES' || fsErr.code === 'EPERM') {
       logger.error(`Permission error writing to ${fullFilePath}`);
-      logger.error("Try running with sudo or elevated permissions");
+      logger.error('Try running with sudo or elevated permissions');
     } else {
       logger.error(`Error writing to ${fullFilePath}`);
     }

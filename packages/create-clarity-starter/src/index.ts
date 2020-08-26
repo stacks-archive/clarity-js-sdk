@@ -1,9 +1,9 @@
-import { createAppGen } from "generator-clarity-dev";
+import { createAppGen } from 'generator-clarity-dev';
 
 const args = process.argv.slice(2);
 const result = createAppGen({
   args: args,
-  options: { skipInstall: false }
+  options: { skipInstall: false },
 });
 
 result.run().catch(error => {

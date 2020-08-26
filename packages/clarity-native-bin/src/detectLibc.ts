@@ -11,17 +11,17 @@
  * limitations under the License.
  */
 
-import { spawnSync, SpawnSyncOptionsWithStringEncoding } from "child_process";
-import { readdirSync } from "fs";
-import { platform } from "os";
+import { spawnSync, SpawnSyncOptionsWithStringEncoding } from 'child_process';
+import { readdirSync } from 'fs';
+import { platform } from 'os';
 
 export function detectLibc() {
-  const GLIBC = "glibc";
-  const MUSL = "musl";
+  const GLIBC = 'glibc';
+  const MUSL = 'musl';
 
   const spawnOptions: SpawnSyncOptionsWithStringEncoding = {
-    encoding: "utf8",
-    env: process.env
+    encoding: 'utf8',
+    env: process.env,
   };
 
   function contains(needle: string) {
@@ -46,58 +46,58 @@ export function detectLibc() {
     return [];
   }
 
-  let family = "";
-  let version = "";
-  let method = "";
+  let family = '';
+  let version = '';
+  let method = '';
 
-  if (platform() === "linux") {
+  if (platform() === 'linux') {
     // Try getconf
-    const glibc = spawnSync("getconf", ["GNU_LIBC_VERSION"], spawnOptions);
+    const glibc = spawnSync('getconf', ['GNU_LIBC_VERSION'], spawnOptions);
     if (glibc.status === 0) {
       family = GLIBC;
-      version = glibc.stdout.trim().split(" ")[1];
-      method = "getconf";
+      version = glibc.stdout.trim().split(' ')[1];
+      method = 'getconf';
     } else {
       // Try ldd
-      const ldd = spawnSync("ldd", ["--version"], spawnOptions);
+      const ldd = spawnSync('ldd', ['--version'], spawnOptions);
       if (ldd.status === 0 && ldd.stdout.indexOf(MUSL) !== -1) {
         family = MUSL;
         version = versionFromMuslLdd(ldd.stdout);
-        method = "ldd";
+        method = 'ldd';
       } else if (ldd.status === 1 && ldd.stderr.indexOf(MUSL) !== -1) {
         family = MUSL;
         version = versionFromMuslLdd(ldd.stderr);
-        method = "ldd";
+        method = 'ldd';
       } else {
         // Try filesystem (family only)
-        const lib = safeReaddirSync("/lib");
-        if (lib.some(contains("-linux-gnu"))) {
+        const lib = safeReaddirSync('/lib');
+        if (lib.some(contains('-linux-gnu'))) {
           family = GLIBC;
-          method = "filesystem";
-        } else if (lib.some(contains("libc.musl-"))) {
+          method = 'filesystem';
+        } else if (lib.some(contains('libc.musl-'))) {
           family = MUSL;
-          method = "filesystem";
-        } else if (lib.some(contains("ld-musl-"))) {
+          method = 'filesystem';
+        } else if (lib.some(contains('ld-musl-'))) {
           family = MUSL;
-          method = "filesystem";
+          method = 'filesystem';
         } else {
-          const usrSbin = safeReaddirSync("/usr/sbin");
-          if (usrSbin.some(contains("glibc"))) {
+          const usrSbin = safeReaddirSync('/usr/sbin');
+          if (usrSbin.some(contains('glibc'))) {
             family = GLIBC;
-            method = "filesystem";
+            method = 'filesystem';
           }
         }
       }
     }
   }
 
-  const isNonGlibcLinux = family !== "" && family !== GLIBC;
+  const isNonGlibcLinux = family !== '' && family !== GLIBC;
   return {
     GLIBC: GLIBC,
     MUSL: MUSL,
     family: family,
     version: version,
     method: method,
-    isNonGlibcLinux: isNonGlibcLinux
+    isNonGlibcLinux: isNonGlibcLinux,
   };
 }

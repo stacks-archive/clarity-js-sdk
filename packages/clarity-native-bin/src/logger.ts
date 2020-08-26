@@ -9,5 +9,5 @@ export const ConsoleLogger: ILogger = {
   },
   log: (message?: string): void => {
     console.log(message);
-  }
+  },
 };

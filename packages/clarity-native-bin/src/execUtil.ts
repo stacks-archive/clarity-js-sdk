@@ -1,6 +1,6 @@
-import { spawn, SpawnOptions } from "child_process";
-import { Readable } from "stream";
-import { pipelineAsync, readStream } from "./streamUtil";
+import { spawn, SpawnOptions } from 'child_process';
+import { Readable } from 'stream';
+import { pipelineAsync, readStream } from './streamUtil';
 
 export interface ExecutionResult {
   stdout: string;
@@ -37,8 +37,8 @@ export async function executeCommand(
 
   let writeStdin: Promise<void> = Promise.resolve();
   if (opts && opts.stdin) {
-    if (typeof opts.stdin === "string") {
-      proc.stdin.end(opts.stdin, "utf8");
+    if (typeof opts.stdin === 'string') {
+      proc.stdin.end(opts.stdin, 'utf8');
     } else {
       writeStdin = pipelineAsync(opts.stdin, proc.stdin).catch((error: any) => {
         console.error(`spawn stdin error: ${error}`);
@@ -46,24 +46,24 @@ export async function executeCommand(
     }
   }
 
-  proc.on("error", (error: any) => {
+  proc.on('error', (error: any) => {
     console.error(`Unexpected process exec error: ${error}`);
   });
 
   const exitCode = await new Promise<number>(resolve => {
-    proc.once("close", (code: number) => {
+    proc.once('close', (code: number) => {
       resolve(code);
     });
   });
 
   const [stdoutData, stderrData] = await Promise.all([readStdout, readStderr, writeStdin]);
 
-  const stdoutStr = stdoutData.toString("utf8");
-  const stderrStr = stderrData.toString("utf8");
+  const stdoutStr = stdoutData.toString('utf8');
+  const stderrStr = stderrData.toString('utf8');
 
   return {
     stdout: stdoutStr,
     stderr: stderrStr,
-    exitCode: exitCode
+    exitCode: exitCode,
   };
 }

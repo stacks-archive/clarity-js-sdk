@@ -1,20 +1,18 @@
-import fs = require("fs");
-import githubUsername = require("github-username");
-import path = require("path");
-import semver = require("semver");
-import Generator = require("yeoman-generator");
+import fs = require('fs');
+import githubUsername = require('github-username');
+import path = require('path');
+import semver = require('semver');
+import Generator = require('yeoman-generator');
 
-const generatorPackage: PackageJson = require("../../package.json");
+const generatorPackage: PackageJson = require('../../package.json');
 
 type Mutable<T> = { -readonly [P in keyof T]: Mutable<T[P]> };
-type PackageJson = Mutable<Required<import("package-json").FullVersion>>;
+type PackageJson = Mutable<Required<import('package-json').FullVersion>>;
 
 const version = generatorPackage.engines.node;
 if (!semver.satisfies(process.version, version)) {
   console.error(
-    `Node.js version ${version} is required. Installed version ${
-    process.version
-    } is not compatible.`
+    `Node.js version ${version} is required. Installed version ${process.version} is not compatible.`
   );
   process.exit(1);
 }
@@ -53,10 +51,10 @@ function inheritDevDependencies(src: PackageJson, target: PackageJson, names: st
   }
 }
 
-const PROJECT_DIR = "project_name";
-const TEMPLATE_HELLO_WORLD = "hello-world";
-const TEMPLATE_COUNTER = "counter";
-const TEMPLATE_ARGUMENT = "template";
+const PROJECT_DIR = 'project_name';
+const TEMPLATE_HELLO_WORLD = 'hello-world';
+const TEMPLATE_COUNTER = 'counter';
+const TEMPLATE_ARGUMENT = 'template';
 
 class ClarityGenerator extends Generator {
   packageJsonTemplateData: any;
@@ -90,19 +88,21 @@ class ClarityGenerator extends Generator {
 
       if (!isDirEmpty(destRoot)) {
         await this.promptForTemplate();
-        const answers = await this.prompt([{
-          name: PROJECT_DIR,
-          message: "Project name",
-          default: `clarity-${this.options.template}`,
-          type: "input"
-        }]);
+        const answers = await this.prompt([
+          {
+            name: PROJECT_DIR,
+            message: 'Project name',
+            default: `clarity-${this.options.template}`,
+            type: 'input',
+          },
+        ]);
         projDirArg = answers[PROJECT_DIR];
         destRoot = this.destinationRoot(projDirArg);
       }
     }
 
     if (!projDirArg) {
-      this.log("Missing project name!");
+      this.log('Missing project name!');
       process.exit(1);
       return;
     }
@@ -111,8 +111,8 @@ class ClarityGenerator extends Generator {
     const normalizePackageName = (name: string) => {
       let result = path.basename(name);
       result = result.toLowerCase();
-      result = result.replace(/[^a-zA-Z0-9_-]/g, "");
-      result = result.replace(/^[_-]+|[_-]+$/g, "");
+      result = result.replace(/[^a-zA-Z0-9_-]/g, '');
+      result = result.replace(/^[_-]+|[_-]+$/g, '');
       return result;
     };
 
@@ -120,14 +120,14 @@ class ClarityGenerator extends Generator {
     const githubUsername = await getGithubUsername(this).catch(_ => undefined);
     const authorName = this.user.git.name();
     const authorEmail = this.user.git.email();
-    const repo = githubUsername ? `https://github.com/${githubUsername}/${packageName}.git` : "";
+    const repo = githubUsername ? `https://github.com/${githubUsername}/${packageName}.git` : '';
 
     this.packageJsonTemplateData = {
       name: packageName,
       authorName: authorName,
       authorEmail: authorEmail,
       authorUsername: githubUsername,
-      repository: repo
+      repository: repo,
     };
   }
 
@@ -138,30 +138,30 @@ class ClarityGenerator extends Generator {
       }
     };
 
-    copyFiles([".vscode/", "tsconfig.json", "test/mocha.opts"]);
+    copyFiles(['.vscode/', 'tsconfig.json', 'test/mocha.opts']);
 
     switch (this.options.template) {
       case TEMPLATE_COUNTER:
-        copyFiles(["contracts/counter.clar", "test/counter.ts_template"]);
+        copyFiles(['contracts/counter.clar', 'test/counter.ts_template']);
         this.fs.move(
-          this.destinationPath("test/counter.ts_template"),
-          this.destinationPath("test/counter.ts")
+          this.destinationPath('test/counter.ts_template'),
+          this.destinationPath('test/counter.ts')
         );
         break;
       default:
-        copyFiles(["contracts/hello-world.clar", "test/hello-world.ts_template"]);
+        copyFiles(['contracts/hello-world.clar', 'test/hello-world.ts_template']);
         this.fs.move(
-          this.destinationPath("test/hello-world.ts_template"),
-          this.destinationPath("test/hello-world.ts")
+          this.destinationPath('test/hello-world.ts_template'),
+          this.destinationPath('test/hello-world.ts')
         );
         break;
     }
 
-    this.fs.copy(this.templatePath("_.gitignore"), this.destinationPath(".gitignore"));
+    this.fs.copy(this.templatePath('_.gitignore'), this.destinationPath('.gitignore'));
     try {
       this.fs.copyTpl(
-        this.templatePath("_package.json"),
-        this.destinationPath("package.json"),
+        this.templatePath('_package.json'),
+        this.destinationPath('package.json'),
         this.packageJsonTemplateData
       );
     } catch (error) {
@@ -170,29 +170,29 @@ class ClarityGenerator extends Generator {
 
     const pkgJson: PackageJson = {
       dependencies: {},
-      devDependencies: {}
+      devDependencies: {},
     } as any;
 
     inheritDependencies(generatorPackage, pkgJson, [
-      "@blockstack/clarity",
-      "@blockstack/clarity-native-bin"
+      '@blockstack/clarity',
+      '@blockstack/clarity-native-bin',
     ]);
     inheritDevDependencies(generatorPackage, pkgJson, [
-      "typescript",
-      "ts-node",
-      "chai",
-      "@types/chai",
-      "mocha",
-      "@types/mocha"
+      'typescript',
+      'ts-node',
+      'chai',
+      '@types/chai',
+      'mocha',
+      '@types/mocha',
     ]);
 
-    this.fs.extendJSON(this.destinationPath("package.json"), pkgJson);
+    this.fs.extendJSON(this.destinationPath('package.json'), pkgJson);
   }
 
   install() {
-    if (!this.options["skip-install"] && !this.options.skipInstall) {
+    if (!this.options['skip-install'] && !this.options.skipInstall) {
       this.installDependencies({
-        bower: false
+        bower: false,
       });
     }
   }
@@ -202,22 +202,24 @@ class ClarityGenerator extends Generator {
       return this.options.template;
     }
 
-    const { template } = await this.prompt([{
-      name: TEMPLATE_ARGUMENT,
-      message: `Select a project template:`,
-      default: TEMPLATE_HELLO_WORLD,
-      type: "list",
-          choices: [
-            {
-              name: "Hello World",
-              value: TEMPLATE_HELLO_WORLD,
-            },
-            {
-              name: "Counter",
-              value: TEMPLATE_COUNTER,
-            }
-          ]
-    }]);
+    const { template } = await this.prompt([
+      {
+        name: TEMPLATE_ARGUMENT,
+        message: `Select a project template:`,
+        default: TEMPLATE_HELLO_WORLD,
+        type: 'list',
+        choices: [
+          {
+            name: 'Hello World',
+            value: TEMPLATE_HELLO_WORLD,
+          },
+          {
+            name: 'Counter',
+            value: TEMPLATE_COUNTER,
+          },
+        ],
+      },
+    ]);
     this.options.template = template;
     return template;
   }

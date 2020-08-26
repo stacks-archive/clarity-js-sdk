@@ -1,5 +1,5 @@
-import { NativeClarityBinProvider } from "./clarityBin";
+import { NativeClarityBinProvider } from './clarityBin';
 export { NativeClarityBinProvider };
-export { JsonRpcProvider } from "./jsonRpc";
+export { JsonRpcProvider } from './jsonRpc';
 
-export * from "./registry";
+export * from './registry';
