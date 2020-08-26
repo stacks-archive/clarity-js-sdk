@@ -236,6 +236,7 @@ export class NativeClarityBinProvider implements Provider {
     );
     if (result.exitCode !== 0) {
       throw new ExecutionError(
+        // tslint:disable-next-line: max-line-length
         `Eval expression on contract failed with bad exit code ${result.exitCode}: ${result.stderr}`,
         result.exitCode,
         result.stdout,
