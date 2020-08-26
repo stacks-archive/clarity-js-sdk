@@ -6,7 +6,7 @@ import { getTempFilePath } from "../src/utils/fsUtil";
 describe("NativeClarityBinProvider", () => {
   it("create ephemeral", async () => {
     const provider = await NativeClarityBinProvider.createEphemeral(
-      "node_modules/@blockstack/clarity-native-bin/.native-bin/clarity-sdk-v0.1.0/clarity-cli"
+      "node_modules/@blockstack/clarity-native-bin/.native-bin/clarity-sdk-v0.1.1/clarity-cli"
     );
     assert.isDefined(provider);
   });
