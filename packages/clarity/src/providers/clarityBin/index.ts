@@ -85,14 +85,9 @@ export class NativeClarityBinProvider implements Provider {
   }
 
   async initialize(): Promise<void> {
-    const tempAllocationsPath = getTempFilePath("blockstack-allocations-{uniqueID}.json");
-    fs.writeFileSync(tempAllocationsPath, JSON.stringify(this.allocations));
-
     const result = await this.runCommand(["initialize", "-", this.dbFilePath], {
       stdin: JSON.stringify(this.allocations),
     });
-
-    fs.unlinkSync(tempAllocationsPath);
 
     if (result.exitCode !== 0) {
       throw new ExecutionError(
