@@ -1,13 +1,14 @@
+import { getDefaultBinaryFilePath } from "@blockstack/clarity-native-bin/src";
 import { assert } from "chai";
 import fs from "fs-extra";
 import { NativeClarityBinProvider, Receipt } from "../src";
 import { getTempFilePath } from "../src/utils/fsUtil";
 
+const clarityBinPath = getDefaultBinaryFilePath();
+
 describe("NativeClarityBinProvider", () => {
   it("create ephemeral", async () => {
-    const provider = await NativeClarityBinProvider.createEphemeral(
-      "node_modules/@blockstack/clarity-native-bin/.native-bin/clarity-sdk-v0.1.1/clarity-cli"
-    );
+    const provider = await NativeClarityBinProvider.createEphemeral(clarityBinPath);
     assert.isDefined(provider);
   });
 
@@ -18,7 +19,7 @@ describe("NativeClarityBinProvider", () => {
     const provider = await NativeClarityBinProvider.create(
       [{ principal, amount }],
       tempDbPath,
-      "node_modules/@blockstack/clarity-native-bin/.native-bin/clarity-sdk-v0.1.0/clarity-cli"
+      clarityBinPath
     );
 
     const receipt = await getStxBalance(principal, provider);
