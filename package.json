@@ -10,6 +10,7 @@
     "url": ""
   },
   "license": "MIT",
+  "prettier": "@blockstack/prettier-config",
   "scripts": {
     "version-bump": "lerna version",
     "version-bump-no-push": "lerna version --force-publish --no-push prerelease",
@@ -22,15 +23,19 @@
     "test-skip-slow": "cross-env SKIP_SLOW_TESTS=true npm run test",
     "lint": "lerna run lint",
     "lint-fix": "lerna run lint-fix",
+    "lint:prettier": "prettier --check \"packages/**/src/**/*.{ts,tsx}\"",
+    "lint:prettier:fix": "prettier --write \"packages/**/src/**/*.{ts,tsx}\"",
     "codecov-upload": "codecov"
   },
   "devDependencies": {
+    "@blockstack/prettier-config": "^0.0.6",
     "@types/fs-extra": "^8.0.0",
     "@types/node": "^10.14.8",
     "codecov": "^3.5.0",
     "cross-env": "^5.2.0",
     "fs-extra": "^8.1.0",
     "lerna": "^3.14.1",
+    "prettier": "^2.0.5",
     "typescript": "^3.5.1"
   }
 }
