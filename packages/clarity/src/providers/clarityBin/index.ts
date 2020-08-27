@@ -27,10 +27,11 @@ export class NativeClarityBinProvider implements Provider {
    *                   and gets deleted when `close` is invoked.
    */
   static async create(
+    allocations: InitialAllocation[],
     dbFilePath: string,
     clarityBinPath: string
   ): Promise<NativeClarityBinProvider> {
-    const executor = new NativeClarityBinProvider(dbFilePath, clarityBinPath);
+    const executor = new NativeClarityBinProvider(allocations, dbFilePath, clarityBinPath);
     await executor.initialize();
     return executor;
   }
@@ -42,7 +43,7 @@ export class NativeClarityBinProvider implements Provider {
    */
   static async createEphemeral(clarityBinPath: string): Promise<Provider> {
     const tempDbPath = getTempFilePath("blockstack-local-{uniqueID}.db");
-    const instance = await this.create(tempDbPath, clarityBinPath);
+    const instance = await this.create([], tempDbPath, clarityBinPath);
     instance.closeActions.push(() => {
       try {
         fs.unlinkSync(instance.dbFilePath);
@@ -53,11 +54,13 @@ export class NativeClarityBinProvider implements Provider {
     return instance;
   }
 
+  public readonly allocations: InitialAllocation[];
   public readonly dbFilePath: string;
   readonly clarityBinPath: string;
   private closeActions: ((() => Promise<any>) | (() => any))[] = [];
 
-  constructor(dbFilePath: string, clarityBinPath: string) {
+  constructor(allocations: InitialAllocation[], dbFilePath: string, clarityBinPath: string) {
+    this.allocations = allocations;
     this.dbFilePath = dbFilePath;
     this.clarityBinPath = clarityBinPath;
   }
@@ -69,7 +72,7 @@ export class NativeClarityBinProvider implements Provider {
    */
   async runCommand(args: string[], opts?: { stdin: string }) {
     const result = await executeCommand(this.clarityBinPath, [...args], {
-      stdin: opts && opts.stdin
+      stdin: opts && opts.stdin,
     });
 
     // Normalize first EOL, and trim the trailing EOL.
@@ -82,7 +85,10 @@ export class NativeClarityBinProvider implements Provider {
   }
 
   async initialize(): Promise<void> {
-    const result = await this.runCommand(["initialize", this.dbFilePath]);
+    const result = await this.runCommand(["initialize", "-", this.dbFilePath], {
+      stdin: JSON.stringify(this.allocations),
+    });
+
     if (result.exitCode !== 0) {
       throw new ExecutionError(
         `Initialize failed with bad exit code ${result.exitCode}: ${result.stderr}`,
@@ -91,7 +97,7 @@ export class NativeClarityBinProvider implements Provider {
         result.stderr
       );
     }
-    if (result.stdout !== "Database created.") {
+    if (!result.stdout.endsWith("Database created.")) {
       throw new ExecutionError(
         `Initialize failed with bad output: ${result.stdout}`,
         result.exitCode,
@@ -107,13 +113,13 @@ export class NativeClarityBinProvider implements Provider {
     if (result.exitCode !== 0) {
       return {
         success: false,
-        error: result.stdout + "\n" + result.stderr
+        error: result.stdout + "\n" + result.stderr,
       };
     } else {
       const contractInterface = JSON.parse(result.stdout);
       return {
         success: true,
-        result: contractInterface
+        result: contractInterface,
       };
     }
   }
@@ -140,7 +146,7 @@ export class NativeClarityBinProvider implements Provider {
     }
     return {
       success: true,
-      debugOutput: result.stderr
+      debugOutput: result.stderr,
     };
   }
 
@@ -156,13 +162,11 @@ export class NativeClarityBinProvider implements Provider {
       contractName,
       functionName,
       senderAddress,
-      ...args
+      ...args,
     ]);
     if (result.exitCode !== 0) {
       throw new ExecutionError(
-        `Execute expression on contract failed with bad exit code ${result.exitCode}: ${
-          result.stderr
-        }`,
+        `Execute expression on contract failed with bad exit code ${result.exitCode}: ${result.stderr}`,
         result.exitCode,
         result.stdout,
         result.stderr
@@ -181,13 +185,13 @@ export class NativeClarityBinProvider implements Provider {
     return {
       success: true,
       result: result.stdout,
-      debugOutput: result.stderr
+      debugOutput: result.stderr,
     };
   }
 
   async evalRaw(evalStatement: string): Promise<Receipt> {
     const result = await this.runCommand(["eval_raw", this.dbFilePath], {
-      stdin: evalStatement
+      stdin: evalStatement,
     });
     if (result.exitCode !== 0) {
       throw new ExecutionError(
@@ -214,7 +218,7 @@ export class NativeClarityBinProvider implements Provider {
     return {
       success: true,
       result: outputResult,
-      debugOutput: result.stderr
+      debugOutput: result.stderr,
     };
   }
 
@@ -222,20 +226,18 @@ export class NativeClarityBinProvider implements Provider {
     contractName: string,
     evalStatement: string,
     includeDebugOutput?: boolean,
-    atChaintip: boolean = true,
+    atChaintip: boolean = true
   ): Promise<Receipt> {
-    const result = await this.runCommand([
-      `eval${atChaintip ? "_at_chaintip" : ""}`,
-      contractName, this.dbFilePath],
+    const result = await this.runCommand(
+      [`eval${atChaintip ? "_at_chaintip" : ""}`, contractName, this.dbFilePath],
       {
-        stdin: evalStatement
+        stdin: evalStatement,
       }
     );
     if (result.exitCode !== 0) {
       throw new ExecutionError(
-        `Eval expression on contract failed with bad exit code ${result.exitCode}: ${
-          result.stderr
-        }`,
+        // tslint:disable-next-line: max-line-length
+        `Eval expression on contract failed with bad exit code ${result.exitCode}: ${result.stderr}`,
         result.exitCode,
         result.stdout,
         result.stderr
@@ -259,12 +261,12 @@ export class NativeClarityBinProvider implements Provider {
       return {
         success: true,
         result: outputResult,
-        debugOutput: result.stderr
+        debugOutput: result.stderr,
       };
     } else {
       return {
         success: true,
-        result: outputResult
+        result: outputResult,
       };
     }
   }
@@ -298,7 +300,7 @@ export class NativeClarityBinProvider implements Provider {
     const result = await this.runCommand([
       "mine_blocks",
       `--data=${this.dbFilePath}`,
-      `--count=${count.toString()}`
+      `--count=${count.toString()}`,
     ]);
 
     if (result.exitCode !== 0) {
@@ -351,4 +353,9 @@ export class NativeClarityBinProvider implements Provider {
       await Promise.resolve(closeAction());
     }
   }
+}
+
+export interface InitialAllocation {
+  principal: string;
+  amount: number;
 }
