@@ -27,10 +27,11 @@ export class NativeClarityBinProvider implements Provider {
    *                   and gets deleted when `close` is invoked.
    */
   static async create(
+    allocations: InitialAllocation[],
     dbFilePath: string,
     clarityBinPath: string
   ): Promise<NativeClarityBinProvider> {
-    const executor = new NativeClarityBinProvider(dbFilePath, clarityBinPath);
+    const executor = new NativeClarityBinProvider(allocations, dbFilePath, clarityBinPath);
     await executor.initialize();
     return executor;
   }
@@ -42,7 +43,7 @@ export class NativeClarityBinProvider implements Provider {
    */
   static async createEphemeral(clarityBinPath: string): Promise<Provider> {
     const tempDbPath = getTempFilePath('blockstack-local-{uniqueID}.db');
-    const instance = await this.create(tempDbPath, clarityBinPath);
+    const instance = await this.create([], tempDbPath, clarityBinPath);
     instance.closeActions.push(() => {
       try {
         fs.unlinkSync(instance.dbFilePath);
@@ -53,11 +54,13 @@ export class NativeClarityBinProvider implements Provider {
     return instance;
   }
 
+  public readonly allocations: InitialAllocation[];
   public readonly dbFilePath: string;
   readonly clarityBinPath: string;
   private closeActions: ((() => Promise<any>) | (() => any))[] = [];
 
-  constructor(dbFilePath: string, clarityBinPath: string) {
+  constructor(allocations: InitialAllocation[], dbFilePath: string, clarityBinPath: string) {
+    this.allocations = allocations;
     this.dbFilePath = dbFilePath;
     this.clarityBinPath = clarityBinPath;
   }
@@ -82,7 +85,10 @@ export class NativeClarityBinProvider implements Provider {
   }
 
   async initialize(): Promise<void> {
-    const result = await this.runCommand(['initialize', this.dbFilePath]);
+    const result = await this.runCommand(['initialize', '-', this.dbFilePath], {
+      stdin: JSON.stringify(this.allocations),
+    });
+
     if (result.exitCode !== 0) {
       throw new ExecutionError(
         `Initialize failed with bad exit code ${result.exitCode}: ${result.stderr}`,
@@ -91,7 +97,7 @@ export class NativeClarityBinProvider implements Provider {
         result.stderr
       );
     }
-    if (result.stdout !== 'Database created.') {
+    if (!result.stdout.endsWith('Database created.')) {
       throw new ExecutionError(
         `Initialize failed with bad output: ${result.stdout}`,
         result.exitCode,
@@ -230,6 +236,7 @@ export class NativeClarityBinProvider implements Provider {
     );
     if (result.exitCode !== 0) {
       throw new ExecutionError(
+        // tslint:disable-next-line: max-line-length
         `Eval expression on contract failed with bad exit code ${result.exitCode}: ${result.stderr}`,
         result.exitCode,
         result.stdout,
@@ -346,4 +353,9 @@ export class NativeClarityBinProvider implements Provider {
       await Promise.resolve(closeAction());
     }
   }
+}
+
+export interface InitialAllocation {
+  principal: string;
+  amount: number;
 }
