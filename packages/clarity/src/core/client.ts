@@ -19,17 +19,17 @@ export class Client {
     if (!checkResult.success) {
       throw new Error(checkResult.error);
     }
-  }
+  };
 
   deployContract = async (): Promise<Receipt> => {
     const receipt = await this.provider.launchContract(this.name, this.filePath);
     return receipt;
-  }
+  };
 
   createTransaction = (params?: { method?: Method }): Transaction => {
     const tx = new Transaction(params && params.method);
     return tx;
-  }
+  };
 
   submitTransaction = async (tx: Transaction): Promise<Receipt> => {
     if (!tx.sender) {
@@ -50,13 +50,20 @@ export class Client {
       receipt = { success: false, error: error };
     }
     return receipt;
-  }
+  };
 
-  createQuery = (params: { method?: Method, atChaintip?: boolean }): Query => {
+  createQuery = (params: { method?: Method; atChaintip?: boolean }): Query => {
     const query = new Query(params.method, params.atChaintip);
     return query;
-  }
+  };
 
+  /**
+   * Submits the given transaction or read-only request
+   * without changing the state of the blockchain. Any change will be rolledback
+   * after the request.
+   *
+   * @param query usualy created using `createQuery`
+   */
   submitQuery = async (query: Query): Promise<Receipt> => {
     // let res = await this.node.execute(
     //     this.name,
@@ -71,8 +78,8 @@ export class Client {
       this.name,
       `(${query.method.name} ${query.method.args.join(" ")})`,
       true,
-      query.atChaintip,
+      query.atChaintip
     );
     return res;
-  }
+  };
 }
