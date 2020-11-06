@@ -10429,7 +10429,7 @@
 												"isExported": true
 											},
 											"comment": {
-												"shortText": "object containing details of the blockchain function\nto call and whether to evaluate the method at the chaintip\n"
+												"shortText": "object containing details of the blockchain function\nto call {@link Method} and whether to advance the blockchain or not\n"
 											},
 											"type": {
 												"type": "reflection",
@@ -15039,7 +15039,7 @@
 					"sources": [
 						{
 							"fileName": "packages/clarity/src/core/types.ts",
-							"line": 17,
+							"line": 28,
 							"character": 28
 						}
 					],
@@ -15070,6 +15070,9 @@
 					"flags": {
 						"isExported": true
 					},
+					"comment": {
+						"shortText": "Describes a function of a smart contract. This can be\na public or read-only function."
+					},
 					"children": [
 						{
 							"id": 143,
@@ -15079,10 +15082,13 @@
 							"flags": {
 								"isExported": true
 							},
+							"comment": {
+								"shortText": "list of function arguments. Arguments are converted to Clarity Values following\nthe same rules as if you would enter the values into the command line"
+							},
 							"sources": [
 								{
 									"fileName": "packages/clarity/src/core/types.ts",
-									"line": 10,
+									"line": 21,
 									"character": 6
 								}
 							],
@@ -15102,10 +15108,13 @@
 							"flags": {
 								"isExported": true
 							},
+							"comment": {
+								"shortText": "function name"
+							},
 							"sources": [
 								{
 									"fileName": "packages/clarity/src/core/types.ts",
-									"line": 9,
+									"line": 16,
 									"character": 6
 								}
 							],
@@ -15128,7 +15137,7 @@
 					"sources": [
 						{
 							"fileName": "packages/clarity/src/core/types.ts",
-							"line": 8,
+							"line": 12,
 							"character": 23
 						}
 					]
@@ -15154,7 +15163,7 @@
 							"sources": [
 								{
 									"fileName": "packages/clarity/src/core/types.ts",
-									"line": 14,
+									"line": 25,
 									"character": 13
 								}
 							],
@@ -15267,7 +15276,7 @@
 					"sources": [
 						{
 							"fileName": "packages/clarity/src/core/types.ts",
-							"line": 13,
+							"line": 24,
 							"character": 24
 						}
 					],
