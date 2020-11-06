@@ -32,7 +32,7 @@
     "lint": "tslint -p tsconfig.json 'src/**/*.ts' 'test/**/*.ts'",
     "lint-fix": "tslint --fix -p tsconfig.json 'src/**/*.ts' 'test/**/*.ts'",
     "test": "npm run build && nyc mocha",
-    "docs": "yarn typedoc --json docs.json src"
+    "docs": "yarn typedoc --out docs --plugin typedoc-plugin-markdown src"
   },
   "peerDependencies": {
     "@blockstack/clarity-native-bin": "^0.1.10-alpha.0"
