@@ -31,7 +31,8 @@
     "prepublishOnly": "npm run build",
     "lint": "tslint -p tsconfig.json 'src/**/*.ts' 'test/**/*.ts'",
     "lint-fix": "tslint --fix -p tsconfig.json 'src/**/*.ts' 'test/**/*.ts'",
-    "test": "npm run build && nyc mocha"
+    "test": "npm run build && nyc mocha",
+    "docs": "yarn typedoc --json docs.json src"
   },
   "peerDependencies": {
     "@blockstack/clarity-native-bin": "^0.1.10-alpha.0"
@@ -49,7 +50,7 @@
     "ts-node": "^8.2.0",
     "tslint": "^5.17.0",
     "typedoc": "^0.19.2",
-    "typescript": "^3.5.1"
+    "typescript": "^4.0.5"
   },
   "nyc": {
     "all": true,

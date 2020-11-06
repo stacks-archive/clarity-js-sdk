@@ -52,6 +52,11 @@ export class Client {
     return receipt;
   };
 
+  /**
+   * Creates a request that won't change the state of the blockchain.
+   * @param params object containing details of the blockchain function
+   * to call and whether to evaluate the method at the chaintip
+   */
   createQuery = (params: { method?: Method; atChaintip?: boolean }): Query => {
     const query = new Query(params.method, params.atChaintip);
     return query;
