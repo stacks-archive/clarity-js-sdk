@@ -204,9 +204,19 @@ class ClarityGenerator extends Generator {
 
     const { template } = await this.prompt([{
       name: TEMPLATE_ARGUMENT,
-      message: `Template: one of [${TEMPLATE_HELLO_WORLD}, ${TEMPLATE_COUNTER}]`,
-      choices: [TEMPLATE_HELLO_WORLD, TEMPLATE_COUNTER],
+      message: `Select a project template:`,
       default: TEMPLATE_HELLO_WORLD,
+      type: "list",
+          choices: [
+            {
+              name: "Hello World",
+              value: TEMPLATE_HELLO_WORLD,
+            },
+            {
+              name: "Counter",
+              value: TEMPLATE_COUNTER,
+            }
+          ]
     }]);
     this.options.template = template;
     return template;

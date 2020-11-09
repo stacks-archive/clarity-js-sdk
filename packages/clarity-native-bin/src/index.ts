@@ -9,7 +9,7 @@ import { ConsoleLogger, ILogger } from "./logger";
  * Should correspond to both a git tag on the blockstack-core repo and a
  * set of clarity-binary distributables uploaded to the cloud storage endpoint.
  */
-export const CORE_SDK_TAG = "clarity-sdk-v0.1.0";
+export const CORE_SDK_TAG = "clarity-sdk-v0.1.2";
 
 export const BLOCKSTACK_CORE_SOURCE_TAG_ENV_VAR = "BLOCKSTACK_CORE_SOURCE_TAG";
 export const BLOCKSTACK_CORE_SOURCE_BRANCH_ENV_VAR = "BLOCKSTACK_CORE_SOURCE_BRANCH";
@@ -22,7 +22,8 @@ export const BLOCKSTACK_CORE_SOURCE_PATH_ENV_VAR = "BLOCKSTACK_CORE_SOURCE_PATH"
  * Otherwise returns false.
  */
 function getOverriddenCoreSource():
-  false | { specifier: "branch" | "tag" | "path"; value: string } {
+  | false
+  | { specifier: "branch" | "tag" | "path"; value: string } {
   for (const [key, val] of Object.entries(process.env)) {
     if (val === undefined) {
       continue;
@@ -56,7 +57,7 @@ function getThisPackageDir(): string {
  */
 export function getDefaultBinaryFilePath({
   checkExists = true,
-  versionTag
+  versionTag,
 }: { checkExists?: boolean; versionTag?: string } = {}): string {
   if (!versionTag) {
     versionTag = CORE_SDK_TAG;
@@ -110,7 +111,7 @@ export async function installDefaultPath(): Promise<boolean> {
       overwriteExisting: true,
       outputFilePath: installPath,
       gitBranch: versionBranch,
-      gitTag: versionTag
+      gitTag: versionTag,
     });
   } else if (sourceOverride && sourceOverride.specifier === "path") {
     success = moveFromPath({
@@ -123,7 +124,7 @@ export async function installDefaultPath(): Promise<boolean> {
       logger: logger,
       overwriteExisting: true,
       outputFilePath: installPath,
-      versionTag: versionTag!
+      versionTag: versionTag!,
     });
   }
 
