@@ -33,7 +33,8 @@
     "lint": "tslint -p tsconfig.json 'src/**/*.ts' 'test/**/*.ts'",
     "lint-fix": "tslint --fix -p tsconfig.json 'src/**/*.ts' 'test/**/*.ts'",
     "test": "npm run build && nyc mocha",
-    "postinstall": "node postInstallScript.js"
+    "postinstall": "node postInstallScript.js",
+    "docs": "yarn typedoc --out docs --plugin typedoc-plugin-markdown src"
   },
   "dependencies": {
     "fs-extra": "^8.0.1",
@@ -56,7 +57,9 @@
     "source-map-support": "^0.5.12",
     "ts-node": "^8.2.0",
     "tslint": "^5.17.0",
-    "typescript": "^3.5.1"
+    "typedoc": "^0.19.2",
+    "typedoc-plugin-markdown": "^3.0.11",
+    "typescript": "^4.0.5"
   },
   "nyc": {
     "all": true,
