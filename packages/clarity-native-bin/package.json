@@ -34,7 +34,7 @@
     "lint-fix": "tslint --fix -p tsconfig.json 'src/**/*.ts' 'test/**/*.ts'",
     "test": "npm run build && nyc mocha",
     "postinstall": "node postInstallScript.js",
-    "docs": "yarn typedoc --out docs --plugin typedoc-plugin-markdown src"
+    "docs": "typedoc --out docs --plugin typedoc-plugin-markdown src"
   },
   "dependencies": {
     "fs-extra": "^8.0.1",
