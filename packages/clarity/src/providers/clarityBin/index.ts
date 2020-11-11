@@ -39,7 +39,9 @@ export class NativeClarityBinProvider implements Provider {
   /**
    * Instantiates a new executor pointed at a new temporary database file.
    * The temp file is deleted when `close` is invoked.
-   * Before returning, ensures db is ready with `initialize`.
+   * Before returning, ensures db is ready with `initialize`.   *
+   * @param allocations initializes the given accounts with amount of STXs at start.
+   * @param clarityBinPath file path to the clarity binary, can be `getDefaultBinaryFilePath`.
    */
   static async createEphemeral(
     allocations: InitialAllocation[],

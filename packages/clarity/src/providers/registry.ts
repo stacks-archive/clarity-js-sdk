@@ -66,6 +66,8 @@ export class ProviderRegistry {
 
   /**
    * Creates an instance of the last registered provider.
+   * @param allocations initializes the given accounts with
+   * amount of STXs at start. Defaults to empty list.
    * @param noWarn Set to true to disable warning log about multiple registered providers.
    */
   static async createProvider(
