@@ -1,7 +1,8 @@
 import { CheckResult, Receipt } from ".";
+import { InitialAllocation } from "../providers/clarityBin";
 
 export interface ProviderConstructor {
-  create(): Promise<Provider>;
+  create(allocations: InitialAllocation[]): Promise<Provider>;
 }
 
 export interface Provider {
