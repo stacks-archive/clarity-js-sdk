@@ -8,7 +8,7 @@ const clarityBinPath = getDefaultBinaryFilePath();
 
 describe("NativeClarityBinProvider", () => {
   it("create ephemeral", async () => {
-    const provider = await NativeClarityBinProvider.createEphemeral(clarityBinPath);
+    const provider = await NativeClarityBinProvider.createEphemeral([], clarityBinPath);
     assert.isDefined(provider);
   });
 

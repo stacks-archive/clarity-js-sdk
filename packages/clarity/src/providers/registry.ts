@@ -52,7 +52,7 @@ export class ProviderRegistry {
         }
         const nativeBinFile = nativeBinModule.getDefaultBinaryFilePath();
         const providerConstructor: ProviderConstructor = {
-          create: () => NativeClarityBinProvider.createEphemeral(nativeBinFile)
+          create: () => NativeClarityBinProvider.createEphemeral([], nativeBinFile),
         };
         // Reset the cached promise so that future invocations have the chance to retry.
         this.defaultLoadCachedPromise = undefined;

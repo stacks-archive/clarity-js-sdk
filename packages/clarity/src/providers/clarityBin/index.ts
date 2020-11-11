@@ -41,9 +41,12 @@ export class NativeClarityBinProvider implements Provider {
    * The temp file is deleted when `close` is invoked.
    * Before returning, ensures db is ready with `initialize`.
    */
-  static async createEphemeral(clarityBinPath: string): Promise<Provider> {
+  static async createEphemeral(
+    allocations: InitialAllocation[],
+    clarityBinPath: string
+  ): Promise<Provider> {
     const tempDbPath = getTempFilePath("blockstack-local-{uniqueID}.db");
-    const instance = await this.create([], tempDbPath, clarityBinPath);
+    const instance = await this.create(allocations, tempDbPath, clarityBinPath);
     instance.closeActions.push(() => {
       try {
         fs.unlinkSync(instance.dbFilePath);
