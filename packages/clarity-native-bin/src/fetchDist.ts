@@ -2,7 +2,6 @@ import * as fs from "fs-extra";
 import fetch from "node-fetch";
 import * as os from "os";
 import * as path from "path";
-import * as tar from "tar";
 import * as unzip from "unzipper";
 import { detectArch } from "./detectArch";
 import { detectLibc } from "./detectLibc";
