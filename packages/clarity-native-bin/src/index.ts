@@ -110,6 +110,7 @@ export async function installDefaultPath(): Promise<boolean> {
       logger: logger,
       overwriteExisting: true,
       outputFilePath: installPath,
+      buildPackage: "blockstack-core",
       gitBranch: versionBranch,
       gitTag: versionTag,
     });
@@ -143,7 +144,7 @@ export async function install(opts: {
     return false;
   }
   if (opts.fromSource) {
-    return cargoInstall({ ...opts, gitTag: opts.versionTag });
+    return cargoInstall({ ...opts, buildPackage: "blockstack-core", gitTag: opts.versionTag });
   } else {
     return fetchDistributable(opts);
   }
