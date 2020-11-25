@@ -2,7 +2,7 @@ import * as fs from "fs-extra";
 import fetch from "node-fetch";
 import * as os from "os";
 import * as path from "path";
-import * as tar from "tar";
+import * as unzip from "unzipper";
 import { detectArch } from "./detectArch";
 import { detectLibc } from "./detectLibc";
 import { getExecutableFileName, makeUniqueTempDir } from "./fsUtil";
@@ -10,12 +10,12 @@ import { ILogger } from "./logger";
 import { pipelineAsync } from "./streamUtil";
 
 const DIST_DOWNLOAD_URL_TEMPLATE =
-  "https://github.com/blockstack/clarity-js-sdk/releases/" +
-  "download/{tag}/clarity-cli-{platform}-{arch}.tar.gz";
+  "https://github.com/blockstack/stacks-blockchain/releases/" +
+  "download/{tag}/{platform}-{arch}.zip";
 
 const enum SupportedDistPlatform {
-  WINDOWS = "win",
-  MACOS = "mac",
+  WINDOWS = "windows",
+  MACOS = "macos",
   LINUX = "linux",
   LINUX_MUSL = "linux-musl"
 }
@@ -114,8 +114,8 @@ export async function fetchDistributable(opts: {
   const tempExtractDir = makeUniqueTempDir();
   opts.logger.log(`Extracting to temp dir ${tempExtractDir}`);
 
-  const tarStream = tar.extract({ cwd: tempExtractDir });
-  await pipelineAsync(httpResponse.body, tarStream);
+  const unzipStream = unzip.Extract({ path: tempExtractDir });
+  await pipelineAsync(httpResponse.body, unzipStream);
 
   const binFileName = getExecutableFileName("clarity-cli");
   const tempBinFilePath = path.join(tempExtractDir, binFileName);
@@ -123,6 +123,7 @@ export async function fetchDistributable(opts: {
   opts.logger.log(`Moving ${tempBinFilePath} to ${opts.outputFilePath}`);
   fs.moveSync(tempBinFilePath, opts.outputFilePath);
   fs.removeSync(tempExtractDir);
+  fs.chmodSync(opts.outputFilePath, 0o775);
 
   return true;
 }

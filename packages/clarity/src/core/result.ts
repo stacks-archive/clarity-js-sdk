@@ -98,9 +98,16 @@ export function unwrapInt(input: ResultInterface<string, unknown>): number {
   return parseInt(match);
 }
 
-export function unwrapString(input: ResultInterface<string, unknown>): string {
-  const match = getWrappedResult(input, /^\(ok\s0x(\w+)\)$/);
-  return Buffer.from(match, "hex").toString();
+export function unwrapString(input: ResultInterface<string, unknown>, encoding = "hex"): string {
+  let match;
+  if (encoding === "hex") {
+    match = getWrappedResult(input, /^\(ok\s0x(\w+)\)$/);
+  } else if (encoding === "utf8") {
+    match = getWrappedResult(input, /^\(ok\s\"(.+)\"\)$/);
+  } else {
+    match = getWrappedResult(input, /^\(ok\s(.+)\)$/);
+  }
+  return Buffer.from(match, encoding).toString();
 }
 
 export const Result = {

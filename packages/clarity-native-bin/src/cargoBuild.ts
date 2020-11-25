@@ -26,6 +26,7 @@ export async function cargoInstall(opts: {
   logger: ILogger;
   overwriteExisting: boolean;
   outputFilePath: string;
+  buildPackage: string;
   gitBranch?: string;
   gitTag?: string;
   gitCommitHash?: string;
@@ -61,7 +62,8 @@ export async function cargoInstall(opts: {
     ...gitSpecifierOpts,
     "--bin=clarity-cli",
     "--root",
-    tempCompileDir
+    tempCompileDir,
+    opts.buildPackage
   ];
   if (opts.overwriteExisting) {
     args.push("--force");
