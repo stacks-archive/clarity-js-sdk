@@ -14,7 +14,7 @@ const DIST_DOWNLOAD_URL_TEMPLATE =
   "download/{tag}/{platform}-{arch}.zip";
 
 const enum SupportedDistPlatform {
-  WINDOWS = "win",
+  WINDOWS = "windows",
   MACOS = "macos",
   LINUX = "linux",
   LINUX_MUSL = "linux-musl"
