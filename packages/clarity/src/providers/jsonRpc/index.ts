@@ -11,14 +11,21 @@ import {
   makeContractCall,
   makeContractDeploy,
   parseToCV,
-  StacksNetwork,
-  StacksTestnet,
+  standardPrincipalCV,
   TxBroadcastResult,
   TxBroadcastResultOk,
   TxBroadcastResultRejected,
-  standardPrincipalCV,
-} from "@blockstack/stacks-transactions";
+} from "@stacks/transactions";
 
+import {
+  Configuration,
+  connectWebSocketClient,
+  FetchAPI,
+  InfoApi,
+  StacksApiWebSocketClient,
+  TransactionsApi,
+} from "@stacks/blockchain-api-client";
+import { StacksNetwork, StacksTestnet } from "@stacks/network";
 import { CheckResult, Receipt } from "../../core";
 import { Provider } from "../../core/provider";
 import { getNormalizedContractFilePath } from "../../utils/contractSourceDir";
@@ -29,7 +36,7 @@ const TIME_TO_MINE_BLOCK = 20000;
 export async function createJsonRpcProvider(
   privateKey: string,
   network: StacksNetwork = new StacksTestnet(),
-  sidecarUrl: string = "https://sidecar.staging.blockstack.xyz"
+  sidecarUrl: string = "https://stacks-node-api.blockstack.org"
 ) {
   ProviderRegistry.registerProvider({
     create: async () => {
@@ -47,7 +54,13 @@ export class JsonRpcProvider implements Provider {
     sidecarUrl: string,
     privateKey: string
   ): Promise<JsonRpcProvider> {
-    const provider = new JsonRpcProvider(network, sidecarUrl, privateKey);
+    const provider = new JsonRpcProvider(
+      network,
+      "https://stacks-node-api.blockstack.org",
+      "ws://stacks-node-api.krypton.blockstack.org",
+      privateKey,
+      fetch
+    );
     await provider.initialize();
     return provider;
   }
@@ -55,19 +68,32 @@ export class JsonRpcProvider implements Provider {
   readonly privateKey: string;
   privateKeys: Map<string, string> = new Map<string, string>();
   readonly network: StacksNetwork = new StacksTestnet();
-  readonly sidecarUrl: string;
+  readonly infoApi: InfoApi;
+  readonly transactionsApi: TransactionsApi;
+  readonly stacksNodeWebSocketUrl: string;
+  stacksApiWebSocketClient: StacksApiWebSocketClient | undefined;
 
-  constructor(network: StacksNetwork, sidecarUrl: string, privateKey: string) {
+  constructor(
+    network: StacksNetwork,
+    stacksNodeApiUrl: string,
+    stacksNodeWebSocketUrl: string,
+    privateKey: string,
+    fetchAPI: FetchAPI
+  ) {
     this.network = network;
-    this.sidecarUrl = sidecarUrl;
+    const config = new Configuration({ basePath: stacksNodeApiUrl, fetchApi: fetchAPI });
+    this.infoApi = new InfoApi(config);
+    this.transactionsApi = new TransactionsApi(config);
+    this.stacksNodeWebSocketUrl = stacksNodeWebSocketUrl;
     this.privateKey = privateKey;
   }
 
   async initialize(): Promise<void> {
-    const infoUrl = `${this.sidecarUrl}/sidecar/v1/status`;
-    const result = await fetch(infoUrl);
-    const info = await result.json();
-    console.log(`using sidecar ${infoUrl}:\n ${JSON.stringify({ result: info })}`);
+    console.log("init", this.stacksNodeWebSocketUrl);
+    this.stacksApiWebSocketClient = await connectWebSocketClient(this.stacksNodeWebSocketUrl);
+    console.log("initi2");
+    const info = await this.infoApi.getStatus();
+    console.log(`using stacks node api:\n ${JSON.stringify({ result: info })}`);
     return;
   }
 
@@ -237,47 +263,25 @@ export class JsonRpcProvider implements Provider {
       const result = await this.transactionWithId(txWithQuotes.substr(1, txWithQuotes.length - 2));
       return {
         success: true,
-        result,
+        result: JSON.stringify(result as object),
       };
     }
   }
+
   async transactionWithId(txId: string, maxWait: number = 60000) {
-    const options = {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    };
-
-    console.log(`waiting for tx ${txId}`);
-    try {
-      const waitTime = 500;
-      let waitCount = Math.round(maxWait / waitTime);
-      while (waitCount > 0) {
-        const response = await fetch(`${this.sidecarUrl}/sidecar/v1/tx/${txId}`, options);
-
-        if (response.ok) {
-          const json = await response.json();
-          if (json.tx_status === "success") {
-            return json;
-          } else if (json.tx_status === "pending") {
-            console.log(`waiting pending ${waitCount}`);
-            await this.wait(waitTime);
-            waitCount--;
-          } else {
-            throw new Error(`transaction ${txId} failed: ${JSON.stringify(json)}`);
+    return new Promise(async (resolve, reject) => {
+      let subscription: any;
+      subscription = await this.stacksApiWebSocketClient?.subscribeTxUpdates(
+        txId,
+        async (event) => {
+          if (event.tx_status === "success") {
+            await subscription.unsubscribe();
+            const tx = await this.transactionsApi.getTransactionById({ txId });
+            resolve(tx);
           }
-        } else if (response.status === 404) {
-          console.log(`waiting submitting ${waitCount}`);
-          await this.wait(waitTime);
-          waitCount--;
-        } else {
-          throw new Error(`Request failed with ${response.status} ${response.statusText}`);
         }
-      }
-      throw new Error(`did not return a value after ${maxWait}`);
-    } catch (e) {
-      throw e;
-    }
+      );
+      console.log(`waiting for tx ${txId}`);
+    });
   }
 }
