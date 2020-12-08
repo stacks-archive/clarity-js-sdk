@@ -11,9 +11,9 @@
   },
   "license": "MIT",
   "scripts": {
-    "version-bump": "lerna version",
-    "version-bump-no-push": "lerna version --force-publish --no-push prerelease",
-    "pub": "lerna publish from-package",
+    "version": "lerna version --yes --conventional-commits --create-release github --message 'chore(release): publish %s'",
+    "version-no-push": "lerna version --conventional-commits --force-publish --no-push --conventional-prerelease",
+    "pub": "lerna publish from-package --yes",
     "prepare": "lerna bootstrap",
     "clean": "lerna run clean && lerna clean --yes",
     "build": "lerna run build",

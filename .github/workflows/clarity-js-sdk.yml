@@ -16,7 +16,7 @@ on:
 jobs:
   notify-start:
     runs-on: ubuntu-latest
-    # Only run on non-PR events or only PRs that aren't from forks 
+    # Only run on non-PR events or only PRs that aren't from forks
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     outputs:
       slack_message_id: ${{ steps.slack.outputs.message_id }}
@@ -86,14 +86,14 @@ jobs:
         if: github.ref == 'refs/heads/master'
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
-        run: "lerna version --yes --conventional-commits --create-release github --message 'chore(release): publish %s'"
+        run: "npm run version"
 
       - name: Publish
         # Only run on master branch
         if: github.ref == 'refs/heads/master'
         env:
           NPM_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-        run: "lerna publish --yes --conventional-commits --create-release github --message 'chore(release): publish %s'"
+        run: "npm run pub"
 
   notify-end:
     runs-on: ubuntu-latest
