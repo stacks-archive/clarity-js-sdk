@@ -3,7 +3,7 @@ name: clarity-js-sdk
 on:
   push:
     branches:
-      - '**'
+      - 'master'
     tags-ignore:
       - '**'
     paths-ignore:
