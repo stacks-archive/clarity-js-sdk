@@ -122,10 +122,4 @@ This is a multi-package monorepo.
 
 ### Publishing
 
-Run the following commands:
-```
-npm run rebuild
-npm run test
-npm run version-bump
-npm run pub
-```
+Publishing happens automatically upon commit or merge into the `master` branch.
