@@ -1,4 +1,7 @@
 name: clarity-js-sdk
+env:
+  COMMIT_USER: Hiro DevOps
+  COMMIT_EMAIL: 45208873+blockstack-devops@users.noreply.github.com
 
 on:
   push:
@@ -86,7 +89,10 @@ jobs:
         if: github.ref == 'refs/heads/master'
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
-        run: "npm run version"
+        run: |
+          git config --global user.email "${COMMIT_EMAIL}"
+          git config --global user.name "${COMMIT_USER}"
+          npm run version
 
       - name: Publish
         # Only run on master branch
