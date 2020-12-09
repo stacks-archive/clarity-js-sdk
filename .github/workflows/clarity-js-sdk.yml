@@ -13,6 +13,7 @@ on:
       - '**/CHANGELOG.md'
       - '**/package.json'
       - '**/package-lock.json'
+      - '**/lerna.json'
   pull_request:
   workflow_dispatch:
 
@@ -98,8 +99,10 @@ jobs:
         # Only run on master branch
         if: github.ref == 'refs/heads/master'
         env:
-          NPM_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-        run: "npm run pub"
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" > .npmrc
+          npm run pub
 
   notify-end:
     runs-on: ubuntu-latest
