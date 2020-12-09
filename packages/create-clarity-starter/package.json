@@ -1,6 +1,6 @@
 {
   "name": "create-clarity-starter",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "An npm initializer to setup a Clarity development environment",
   "author": "Blockstack <engineering@blockstack.com> (https://blockstack.com/)",
   "license": "MIT",
@@ -39,7 +39,7 @@
     "/cmd"
   ],
   "dependencies": {
-    "generator-clarity-dev": "^0.3.0"
+    "generator-clarity-dev": "^0.3.1"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
