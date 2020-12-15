@@ -22,11 +22,13 @@
 
 ;;; Storage
 (define-map rockets-count
-  ((owner principal))
-  ((count uint)))
+  { owner: principal }
+  { count: uint }
+)
 (define-map factory-address
-  ((id int))
-  ((address principal)))
+  { id: int }
+  { address: principal }
+)
 
 ;;; Constants
 
@@ -46,7 +48,7 @@
   (ok
     (default-to u0
       (get count
-        (map-get? rockets-count ((owner account)))
+        (map-get? rockets-count { owner: account })
       )
     )
   )
@@ -57,7 +59,7 @@
 (define-private (is-tx-from-factory)
   (let ((address
          (get address
-              (unwrap! (map-get? factory-address ((id 0)))
+              (unwrap! (map-get? factory-address { id: 0 })
                         false))))
     (is-eq tx-sender address)))
 
@@ -88,11 +90,11 @@
 ;;         (begin
 ;;           (nft-transfer? rocket rocket-id tx-sender recipient)
 ;;           (map-set rockets-count
-;;                       ((owner recipient))
-;;                       ((count (+ balance-recipient 1))))
+;;                       { owner: recipient }
+;;                       { count: (+ balance-recipient 1) })
 ;;           (map-set rockets-count
-;;                       ((owner tx-sender))
-;;                       ((count (- balance-sender 1))))
+;;                       { owner: tx-sender }
+;;                       { count: (- balance-sender 1) })
 ;;           (ok rocket-id))
 ;;         bad-rocket-transfer-err))
 ;; )
@@ -113,8 +115,8 @@
           (print size)
           (print owner)
           (map-set rockets-count
-                      ((owner owner))
-                      ((count (+ u1 current-balance))))
+                      { owner: owner }
+                      { count: (+ u1 current-balance) })
           (ok true)
         )
       )
@@ -126,10 +128,10 @@
 ;; returns: Response<Principal, int>
 (define-public (set-factory)
   (let ((factory-entry
-         (map-get? factory-address ((id 0)))))
+         (map-get? factory-address { id: 0 })))
     (if (and (is-none factory-entry)
              (map-insert factory-address
-                            ((id 0))
-                            ((address tx-sender))))
+                            { id: 0 }
+                            { address: tx-sender }))
         (ok tx-sender)
         factory-already-set-err)))

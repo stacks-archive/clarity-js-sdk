@@ -19,8 +19,9 @@
 
 ;;; Storage
 (define-map orderbook
-  ((buyer principal))
-  ((rocket-id uint) (ordered-at-block uint) (ready-at-block uint) (balance uint) (size uint)))
+  { buyer: principal }
+  { rocket-id: uint, ordered-at-block: uint, ready-at-block: uint, balance: uint, size: uint }
+)
 (define-data-var last-rocket-id uint u0)
 
 ;;; Constants
@@ -45,9 +46,12 @@
 ;; returns: boolean
 (define-private (can-user-buy (user principal))
   (let ((ordered-at-block
-      (get ordered-at-block
-        (print (map-get? orderbook {buyer: (print user)})))))
-      (is-none ordered-at-block)))
+    (get ordered-at-block
+      (map-get? orderbook { buyer: user })
+    )))
+    (is-none ordered-at-block)
+  )
+)
 
 ;; Check if a given user can claim a rocket previously ordered
 ;; args:
@@ -127,7 +131,7 @@
         (if (and (can-user-claim buyer)
                (is-ok (contract-call? 'SP3GWX3NE58KXHESRYE4DYQ1S31PQJTCRXB3PE9SB.rocket-token transfer-token funds-address balance))
                (is-ok (as-contract (contract-call? 'SP3GWX3NE58KXHESRYE4DYQ1S31PQJTCRXB3PE9SB.rocket-market mint buyer rocket-id size )))
-               (map-delete orderbook ((buyer buyer))))
+               (map-delete orderbook { buyer: buyer }))
           (ok rocket-id)
           order-fulfillment-err)))))
 

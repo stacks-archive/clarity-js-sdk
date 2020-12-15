@@ -20,14 +20,17 @@
 
 ;; Storage
 (define-map tokens-spender
-  ((token-id int))
-  ((spender principal)))
+  { token-id: int }
+  { spender: principal }
+)
 (define-map tokens-count
-  ((owner principal))
-  ((count int)))
+  { owner: principal }
+  { count: int }
+)
 (define-map accounts-operator
-  ((operator principal) (account principal))
-  ((is-approved bool)))
+  { operator: principal, account: principal }
+  { is-approved: bool }
+)
 
 ;; Internals
 
@@ -35,7 +38,10 @@
 (define-private (balance-of (account principal))
   (default-to 0
     (get count
-         (map-get? tokens-count ((owner account))))))
+      (map-get? tokens-count { owner: account })
+    )
+  )
+)
 
 ;; Gets the owner of the specified token ID.
 (define-public (owner-of? (token-id int))
@@ -46,7 +52,7 @@
 (define-private (is-spender-approved (spender principal) (token-id int))
   (let ((approved-spender
          (unwrap! (get spender
-                        (map-get? tokens-spender ((token-id token-id))))
+                        (map-get? tokens-spender { token-id: token-id }))
                    false))) ;; return false if no specified spender
     (is-eq spender approved-spender)))
 
@@ -54,7 +60,7 @@
 (define-private (is-operator-approved (account principal) (operator principal))
   (unwrap!
     (get is-approved
-      (map-get? accounts-operator ((operator operator) (account account)))
+      (map-get? accounts-operator { operator: operator, account: account })
     )
     false
   )
@@ -83,22 +89,31 @@
 (define-private (register-token (new-owner principal) (token-id int))
   (let ((current-balance (balance-of new-owner)))
     (begin
-      (nft-mint? non-fungible-token token-id new-owner)
+      (unwrap-panic (nft-mint? non-fungible-token token-id new-owner))
       (map-set tokens-count
-        ((owner new-owner))
-        ((count (+ 1 current-balance))))
-      true)))
+        { owner: new-owner }
+        { count: (+ 1 current-balance) }
+      )
+      true
+    )
+  )
+)
 
 ;; Internal - Release token
 (define-private (release-token (owner principal) (token-id int))
   (let ((current-balance (balance-of owner)))
     (begin
       (map-delete tokens-spender
-        ((token-id token-id)))
+        { token-id: token-id }
+      )
       (map-set tokens-count
-        ((owner owner))
-        ((count (- current-balance 1))))
-      true)))
+        { owner: owner }
+        { count: (- current-balance 1) }
+      )
+      true
+    )
+  )
+)
 
 ;; Public functions
 
@@ -119,20 +134,24 @@
                tx-sender))
           (begin
             (map-set tokens-spender
-                        ((token-id token-id))
-                        ((spender spender)))
+                        { token-id: token-id }
+                        { spender: spender })
             (ok token-id))
           not-approved-spender-err)))
 
 ;; Sets or unsets the approval of a given operator (setApprovalForAll method in ERC721)
 (define-public (set-operator-approval (operator principal) (is-approved bool))
   (if (is-eq operator tx-sender)
-      same-spender-err
-      (begin
-        (map-set accounts-operator
-                    ((operator operator) (account tx-sender))
-                    ((is-approved is-approved)))
-        (ok true))))
+    same-spender-err
+    (begin
+      (map-set accounts-operator
+        { operator: operator, account: tx-sender }
+        { is-approved: is-approved }
+      )
+      (ok true)
+    )
+  )
+)
 
 ;; Transfers the ownership of a given token ID to another address.
 (define-public (transfer-from (owner principal) (recipient principal) (token-id int))
@@ -145,12 +164,12 @@
         (and
           (unwrap-panic (nft-transfer? non-fungible-token token-id owner recipient))
           (map-set tokens-count
-            ((owner recipient))
-            ((count (+ 1 (balance-of recipient))))
+            { owner: recipient }
+            { count: (+ 1 (balance-of recipient)) }
           )
           (map-set tokens-count
-            ((owner owner))
-            ((count (- (balance-of owner) 1)))
+            { owner: owner }
+            { count: (- (balance-of owner) 1) }
           )
         )
         (ok token-id)
@@ -173,6 +192,7 @@
 
 ;; Initialize the contract
 (begin
-  (mint! 'SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7 10001)
-  (mint! 'SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7 10002)
-  (mint! 'S02J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKPVKG2CE 10003))
+  (try! (mint! 'SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7 10001))
+  (try! (mint! 'SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7 10002))
+  (try! (mint! 'S02J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKPVKG2CE 10003))
+)
