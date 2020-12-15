@@ -19,8 +19,9 @@
 
 (define-fungible-token rocket-token)
 (define-map balances
-  ((owner principal))
-  ((balance uint)))
+  { owner: principal }
+  { balance: uint }
+)
 (define-data-var total-supply uint u30)
 
 (define-constant err-min-transfer u1)
@@ -46,6 +47,6 @@
 
 ;; Initialize the contract
 (begin
-  (ft-mint? rocket-token u20 'SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7) ;; alice
-  (ft-mint? rocket-token u10 'S02J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKPVKG2CE) ;; bob
+  (try! (ft-mint? rocket-token u20 'SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7)) ;; alice
+  (try! (ft-mint? rocket-token u10 'S02J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKPVKG2CE)) ;; bob
 )

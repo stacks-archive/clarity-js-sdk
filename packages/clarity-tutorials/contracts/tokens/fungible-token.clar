@@ -21,8 +21,9 @@
 
 ;; Storage
 (define-map allowances
-  ((spender principal) (owner principal))
-  ((allowance uint)))
+  { spender: principal, owner: principal }
+  { allowance: uint }
+)
 (define-data-var total-supply uint u0)
 
 ;; Internals
@@ -35,12 +36,18 @@
 (define-private (allowance-of (spender principal) (owner principal))
   (begin
     (print
-         (map-get? allowances ((spender spender) (owner owner))))
-    (print (get allowance
-         (map-get? allowances ((spender spender) (owner owner)))))
-  (default-to u0
-    (get allowance
-         (map-get? allowances ((spender spender) (owner owner))))))
+      (map-get? allowances { spender: spender, owner: owner }))
+    (print
+      (get allowance
+        (map-get? allowances { spender: spender, owner: owner })
+      )
+    )
+    (default-to u0
+      (get allowance
+        (map-get? allowances { spender: spender, owner: owner })
+      )
+    )
+  )
 )
 
 (define-public (get-allowance-of (spender principal) (owner principal))
@@ -59,9 +66,14 @@
       true
       (begin
         (map-set allowances
-          ((spender spender) (owner owner))
-          ((allowance (- allowance amount))))
-        true))))
+          { spender: spender, owner: owner }
+          { allowance: (- allowance amount) }
+        )
+        true
+      )
+    )
+  )
+)
 
 ;; Internal - Increase allowance of a specified spender.
 (define-private (increase-allowance (spender principal) (owner principal) (amount uint))
@@ -71,9 +83,15 @@
       (begin
         (print (tuple (spender spender) (owner owner)))
         (print (map-set allowances
-          ((spender spender) (owner owner))
-          ((allowance (+ allowance amount)))))
-        true))))
+          { spender: spender, owner: owner }
+          { allowance: (+ allowance amount) }
+          )
+        )
+        true
+      )
+    )
+  )
+)
 
 ;; Public functions
 
@@ -120,10 +138,11 @@
       (err false)
       (begin
         (var-set total-supply (+ (var-get total-supply) amount))
-        (ft-mint? fungible-token amount account)
+        (unwrap-panic (ft-mint? fungible-token amount account))
         (ok amount))))
 
 ;; Initialize the contract
 (begin
-  (mint! 'SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7 u20)
-  (mint! 'S02J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKPVKG2CE u10))
+  (try! (mint! 'SP2J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKNRV9EJ7 u20))
+  (try! (mint! 'S02J6ZY48GV1EZ5V2V5RB9MP66SW86PYKKPVKG2CE u10))
+)
