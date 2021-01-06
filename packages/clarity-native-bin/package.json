@@ -1,6 +1,6 @@
 {
   "name": "@blockstack/clarity-native-bin",
-  "version": "0.3.6",
+  "version": "0.3.7",
   "description": "Library for providing the native Clarity CLI binary",
   "author": "Blockstack <engineering@blockstack.com> (https://blockstack.com/)",
   "license": "MIT",
