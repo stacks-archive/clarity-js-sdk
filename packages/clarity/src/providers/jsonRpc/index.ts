@@ -4,7 +4,7 @@ import { Provider } from "../../core/provider";
 export class JsonRpcProvider implements Provider {
   async initialize(): Promise<void> {}
 
-  async checkContract(contractFilePath: string): Promise<CheckResult> {
+  async checkContract(contractFilePath: string, contractId?: string): Promise<CheckResult> {
     return {
       success: false
     };
