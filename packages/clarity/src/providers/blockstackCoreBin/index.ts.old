@@ -253,7 +253,7 @@ export class CargoBuildProvider implements Provider {
     }
   }
 
-  async checkContract(contractFilePath: string): Promise<Receipt> {
+  async checkContract(contractFilePath: string, contractId?: string): Promise<Receipt> {
     const filePath = getContractFilePath(contractFilePath);
     const result = await this.cargoRunLocal([
       "check",
