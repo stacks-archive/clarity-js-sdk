@@ -7,7 +7,7 @@ export interface ProviderConstructor {
 export interface Provider {
   initialize(): Promise<void>;
 
-  checkContract(contractFilePath: string): Promise<CheckResult>;
+  checkContract(contractFilePath: string, contractId?: string): Promise<CheckResult>;
 
   launchContract(contractName: string, contractFilePath: string): Promise<Receipt>;
 
