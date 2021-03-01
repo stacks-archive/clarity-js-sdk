@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## Unreleased
+
+### Fixed
+
+* Enable `checkContract()` to succeed with short-hand contract identifiers.
+
 ## 0.3.7 (2021-01-06)
 
 **Note:** Version bump only for package clarity-monorepo-wrapper
