@@ -107,9 +107,13 @@ export class NativeClarityBinProvider implements Provider {
     }
   }
 
-  async checkContract(contractFilePath: string): Promise<CheckResult> {
+  async checkContract(contractFilePath: string, contractId?: string): Promise<CheckResult> {
     const filePath = getNormalizedContractFilePath(contractFilePath);
-    const result = await this.runCommand(["check", filePath, this.dbFilePath, "--output_analysis"]);
+    let args = ["check", filePath, this.dbFilePath, "--output_analysis"];
+    if (contractId !== undefined) {
+       args = args.concat("--contract_id", contractId);
+    }
+    const result = await this.runCommand(args);
     if (result.exitCode !== 0) {
       return {
         success: false,
