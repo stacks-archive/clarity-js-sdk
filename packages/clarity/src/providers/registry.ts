@@ -1,5 +1,5 @@
 import { Provider, ProviderConstructor } from "../core/provider";
-import { NativeClarityBinProvider } from "./clarityBin";
+import { InitialAllocation, NativeClarityBinProvider } from "./clarityBin";
 
 export class ProviderRegistry {
   static availableProviders: ProviderConstructor[] = [];
@@ -52,7 +52,8 @@ export class ProviderRegistry {
         }
         const nativeBinFile = nativeBinModule.getDefaultBinaryFilePath();
         const providerConstructor: ProviderConstructor = {
-          create: () => NativeClarityBinProvider.createEphemeral(nativeBinFile)
+          create: (allocations) =>
+            NativeClarityBinProvider.createEphemeral(allocations, nativeBinFile),
         };
         // Reset the cached promise so that future invocations have the chance to retry.
         this.defaultLoadCachedPromise = undefined;
@@ -65,9 +66,14 @@ export class ProviderRegistry {
 
   /**
    * Creates an instance of the last registered provider.
+   * @param allocations initializes the given accounts with
+   * amount of STXs at start. Defaults to empty list.
    * @param noWarn Set to true to disable warning log about multiple registered providers.
    */
-  static async createProvider(noWarn = false): Promise<Provider> {
+  static async createProvider(
+    allocations: InitialAllocation[] = [],
+    noWarn = false
+  ): Promise<Provider> {
     if (this.availableProviders.length === 0) {
       const defaultProvider = await this.tryLoadDefaultBinProvider();
       if (defaultProvider === false) {
@@ -86,7 +92,7 @@ export class ProviderRegistry {
     }
     // Return the last registered provider
     const providerConstructor = this.availableProviders[this.availableProviders.length - 1];
-    return providerConstructor.create();
+    return providerConstructor.create(allocations);
   }
 
   private constructor() {}
