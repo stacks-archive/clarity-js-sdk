@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 0.3.10 (2021-03-23)
+
+**Note:** Version bump only for package @blockstack/clarity-native-bin
+
+
+
+
+
 ## 0.3.9 (2021-03-12)
 
 **Note:** Version bump only for package @blockstack/clarity-native-bin
