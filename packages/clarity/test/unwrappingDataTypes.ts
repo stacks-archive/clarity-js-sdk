@@ -11,10 +11,28 @@ describe("Unwrapping data types", () => {
     assert.equal(Result.unwrapUInt(example), 123);
   });
 
+  it("Unwraps uint ", () => {
+    const example:ResultInterface<string, unknown> = {
+      success: true,
+      result: "u123",
+      error: ""
+    };
+    assert.equal(Result.unwrapUInt(example), 123);
+  });
+
   it("Unwraps ok int", () => {
     const example:ResultInterface<string, unknown> = {
       success: true,
       result: "(ok 123)",
+      error: ""
+    };
+    assert.equal(Result.unwrapInt(example), 123);
+  });
+
+  it("Unwraps int", () => {
+    const example:ResultInterface<string, unknown> = {
+      success: true,
+      result: "123",
       error: ""
     };
     assert.equal(Result.unwrapInt(example), 123);
@@ -29,10 +47,28 @@ describe("Unwrapping data types", () => {
     assert.equal(Result.unwrapString(example), "hello world");
   });
 
+  it("Unwraps hex string", () => {
+    const example:ResultInterface<string, unknown> = {
+      success: true,
+      result: "0x68656c6c6f20776f726c64",
+      error: ""
+    };
+    assert.equal(Result.unwrapString(example), "hello world");
+  });
+
   it("Unwraps ok utf-8 string", () => {
     const example:ResultInterface<string, unknown> = {
       success: true,
       result: `(ok u"\u{d83e}\u{dd84} Stacks")`,
+      error: ""
+    };
+    assert.equal(Result.unwrapString(example, "utf8"), "🦄 Stacks");
+  });
+
+  it("Unwraps utf-8 string", () => {
+    const example:ResultInterface<string, unknown> = {
+      success: true,
+      result: `u"\u{d83e}\u{dd84} Stacks"`,
       error: ""
     };
     assert.equal(Result.unwrapString(example, "utf8"), "🦄 Stacks");
@@ -47,6 +83,15 @@ describe("Unwrapping data types", () => {
     assert.equal(Result.unwrapString(example, "base64"), "hello world");
   });
 
+  it("Unwraps base64 string", () => {
+    const example:ResultInterface<string, unknown> = {
+      success: true,
+      result: '"aGVsbG8gd29ybGQ="',
+      error: ""
+    };
+    assert.equal(Result.unwrapString(example, "base64"), "hello world");
+  });
+
   it("Unwraps ok boolean (true)", () => {
     const example:ResultInterface<string, unknown> = {
       success: true,
@@ -56,10 +101,28 @@ describe("Unwrapping data types", () => {
     assert.equal(Result.unwrapBool(example), true);
   });
 
+  it("Unwraps boolean (true)", () => {
+    const example:ResultInterface<string, unknown> = {
+      success: true,
+      result: 'true',
+      error: ""
+    };
+    assert.equal(Result.unwrapBool(example), true);
+  });
+
   it("Unwraps ok boolean (false)", () => {
     const example:ResultInterface<string, unknown> = {
       success: true,
       result: '(ok false)',
+      error: ""
+    };
+    assert.equal(Result.unwrapBool(example), false);
+  });
+
+  it("Unwraps boolean (false)", () => {
+    const example:ResultInterface<string, unknown> = {
+      success: true,
+      result: 'false',
       error: ""
     };
     assert.equal(Result.unwrapBool(example), false);

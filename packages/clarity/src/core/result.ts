@@ -89,29 +89,29 @@ const getWrappedResult = (input: ResultInterface<string, unknown>, r: RegExp) =>
 };
 
 export function unwrapUInt(input: ResultInterface<string, unknown>): number {
-  const match = getWrappedResult(input, /^\(ok\su(\d+)\)$/);
+  const match = getWrappedResult(input, /^(?:\(?ok\s)?u(\d+)\)?$/);
   return parseInt(match);
 }
 
 export function unwrapInt(input: ResultInterface<string, unknown>): number {
-  const match = getWrappedResult(input, /^\(ok\s(\d+)\)$/);
+  const match = getWrappedResult(input, /^(?:\(?ok\s)?(\d+)\)?$/);
   return parseInt(match);
 }
 
 export function unwrapString(input: ResultInterface<string, unknown>, encoding = "hex"): string {
   let match;
   if (encoding === "hex") {
-    match = getWrappedResult(input, /^\(ok\s0x(\w+)\)$/);
+    match = getWrappedResult(input, /^(?:\(?ok\s)?0x(\w+)\)?$/);
   } else if (encoding === "utf8") {
-    match = getWrappedResult(input, /^\(ok\s\u"(.+)\"\)$/);
+    match = getWrappedResult(input, /^(?:\(?ok\s)?u\"(.+)\"\)?$/);
   } else {
-    match = getWrappedResult(input, /^\(ok\s(.+)\)$/);
+    match = getWrappedResult(input, /^(?:\(?ok\s)?(.+)\)?$/);
   }
   return Buffer.from(match, encoding).toString();
 }
 
 export function unwrapBool(input: ResultInterface<string, unknown>): boolean {
-  const match = getWrappedResult(input, /^\(ok\s(true|false)\)$/);
+  const match = getWrappedResult(input, /^(?:\(?ok\s)?(true|false)\)?$/);
   return match === 'true' 
 }
 
