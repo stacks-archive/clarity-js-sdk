@@ -110,6 +110,11 @@ export function unwrapString(input: ResultInterface<string, unknown>, encoding =
   return Buffer.from(match, encoding).toString();
 }
 
+export function unwrapBool(input: ResultInterface<string, unknown>): boolean {
+  const match = getWrappedResult(input, /^\(ok\s(true|false)\)$/);
+  return match === 'true' 
+}
+
 export const Result = {
   unwrap: unwrapResult,
   extract: extractResult,
@@ -117,4 +122,5 @@ export const Result = {
   unwrapUInt,
   unwrapInt,
   unwrapString,
+  unwrapBool
 };

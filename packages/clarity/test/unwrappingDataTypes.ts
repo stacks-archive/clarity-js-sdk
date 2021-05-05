@@ -46,4 +46,22 @@ describe("Unwrapping data types", () => {
     };
     assert.equal(Result.unwrapString(example, "base64"), "hello world");
   });
+
+  it("Unwraps ok boolean (true)", () => {
+    const example:ResultInterface<string, unknown> = {
+      success: true,
+      result: '(ok true)',
+      error: ""
+    };
+    assert.equal(Result.unwrapBool(example), true);
+  });
+
+  it("Unwraps ok boolean (false)", () => {
+    const example:ResultInterface<string, unknown> = {
+      success: true,
+      result: '(ok false)',
+      error: ""
+    };
+    assert.equal(Result.unwrapBool(example), false);
+  });
 })
