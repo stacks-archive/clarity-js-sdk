@@ -103,7 +103,7 @@ export function unwrapString(input: ResultInterface<string, unknown>, encoding =
   if (encoding === "hex") {
     match = getWrappedResult(input, /^\(ok\s0x(\w+)\)$/);
   } else if (encoding === "utf8") {
-    match = getWrappedResult(input, /^\(ok\s\"(.+)\"\)$/);
+    match = getWrappedResult(input, /^\(ok\s\u"(.+)\"\)$/);
   } else {
     match = getWrappedResult(input, /^\(ok\s(.+)\)$/);
   }
