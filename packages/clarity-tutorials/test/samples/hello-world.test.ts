@@ -21,7 +21,7 @@ describe("hello world contract test suite", () => {
     it("should return 'hello world'", async () => {
       const query = helloWorldClient.createQuery({ method: { name: "say-hi", args: [] } });
       const receipt = await helloWorldClient.submitQuery(query);
-      const result = Result.unwrapString(receipt, "utf8");
+      const result = Result.unwrapString(receipt, "");
       expect(result).toEqual("hello world");
     });
 
