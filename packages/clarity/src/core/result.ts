@@ -101,11 +101,11 @@ export function unwrapInt(input: ResultInterface<string, unknown>): number {
 export function unwrapString(input: ResultInterface<string, unknown>, encoding = "hex"): string {
   let match;
   if (encoding === "hex") {
-    match = getWrappedResult(input, /^\(ok\s0x(\w+)\)$/);
+    match = getWrappedResult(input, /^\(ok\s0x(.*?)\)$/);
   } else if (encoding === "utf8") {
-    match = getWrappedResult(input, /^\(ok\s\"(.+)\"\)$/);
+    match = getWrappedResult(input, /^\(ok\s\u"(.*?)\"\)$/);
   } else {
-    match = getWrappedResult(input, /^\(ok\s(.+)\)$/);
+    match = getWrappedResult(input, /^\(ok\s"(.*?)"\)$/);
   }
   return Buffer.from(match, encoding).toString();
 }
