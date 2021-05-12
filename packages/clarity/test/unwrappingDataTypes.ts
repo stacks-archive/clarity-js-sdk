@@ -3,7 +3,7 @@ import { Result, ResultInterface } from "../src"
 
 describe("Unwrapping data types", () => {
   it("Unwraps uint ", () => {
-    const example:ResultInterface<string, unknown> = {
+    const example: ResultInterface<string, unknown> = {
       success: true,
       result: "(ok u123)",
       error: ""
@@ -12,7 +12,7 @@ describe("Unwrapping data types", () => {
   });
 
   it("Unwraps int", () => {
-    const example:ResultInterface<string, unknown> = {
+    const example: ResultInterface<string, unknown> = {
       success: true,
       result: "(ok 123)",
       error: ""
@@ -21,7 +21,7 @@ describe("Unwrapping data types", () => {
   });
 
   it("Unwraps hex string", () => {
-    const example:ResultInterface<string, unknown> = {
+    const example: ResultInterface<string, unknown> = {
       success: true,
       result: "(ok 0x68656c6c6f20776f726c64)",
       error: ""
@@ -30,7 +30,7 @@ describe("Unwrapping data types", () => {
   });
 
   it("Unwraps empty hex string", () => {
-    const example:ResultInterface<string, unknown> = {
+    const example: ResultInterface<string, unknown> = {
       success: true,
       result: "(ok 0x)",
       error: ""
@@ -39,7 +39,7 @@ describe("Unwrapping data types", () => {
   });
 
   it("Unwraps utf-8 string", () => {
-    const example:ResultInterface<string, unknown> = {
+    const example: ResultInterface<string, unknown> = {
       success: true,
       result: `(ok u"\u{d83e}\u{dd84} Stacks")`,
       error: ""
@@ -48,7 +48,7 @@ describe("Unwrapping data types", () => {
   });
 
   it("Unwraps empty utf-8 string", () => {
-    const example:ResultInterface<string, unknown> = {
+    const example: ResultInterface<string, unknown> = {
       success: true,
       result: `(ok u"")`,
       error: ""
@@ -57,7 +57,7 @@ describe("Unwrapping data types", () => {
   });
 
   it("Unwraps base64 string", () => {
-    const example:ResultInterface<string, unknown> = {
+    const example: ResultInterface<string, unknown> = {
       success: true,
       result: '(ok "aGVsbG8gd29ybGQ=")',
       error: ""
@@ -66,7 +66,7 @@ describe("Unwrapping data types", () => {
   });
 
   it("Unwraps empty base64 string", () => {
-    const example:ResultInterface<string, unknown> = {
+    const example: ResultInterface<string, unknown> = {
       success: true,
       result: '(ok "")',
       error: ""
@@ -75,7 +75,7 @@ describe("Unwrapping data types", () => {
   });
 
   it("Unwraps not encoded string", () => {
-    const example:ResultInterface<string, unknown> = {
+    const example: ResultInterface<string, unknown> = {
       success: true,
       result: '(ok "hello world")',
       error: ""
@@ -84,7 +84,7 @@ describe("Unwrapping data types", () => {
   });
 
   it("Unwraps not encoded empty string", () => {
-    const example:ResultInterface<string, unknown> = {
+    const example: ResultInterface<string, unknown> = {
       success: true,
       result: '(ok "")',
       error: ""
