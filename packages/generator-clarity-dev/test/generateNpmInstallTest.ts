@@ -52,7 +52,7 @@ describe("generate project with `npm install` and `npm test`", () => {
 
   it("run npm test", () => {
     // Ensure `npm test` succeeds in generated project.
-    generator.spawnCommandSync("npm", ["test"]);
+    assert.strictEqual(generator.spawnCommandSync("npm", ["test"]).status, 0, "'npm test' should end with exit status 0");
   });
 
   after(async () => {
