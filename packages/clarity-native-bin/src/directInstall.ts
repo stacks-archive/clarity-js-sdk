@@ -13,7 +13,8 @@ export default (async () => {
       process.exit();
     }
   } catch (error) {
-    console.error(`Failed to install clarity-cli native binary: ${error}`);
+    console.error(`Failed to install clarity-cli native binary:`);
+    console.error(error);
     process.exit(1);
   }
 })();

@@ -73,7 +73,9 @@ export const moveFromPath = (opts: {
   outputFilePath: string;
   inputFilePAth: string;
 }) => {
-  opts.logger.log(`Moving ${opts.inputFilePAth} to ${opts.outputFilePath}`);
-  fs.moveSync(opts.inputFilePAth, opts.outputFilePath);
+  opts.logger.log(`Copying ${opts.inputFilePAth} to ${opts.outputFilePath}`);
+  const dirName = path.dirname(opts.outputFilePath);
+  fs.mkdirpSync(dirName);
+  fs.copyFileSync(opts.inputFilePAth, opts.outputFilePath);
   return true;
 };
