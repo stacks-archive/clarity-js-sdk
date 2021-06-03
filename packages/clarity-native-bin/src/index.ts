@@ -81,6 +81,16 @@ export async function installDefaultPath(): Promise<boolean> {
 
   // Check if source git tag/branch was specified using env var
   const sourceOverride = getOverriddenCoreSource();
+
+  if (sourceOverride && sourceOverride.specifier === "path") {
+    logger.log(`Found path source env var ${sourceOverride.specifier}=${sourceOverride.value}`);
+    return moveFromPath({
+      logger,
+      outputFilePath: installPath,
+      inputFilePAth: sourceOverride.value,
+    });
+  }
+
   if (sourceOverride !== false && sourceOverride.specifier !== "path") {
     logger.log(`Found git source env var ${sourceOverride.specifier}=${sourceOverride.value}`);
     fromSource = true;
@@ -113,12 +123,6 @@ export async function installDefaultPath(): Promise<boolean> {
       buildPackage: "blockstack-core",
       gitBranch: versionBranch,
       gitTag: versionTag,
-    });
-  } else if (sourceOverride && sourceOverride.specifier === "path") {
-    success = moveFromPath({
-      logger,
-      outputFilePath: installPath,
-      inputFilePAth: sourceOverride.value,
     });
   } else {
     success = await fetchDistributable({

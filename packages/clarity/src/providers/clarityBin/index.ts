@@ -102,7 +102,7 @@ export class NativeClarityBinProvider implements Provider {
         result.stderr
       );
     }
-    if (!result.stdout.endsWith("Database created.")) {
+    if (!result.stdout.includes("Database created.")) {
       throw new ExecutionError(
         `Initialize failed with bad output: ${result.stdout}`,
         result.exitCode,
@@ -141,7 +141,7 @@ export class NativeClarityBinProvider implements Provider {
         result.stderr
       );
     }
-    if (result.stdout !== "Contract initialized!") {
+    if (!result.stdout.includes("Contract initialized!")) {
       throw new ExecutionError(
         `Launch contract failed with bad output: ${result.stdout}`,
         result.exitCode,
